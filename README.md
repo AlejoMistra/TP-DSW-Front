@@ -24,7 +24,6 @@ gym-frontend/
 │   ├── App.tsx             # Componente raíz
 │   └── main.tsx            # Punto de entrada
 ├── .env                    # Variables de entorno (no se commitea)
-├── .env.example            # Ejemplo de variables de entorno
 ├── index.html
 ├── vite.config.ts
 ├── tsconfig.app.json
