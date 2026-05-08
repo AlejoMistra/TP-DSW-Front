@@ -13,21 +13,29 @@ Frontend del sistema de gestión de gimnasio desarrollado para la materia Desarr
 ## Estructura del proyecto
 
 ```markdown
+## Estructura del proyecto
+
+```markdown
 gym-frontend/
 ├── public/                 # Archivos estáticos
 ├── src/
+│   ├── assets/             # Imágenes, íconos y recursos estáticos
 │   ├── components/         # Componentes reutilizables
-│   ├── pages/              # Vistas/páginas de la app
-│   ├── services/           # Llamadas a la API del backend
+│   ├── hooks/              # Custom hooks de React
+│   ├── layouts/            # Layouts por rol / secciones de la app
 │   ├── models/             # Interfaces y tipos TypeScript
-│   ├── hooks/              # Custom hooks (React)
-│   ├── App.tsx             # Componente raíz
-│   └── main.tsx            # Punto de entrada
+│   ├── pages/              # Páginas / vistas de la app
+│   ├── routes/             # Definición de rutas con react-router-dom
+│   │   └── router.tsx
+│   ├── services/           # Lógica de acceso a datos / servicios
+│   │   └── socioService.ts
+│   ├── App.tsx             # Componente raíz de la aplicación
+│   └── main.tsx            # Punto de entrada y configuración del router
 ├── .env                    # Variables de entorno (no se commitea)
 ├── index.html
-├── vite.config.ts
+├── package.json
 ├── tsconfig.app.json
-└── package.json
+└── vite.config.ts
 ```
 
 ---
