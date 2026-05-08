@@ -13,9 +13,6 @@ Frontend del sistema de gestión de gimnasio desarrollado para la materia Desarr
 ## Estructura del proyecto
 
 ```markdown
-## Estructura del proyecto
-
-```markdown
 gym-frontend/
 ├── public/                 # Archivos estáticos
 ├── src/
@@ -26,9 +23,7 @@ gym-frontend/
 │   ├── models/             # Interfaces y tipos TypeScript
 │   ├── pages/              # Páginas / vistas de la app
 │   ├── routes/             # Definición de rutas con react-router-dom
-│   │   └── router.tsx
 │   ├── services/           # Lógica de acceso a datos / servicios
-│   │   └── socioService.ts
 │   ├── App.tsx             # Componente raíz de la aplicación
 │   └── main.tsx            # Punto de entrada y configuración del router
 ├── .env                    # Variables de entorno (no se commitea)
