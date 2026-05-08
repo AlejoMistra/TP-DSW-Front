@@ -51,13 +51,13 @@ git clone <url-de-este-repo>
 cd gym-frontend
 ```
 
-1. Instalar dependencias
+2. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-1. Configurar variables de entorno
+3. Configurar variables de entorno (TODAVIA NO HACE FALTA)
 
 ```bash
 cp .env.example .env
@@ -69,7 +69,7 @@ Editar `.env` con la URL del backend:
 VITE_API_URL=http://localhost:3000
 ```
 
-1. Iniciar en modo desarrollo
+4. Iniciar en modo desarrollo
 
 ```bash
 npm run dev
