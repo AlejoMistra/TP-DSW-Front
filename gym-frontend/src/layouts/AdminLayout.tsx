@@ -1,33 +1,17 @@
-import { Outlet, Link } from 'react-router-dom'
+// layouts/AdminLayout.tsx
+import { Outlet } from 'react-router-dom'
+import Sidebar from '../components/admin/Sidebar'
 
-export const AdminLayout = () => {
+export default function AdminLayout() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Navbar lateral */}
-      <nav style={{
-        backgroundColor: '#f0f0f0',
-        padding: '20px',
-        width: '200px',
-        borderRight: '1px solid #ddd'
-      }}>
-        <h2>Admin</h2>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li>
-            <Link to="/admin/socios">Socios</Link>
-          </li>
-          <li>
-            <Link to="#">Clases</Link>
-          </li>
-          <li>
-            <Link to="#">Configuración</Link>
-          </li>
-        </ul>
-      </nav>
-
-      {/* Contenido principal */}
-      <main style={{ flex: 1, padding: '20px' }}>
-        <Outlet />
-      </main>
+    <div className="flex h-screen">
+      <Sidebar />
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <main className="flex-1 overflow-auto p-6">
+          <Outlet />   {/* acá se renderiza SociosPage, etc */}
+        </main>
+        <footer>...</footer>
+      </div>
     </div>
   )
 }
