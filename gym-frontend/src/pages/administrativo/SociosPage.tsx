@@ -1,7 +1,7 @@
 //Pagina para mostrar los socios, por ahora tiene solo el layout y un holamundo en donde va a ir el contenido
 
 export const SociosPage = () => {
-  //Aqui va la logica para traer los socios del back, por ahora solo es un console.log
+  //Aca va la logica para traer los socios del back, por ahora solo es un console.log
   console.log('Traer socios del back');
 
   return (
@@ -12,4 +12,3 @@ export const SociosPage = () => {
   )
 }
 
-  

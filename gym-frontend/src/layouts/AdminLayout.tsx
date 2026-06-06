@@ -1,14 +1,16 @@
 import { Outlet, Link } from 'react-router-dom'
 
 export const AdminLayout = () => {
-  return (
+  return (//Mover la barra lateral pegada al margen izquierdo
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Navbar lateral */}
       <nav style={{
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#f0f0f03f',
         padding: '20px',
         width: '200px',
-        borderRight: '1px solid #ddd'
+        height: '100vh',
+        top: 0,
+        left: 0,
       }}>
         <h2>Admin</h2>
         <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -16,7 +18,7 @@ export const AdminLayout = () => {
             <Link to="/admin/socios">Socios</Link>
           </li>
           <li>
-            <Link to="#">Clases</Link>
+            <Link to="/admin/clases">Clases</Link>
           </li>
           <li>
             <Link to="#">Configuración</Link>
@@ -25,9 +27,9 @@ export const AdminLayout = () => {
       </nav>
 
       {/* Contenido principal */}
-      <main style={{ flex: 1, padding: '20px' }}>
+      <main style={{ padding: '20px', flex: 1 }}>
         <Outlet />
       </main>
-    </div>
+    </div >
   )
 }
