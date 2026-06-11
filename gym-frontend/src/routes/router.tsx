@@ -2,8 +2,8 @@ import { createBrowserRouter } from 'react-router-dom'
 import AdminLayout from '../layouts/AdminLayout'
 import { LandingTemporal } from '../pages/LandingTemporal'
 //import DashboardPage from '../pages/admin/DashboardPage'
-import { ClasesPage } from '@/pages/admin/ClasesPage'
-import { SociosPage } from '@/pages/admin/SociosPage'
+import { ClasesPage } from '@/pages/administrativo/ClasesPage'
+import SociosPage from '@/pages/administrativo/SociosPage'
 
 
 export const router = createBrowserRouter([
