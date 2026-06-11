@@ -31,7 +31,7 @@ const sociosMock: Socio[] = [
 export const socioService = {
   getAllSocios: async (): Promise<Socio[]> => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(sociosMock), 500); // simula delay
+      setTimeout(() => resolve(sociosMock), 600); // simula delay
     });
   },
 };
