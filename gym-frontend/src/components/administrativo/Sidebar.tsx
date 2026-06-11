@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom'
 
 const links = [
-  { to: '/admin', label: 'Dashboard' },
-  { to: '/admin/clases', label: 'Clases' },
-  { to: '/admin/socios', label: 'Socios' },
+  { to: '/administrativo', label: 'Dashboard' },
+  { to: '/administrativo/clases', label: 'Clases' },
+  { to: '/administrativo/socios', label: 'Socios' },
 ]
 
 export default function Sidebar() {
@@ -14,7 +14,7 @@ export default function Sidebar() {
           <NavLink
             key={link.to}
             to={link.to}
-            end                          // evita que /admin matchee todo
+            end                          // evita que /administrador matchee todo
             className={({ isActive }) =>
               isActive
                 ? 'bg-accent text-accent-foreground rounded px-3 py-2'
