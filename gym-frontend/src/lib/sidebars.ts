@@ -7,7 +7,7 @@ export type SidebarLink = {
 }
 
 export const INSTRUCTOR_LINKS: SidebarLink[] = [
-  { to: "/instructor", label: "Inicio" },
-  { to: "/instructor/", label: "Mis clases" },
-  { to: "/instructor/", label: "Asistencias" }, 
+  { to: "/instructor/", label: "Inicio" },
+  { to: "/instructor/rutinas", label: "Rutinas" },
+  { to: "/instructor/ejercicios", label: "Ejercicios" }, 
 ]
