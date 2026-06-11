@@ -4,6 +4,7 @@ import { LandingTemporal } from '../pages/LandingTemporal'
 //import DashboardPage from '../pages/admin/DashboardPage'
 import { ClasesPage } from '@/pages/administrativo/ClasesPage'
 import SociosPage from '@/pages/administrativo/SociosPage'
+import InstructorLayout from '@/layouts/InstructorLayout'
 
 
 export const router = createBrowserRouter([
@@ -13,7 +14,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    path: '/admin',
+    path: '/administrativo',
     element: <AdminLayout />,
     children: [
       //{ index: true, element: <DashboardPage /> },
@@ -21,4 +22,11 @@ export const router = createBrowserRouter([
       { path: 'socios', element: <SociosPage /> },
     ],
   },
+  {
+    path: "/instructor",
+    element: <InstructorLayout />,
+    children: [
+      { index: true, element: <div>Instructor Home</div> }
+    ]
+  }
 ])
