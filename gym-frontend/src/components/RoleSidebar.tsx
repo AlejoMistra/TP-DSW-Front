@@ -28,7 +28,7 @@ export default function RoleSidebar({
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <div className="flex h-screen">
-        <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
+        <Sidebar side="left" variant="sidebar" collapsible="icon">
           <SidebarHeader className="px-3 py-2 flex items-center justify-between">
             <div className="font-semibold">{title ?? "App"}</div>
             <SidebarTrigger />
