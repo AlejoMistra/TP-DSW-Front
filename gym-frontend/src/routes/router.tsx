@@ -6,6 +6,8 @@ import SociosPage from '@/pages/administrativo/SociosPage'
 import InstructorLayout from '@/layouts/InstructorLayout'
 import RutinasPage from '@/pages/instructor/RutinasPage'
 import EjerciciosPage from '@/pages/instructor/EjerciciosPage'
+import SocioLayout from '@/layouts/SocioLayout'
+
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +29,14 @@ export const router = createBrowserRouter([
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Instructor</div> },
       { path: 'rutinas', element: <RutinasPage /> },
       { path: 'ejercicios', element: <EjerciciosPage /> },
+    ],
+  },
+  {
+    path: '/socio',
+    element: <SocioLayout />,
+    children: [
+      { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
+      { path: 'rutinas', element: <RutinasPage /> },
     ],
   },
 ])
