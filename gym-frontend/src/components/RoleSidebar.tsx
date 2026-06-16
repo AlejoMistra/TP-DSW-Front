@@ -8,7 +8,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarInset,
 
   SidebarMenuSkeleton
 } from "@/components/ui/sidebar"
@@ -17,7 +16,6 @@ import type { SidebarLink } from "@/lib/sidebars"
 export default function RoleSidebar({
   links,
   title,
-  children,
 }: {
   links: SidebarLink[]
   title?: React.ReactNode
@@ -53,15 +51,15 @@ export default function RoleSidebar({
           </SidebarMenu>
         </SidebarContent>
 
-        <SidebarFooter className="px-3 py-2">
-          {/* footer: avatar, logout, etc. */}
-          SidebarFooter
+        <SidebarFooter>
+          Sidebar footer
         </SidebarFooter>
       </Sidebar>
-
-      <SidebarInset className="flex-1">
-        {children}
-      </SidebarInset>
+      {/*
+        <SidebarInset className="flex-1">
+          {children}
+        </SidebarInset>
+      */}
     </div>
   )
 }
