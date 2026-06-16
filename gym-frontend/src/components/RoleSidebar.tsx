@@ -1,7 +1,6 @@
 import React from "react"
 import { NavLink } from "react-router-dom"
 import {
-  SidebarProvider,
   Sidebar,
   SidebarHeader,
   SidebarContent,
@@ -9,16 +8,14 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarInset,
-  SidebarTrigger,
+
+  SidebarMenuSkeleton
 } from "@/components/ui/sidebar"
 import type { SidebarLink } from "@/lib/sidebars"
 
 export default function RoleSidebar({
   links,
   title,
-  children,
-  defaultOpen = true,
 }: {
   links: SidebarLink[]
   title?: React.ReactNode
@@ -26,37 +23,43 @@ export default function RoleSidebar({
   defaultOpen?: boolean
 }) {
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <div className="flex h-screen">
-        <Sidebar side="left" variant="sidebar" collapsible="icon">
-          <SidebarHeader className="px-3 py-2 flex items-center justify-between">
-            <div className="font-semibold">{title ?? "App"}</div>
-            <SidebarTrigger />
-          </SidebarHeader>
+    <div className="flex h-screen">
+      <Sidebar side="left" variant="sidebar" collapsible="icon">
+        <SidebarHeader className="px-3 py-2 flex items-center justify-between">
+          <div className="font-semibold">{title ?? "App"}</div>
+        </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarMenu>
-              {links.map((l) => (
-                <SidebarMenuItem key={l.to}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={l.to} end>
-                      {l.label}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
+        <SidebarContent>
+          <SidebarMenu>
+            {links.map((l) => (
+              <SidebarMenuItem key={l.to}>
+                <SidebarMenuButton asChild>
+                  <NavLink to={l.to} end>
+                    {l.label}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
 
-          <SidebarFooter className="px-3 py-2">
-            {/* footer: avatar, logout, etc. */}
-          </SidebarFooter>
-        </Sidebar>
+          <SidebarMenu>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <SidebarMenuItem key={index}>
+                <SidebarMenuSkeleton />
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
 
+        <SidebarFooter>
+          Sidebar footer
+        </SidebarFooter>
+      </Sidebar>
+      {/*
         <SidebarInset className="flex-1">
           {children}
         </SidebarInset>
-      </div>
-    </SidebarProvider>
+      */}
+    </div>
   )
 }

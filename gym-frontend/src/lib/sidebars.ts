@@ -11,3 +11,8 @@ export const INSTRUCTOR_LINKS: SidebarLink[] = [
   { to: "/instructor/rutinas", label: "Rutinas" },
   { to: "/instructor/ejercicios", label: "Ejercicios" }, 
 ]
+
+export const SOCIO_LINKS: SidebarLink[] = [
+  { to: "/socio/", label: "Inicio" },
+  { to: "/socio/rutinas", label: "Rutinas" }, 
+]

@@ -1,14 +1,13 @@
-import { Outlet } from "react-router-dom"
+import { Outlet } from 'react-router-dom'
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import RoleSidebar from "@/components/RoleSidebar"
-import { INSTRUCTOR_LINKS } from "@/lib/sidebars"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SOCIO_LINKS } from '@/lib/sidebars'
 
 export default function InstructorLayout() {
   return (
     <SidebarProvider className="p-6">
       <div className="flex h-screen">
-        <RoleSidebar links={INSTRUCTOR_LINKS} title="Instructor" />
-
+        <RoleSidebar links={SOCIO_LINKS} title="Socio" />
         <SidebarInset className="flex-1">
           <header>
             <SidebarTrigger />
