@@ -15,12 +15,15 @@ export const LandingTemporal = () => {
           Track progress and recent activity for your Vite app.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        Las rutas del administrativo <a href="/administrativo" className="text-blue-500 underline">/Administrativo</a> usan
-        el AdminLayout que se encarga de mostrar la barra lateral y renderizar el contenido de las páginas en el componente
+      <CardContent className="pb-2">
+        Las rutas del <a href="/administrativo" className="text-blue-500 underline">/administrativo</a> usa
+        AdminLayout que muestra la barra lateral y renderizar el contenido de las páginas
       </CardContent>
       <CardContent>
-        Vista del instructor en <a href="/instructor" className="text-blue-500 underline">/Instructor</a> aca estoy probando usar una sidebar reutilizable
+        Vista del instructor en <a href="/instructor" className="text-blue-500 underline">/instructor</a> usa RoleSidebar (Sidebar de shadcn <a href="https://ui.shadcn.com/docs/components/radix/sidebar" target="_blank" className="text-blue-500 underline"> link a la doc</a>)
+      </CardContent>
+      <CardContent>
+        Vista del socio en <a href="/socio" className="text-blue-500 underline">/socio</a> usa RoleSidebar (Sidebar de shadcn <a href="https://ui.shadcn.com/docs/components/radix/sidebar" target="_blank" className="text-blue-500 underline"> link a la doc</a>)
       </CardContent>
     </Card >
   )
