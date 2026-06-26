@@ -26,74 +26,71 @@ export default function SociosPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   useEffect(() => {
-    let mounted = true
-    setLoading(true)
-    socioService
-      .getAllSocios()
-      .then((data) => {
-        if (!mounted) return
+    void (async () => {
+      try {
+        const data = await socioService.getAllSocios()
         setSocios(data)
-      })
-      .catch((err) => {
-        if (!mounted) return
-        setError(String(err) || "Error cargando socios")
-      })
-      .finally(() => {
-        if (!mounted) return
+      } catch (err) {
+        setError(String(err) || 'Error al cargar socios')
+      } finally {
         setLoading(false)
-      })
-    return () => {
-      mounted = false
-    }
+      }
+    })()
   }, [])
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex space-x-4">
-        <h1 className="text-2xl font-semibold">Socios</h1>
+    <>
+      {loading && <div>Cargando...</div>}
+      {error && <div className="text-red-600">{error}</div>}
+      {!loading && !error && (
+        <div className="p-6 space-y-4">
+          <div className="flex space-x-4">
+            <h1 className="text-2xl font-semibold">Socios</h1>
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              Nuevo socio
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Registrar socio</DialogTitle>
-            </DialogHeader>
-            <SocioForm />
-          </DialogContent>
-        </Dialog>
-      </div>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  Nuevo socio
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Registrar socio</DialogTitle>
+                </DialogHeader>
+                <SocioForm />
+              </DialogContent>
+            </Dialog>
+          </div>
 
-      {error && <div className="text-sm text-red-600">{error}</div>}
-      {loading ? (
-        <div className="text-sm">Cargando...</div>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Id</TableHead>
-              <TableHead>Nombre Completo</TableHead>
-              <TableHead>Plan</TableHead>
-              <TableHead className="text-right">Estado</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {socios.map((s) => (
-              <TableRow key={s.id}>
-                {/*TODO: Terminar de acomodar las columnas que se muestan*/}
-                <TableCell>{s.id}</TableCell>
-                <TableCell>{`${s.nombre} ${s.apellido}`}</TableCell>
-                <TableCell>{/* placeholder: adaptar cuando exista plan */}-</TableCell>
-                <TableCell className="text-right">{s.estado}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+          {error && <div className="text-sm text-red-600">{error}</div>}
+          {loading ? (
+            <div className="text-sm">Cargando...</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-25">Id</TableHead>
+                  <TableHead>Nombre Completo</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead className="text-right">Estado</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {socios.map((s) => (
+                  <TableRow key={s.id}>
+                    {/*TODO: Terminar de acomodar las columnas que se muestan*/}
+                    <TableCell>{s.id}</TableCell>
+                    <TableCell>{`${s.nombre} ${s.apellido}`}</TableCell>
+                    <TableCell>{/* placeholder: adaptar cuando exista plan */}-</TableCell>
+                    <TableCell className="text-right">{s.estado}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </div >
       )}
-    </div >
+    </>
   )
 }
 
