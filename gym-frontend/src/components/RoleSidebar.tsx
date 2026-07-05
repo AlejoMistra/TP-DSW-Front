@@ -8,58 +8,41 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-
-  SidebarMenuSkeleton
 } from "@/components/ui/sidebar"
 import type { SidebarLink } from "@/lib/sidebars"
 
+type RoleSidebarProps = {
+  links: SidebarLink[],
+  title?: React.ReactNode,
+  footer?: React.ReactNode,
+}
+
 export default function RoleSidebar({
   links,
-  title,
-}: {
-  links: SidebarLink[]
-  title?: React.ReactNode
-  children?: React.ReactNode
-  defaultOpen?: boolean
-}) {
+  title = "App",
+  footer,
+}: RoleSidebarProps) {
   return (
-    <div className="flex h-screen">
-      <Sidebar side="left" variant="sidebar" collapsible="icon">
-        <SidebarHeader className="px-3 py-2 flex items-center justify-between">
-          <div className="font-semibold">{title ?? "App"}</div>
-        </SidebarHeader>
+    <Sidebar side="left" variant="sidebar" collapsible="icon">
+      <SidebarHeader className="flex items-center justify-between px-3 py-2">
+        <div className="font-semibold">{title}</div>
+      </SidebarHeader>
 
-        <SidebarContent>
-          <SidebarMenu>
-            {links.map((l) => (
-              <SidebarMenuItem key={l.to}>
-                <SidebarMenuButton asChild>
-                  <NavLink to={l.to} end>
-                    {l.label}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+      <SidebarContent>
+        <SidebarMenu>
+          {links.map((link) => (
+            <SidebarMenuItem key={link.to}>
+              <SidebarMenuButton asChild>
+                <NavLink to={link.to} end>
+                  {link.label}
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarContent>
 
-          <SidebarMenu>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <SidebarMenuItem key={index}>
-                <SidebarMenuSkeleton />
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-
-        <SidebarFooter>
-          Sidebar footer
-        </SidebarFooter>
-      </Sidebar>
-      {/*
-        <SidebarInset className="flex-1">
-          {children}
-        </SidebarInset>
-      */}
-    </div>
+      {footer ? <SidebarFooter>{footer}</SidebarFooter> : null}
+    </Sidebar>
   )
 }
