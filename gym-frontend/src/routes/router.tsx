@@ -1,13 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
-import AdminLayout from '../layouts/AdminLayout'
-import { LandingTemporal } from '../pages/LandingTemporal'
-import { ClasesPage } from '@/pages/administrativo/ClasesPage'
-import SociosPage from '@/pages/administrativo/SociosPage'
-import InstructorLayout from '@/layouts/InstructorLayout'
+import RoleLayout from '@/layouts/RoleLayout'
+import { LandingTemporal } from '../pages/TemporalLanding'
+import { ClasesPage } from '@/pages/admin/ClasesPage'
+import SociosPage from '@/pages/admin/SociosPage'
 import RutinasPage from '@/pages/instructor/RutinasPage'
 import EjerciciosPage from '@/pages/instructor/EjerciciosPage'
-import SocioLayout from '@/layouts/SocioLayout'
-
 
 export const router = createBrowserRouter([
   {
@@ -16,7 +13,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/administrativo',
-    element: <AdminLayout />,
+    element: <RoleLayout role="admin" />,
     children: [
       { path: 'clases', element: <ClasesPage /> },
       { path: 'socios', element: <SociosPage /> },
@@ -24,7 +21,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/instructor',
-    element: <InstructorLayout />,
+    element: <RoleLayout role="instructor" />,
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Instructor</div> },
       { path: 'rutinas', element: <RutinasPage /> },
@@ -33,7 +30,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/socio',
-    element: <SocioLayout />,
+    element: <RoleLayout role="member" />,
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
       { path: 'rutinas', element: <RutinasPage /> },
