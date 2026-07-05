@@ -6,13 +6,19 @@ export type SidebarLink = {
   icon?: ReactNode
 }
 
+export const ADMIN_LINKS: SidebarLink[] = [
+  { to: "/administrativo/", label: "Inicio" },
+  { to: "/administrativo/clases", label: "Clases" },
+  { to: "/administrativo/socios", label: "Socios" },
+]
+
 export const INSTRUCTOR_LINKS: SidebarLink[] = [
   { to: "/instructor/", label: "Inicio" },
   { to: "/instructor/rutinas", label: "Rutinas" },
   { to: "/instructor/ejercicios", label: "Ejercicios" }, 
 ]
 
-export const SOCIO_LINKS: SidebarLink[] = [
+export const MEMBER_LINKS: SidebarLink[] = [
   { to: "/socio/", label: "Inicio" },
   { to: "/socio/rutinas", label: "Rutinas" }, 
 ]

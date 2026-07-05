@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import SocioForm from "@/components/socios/SocioForm"
+import SocioForm from "@/components/admin/SocioForm"
 import { socioService } from "@/services/socioService"
 import type { Socio } from "@/models/Socio"
 
