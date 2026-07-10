@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Home, Dumbbell, Calendar, User, Clock, Users } from 'lucide-react'; {/*TODO: Cambiar a iconos de shadcn*/ }
+import { User, Clock, Users } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/badge";
 
 // --- Mock Data ---
@@ -62,9 +62,7 @@ export default function ClassesPage() {
   const [activeCategory, setActiveCategory] = useState('Todos');
 
   return (
-    // Contenedor principal: min-h-screen, fondo oscuro. 
-    // pb-24 es VITAL para que la última tarjeta no quede tapada por el menú inferior en mobile.
-    <div className="min-h-screen pb-24">
+    <div>
 
       {/* Contenedor centralizado para no desbordar en pantallas ultra anchas */}
       <div className="max-w-7xl mx-auto">
@@ -159,30 +157,6 @@ export default function ClassesPage() {
         </main>
 
       </div >
-
-      {/* TODO: Integrar esta bottom navbar a la sidebar para mobile, actualmente se pisa con el layout actual, tapa el footer y genera conflicto con la sidebar*/}
-      {/* --- BOTTOM NAVIGATION (Mobile Solo) --- */}
-      {/* Se oculta a partir de md (md:hidden) para favorecer una navegación lateral o superior en desktop */}
-      <nav className="fixed bottom-0 w-full backdrop-blur-md border-t pb-safe md:hidden z-50">
-        <div className="flex justify-around items-center h-16">
-          <button className="flex flex-col items-center justify-center w-full gap-1">
-            <Home className="h-5 w-5" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">Menu</span>
-          </button>
-          <button className="flex flex-col items-center justify-center w-full gap-1">
-            <Dumbbell className="h-5 w-5" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">Rutinas</span>
-          </button>
-          <button className="flex flex-col items-center justify-center w-full gap-1">
-            <Calendar className="h-5 w-5" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">Clases</span>
-          </button>
-          <button className="flex flex-col items-center justify-center w-full gap-1">
-            <User className="h-5 w-5" />
-            <span className="text-[10px] font-medium uppercase tracking-wider">Perfil</span>
-          </button>
-        </div>
-      </nav>
 
     </div >
   );

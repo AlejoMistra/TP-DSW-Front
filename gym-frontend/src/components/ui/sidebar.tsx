@@ -6,7 +6,7 @@ import { Slot } from "radix-ui"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -163,6 +163,19 @@ function Sidebar({
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
 
+  const handleMobileNavigationClick = React.useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      const target = event.target as HTMLElement | null
+      if (!target) return
+
+      // If a navigation link inside the mobile sheet is clicked, close it.
+      if (target.closest("a[href]")) {
+        setOpenMobile(false)
+      }
+    },
+    [setOpenMobile]
+  )
+
   if (collapsible === "none") {
     return (
       <div
@@ -198,7 +211,12 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div
+            className="flex h-full w-full flex-col"
+            onClickCapture={handleMobileNavigationClick}
+          >
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     )
@@ -253,6 +271,7 @@ function Sidebar({
 function SidebarTrigger({
   className,
   onClick,
+  children,
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
@@ -270,8 +289,12 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      {children ?? (
+        <>
+          <PanelLeftIcon />
+          <span className="sr-only">Toggle Sidebar</span>
+        </>
+      )}
     </Button>
   )
 }
