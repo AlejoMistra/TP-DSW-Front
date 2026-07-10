@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import NotFoundPage from '@/pages/NotFoundPage'
 import RoleLayout from '@/layouts/RoleLayout'
-import TemporalLanding from '../pages/TemporalLanding'
+import TemporalLanding from '../pages/TemporaryLandingPage'
 import { ClasesPage } from '@/pages/admin/ClasesPage'
 import SociosPage from '@/pages/admin/SociosPage'
 import RutinasPage from '@/pages/instructor/RutinasPage'

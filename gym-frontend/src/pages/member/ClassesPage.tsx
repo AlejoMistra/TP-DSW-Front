@@ -69,7 +69,7 @@ export default function ClassesPage() {
         {/* --- TÍTULO SECCIÓN --- */}
         <section className="px-4 py-2 md:px-8">
           <h2 className="text-4xl font-extrabold leading-tight mb-2">Reserva de Clases</h2>
-          <p >Encuentra tu próximo desafío.</p>
+          <p >Encontrá tu próximo desafío.</p>
         </section>
 
         {/* --- SELECTOR DE FECHAS (Scroll Horizontal Aislado) --- */}

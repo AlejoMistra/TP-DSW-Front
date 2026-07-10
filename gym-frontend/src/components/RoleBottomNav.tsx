@@ -16,7 +16,7 @@ export default function RoleBottomNav({ links }: RoleBottomNavProps) {
   const totalItems = links.length + 1
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 backdrop-blur-md md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/70 backdrop-blur-lg md:hidden">
       <div
         className="mx-auto grid h-16 max-w-7xl items-stretch pb-[env(safe-area-inset-bottom)]"
         style={{ gridTemplateColumns: `repeat(${totalItems}, minmax(0, 1fr))` }}
