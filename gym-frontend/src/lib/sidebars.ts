@@ -21,4 +21,5 @@ export const INSTRUCTOR_LINKS: SidebarLink[] = [
 export const MEMBER_LINKS: SidebarLink[] = [
   { to: "/socio/", label: "Inicio" },
   { to: "/socio/rutinas", label: "Rutinas" }, 
+  { to: "/socio/clases", label: "Clases" },
 ]
