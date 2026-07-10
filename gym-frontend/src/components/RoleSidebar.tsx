@@ -33,8 +33,9 @@ export default function RoleSidebar({
           {links.map((link) => (
             <SidebarMenuItem key={link.to}>
               <SidebarMenuButton asChild>
-                <NavLink to={link.to} end>
-                  {link.label}
+                <NavLink to={link.to} end={link.to.endsWith("/")}>
+                  {link.icon ? <link.icon /> : null}
+                  <span>{link.label}</span>
                 </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
