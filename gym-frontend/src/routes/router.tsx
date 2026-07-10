@@ -1,15 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom'
 import RoleLayout from '@/layouts/RoleLayout'
-import { LandingTemporal } from '../pages/TemporalLanding'
+import TemporalLanding from '../pages/TemporalLanding'
 import { ClasesPage } from '@/pages/admin/ClasesPage'
 import SociosPage from '@/pages/admin/SociosPage'
 import RutinasPage from '@/pages/instructor/RutinasPage'
 import EjerciciosPage from '@/pages/instructor/EjerciciosPage'
+import ClassesPage from '@/pages/member/ClassesPage'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <LandingTemporal />,
+    element: <TemporalLanding />,
   },
   {
     path: '/administrativo',
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
       { path: 'rutinas', element: <RutinasPage /> },
+      { path: 'clases', element: <ClassesPage /> }
     ],
   },
 ])
