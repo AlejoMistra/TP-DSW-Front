@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
+import NotFoundPage from '@/pages/NotFoundPage'
 import RoleLayout from '@/layouts/RoleLayout'
 import TemporalLanding from '../pages/TemporalLanding'
 import { ClasesPage } from '@/pages/admin/ClasesPage'
@@ -38,4 +39,6 @@ export const router = createBrowserRouter([
       { path: 'clases', element: <ClassesPage /> }
     ],
   },
+
+  { path: '*', element: <NotFoundPage /> },
 ])
