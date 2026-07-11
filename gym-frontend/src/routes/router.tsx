@@ -3,7 +3,7 @@ import NotFoundPage from '../pages/NotFoundPage'
 import RoleLayout from '../layouts/RoleLayout'
 import TemporalLanding from '../pages/TemporaryLandingPage'
 import { ClasesPage } from '../pages/admin/ClasesPage'
-import SociosPage1 from '../pages/admin/SociosPage'
+import SociosPage from '../pages/admin/SociosPage'
 import RutinasPage from '../pages/instructor/RutinasPage'
 import EjerciciosPage from '../pages/instructor/EjerciciosPage'
 import ClassesPage from '../pages/member/ClassesPage'
@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
     element: <RoleLayout role="admin" />,
     children: [
       { path: 'clases', element: <ClasesPage /> },
-      { path: 'socios', element: <SociosPage1 /> },
+      { path: 'socios', element: <SociosPage /> },
     ],
   },
   {
