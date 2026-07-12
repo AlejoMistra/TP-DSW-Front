@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/sidebar"
 import type { SidebarLink } from "@/lib/sidebars"
 
+// TODO: Acomodar el tamaño de los iconos y el texto cuando la sidebar está colapsada. Actualmente el texto sobresale y los iconos se ven muy chicos.
+
 type RoleSidebarProps = {
   links: SidebarLink[],
   title?: React.ReactNode,

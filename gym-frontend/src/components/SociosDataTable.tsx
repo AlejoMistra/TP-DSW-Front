@@ -59,6 +59,8 @@ import { useIsMobile } from "@/hooks/use-mobile"
 
 import type { Member, Role, Status } from "../models/Member"
 
+// TODO: Ajustar que cuando se vuelve de un breackpoint mobile a desktop se vuelvan a mostrar todas las columnas nuevamente.
+
 type SociosDataTableProps = {
   initialData: Member[]
   title?: string

@@ -1,10 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { User } from "lucide-react"
 
-export default function SocioForm() {
+type SocioFormProps = {
+  showActions?: boolean
+}
+
+export default function SocioForm({ showActions = true }: SocioFormProps) {
   return (
-    <form className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form className="rounded-xl border bg-background px-4 py-2 items-baseline sm:px-6 sm:py-6">
+      <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold">
+        <User className="size-5" aria-hidden="true" />
+        Información del Socio
+      </h3>
+
+      <div className="grid gap-2 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="nombre" className="text-sm font-medium">
             Nombre
@@ -19,19 +29,12 @@ export default function SocioForm() {
           <Input id="apellido" name="apellido" placeholder="Apellido" />
         </div>
 
+
         <div className="space-y-2">
-          <label htmlFor="tipo_doc" className="text-sm font-medium">
-            Tipo de documento
+          <label htmlFor="fechaNacimiento" className="text-sm font-medium">
+            Fecha de nacimiento
           </label>
-          <select
-            id="tipo_doc"
-            name="tipo_doc"
-            className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
-            <option value="DNI">DNI</option>
-            <option value="Pasaporte">Pasaporte</option>
-            <option value="Otro">Otro</option>
-          </select>
+          <Input id="fechaNacimiento" name="fechaNacimiento" type="date" />
         </div>
 
         <div className="space-y-2">
@@ -54,35 +57,18 @@ export default function SocioForm() {
           </label>
           <Input id="telefono" name="telefono" placeholder="+54 9 11 1234 5678" />
         </div>
-
-        <div className="space-y-2">
-          <label htmlFor="fechaNacimiento" className="text-sm font-medium">
-            Fecha de nacimiento
-          </label>
-          <Input id="fechaNacimiento" name="fechaNacimiento" type="date" />
-        </div>
-
-        <div className="space-y-2 sm:col-span-2">
-          <label htmlFor="estado" className="text-sm font-medium">
-            Estado
-          </label>
-          <select
-            id="estado"
-            name="estado"
-            className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-          >
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
       </div>
 
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" type="button">
-          Cancelar
-        </Button>
-        <Button type="submit">Guardar</Button>
-      </div>
+      {showActions && (
+        <div className="flex justify-end gap-2 py-4">
+          <Button variant="outline" type="button">
+            Cancelar
+          </Button>
+          <Button type="submit">
+            Guardar
+          </Button>
+        </div>
+      )}
     </form>
   )
 }
