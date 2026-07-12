@@ -66,15 +66,14 @@ type SociosDataTableProps = {
 }
 
 const statusVariant: Record<Status, "default" | "secondary" | "outline"> = {
-  Active: "default",
-  Invited: "secondary",
-  Inactive: "outline",
+  Activo: "default",
+  Inactivo: "secondary"
 }
 
 const roleClass: Record<Role, string> = {
-  Admin: "text-foreground font-medium",
-  Editor: "text-muted-foreground",
-  Viewer: "text-muted-foreground",
+  Basico: "text-foreground",
+  Plus: "text-foreground",
+  Premium: "text-foreground",
 }
 
 const COLUMN_LABELS: Record<string, string> = {
@@ -85,9 +84,9 @@ const COLUMN_LABELS: Record<string, string> = {
   joined: "Fecha de Inscripción",
 }
 
-const dateFmt = new Intl.DateTimeFormat("en-US", {
-  month: "short",
+const dateFmt = new Intl.DateTimeFormat("es-ES", {
   day: "2-digit",
+  month: "short",
   year: "numeric",
 })
 
@@ -192,7 +191,7 @@ const columns: ColumnDef<Member>[] = [
       </button>
     ),
     cell: ({ row }) => (
-      <span className={cn("text-sm", roleClass[row.original.role])}>{row.original.role}</span>
+      <span className={cn("text-sm", roleClass[row.original.plan])}>{row.original.plan}</span>
     ),
   },
   {
