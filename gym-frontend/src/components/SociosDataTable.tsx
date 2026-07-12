@@ -14,7 +14,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import {
-  RiAddLine,
   RiArrowDownLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
@@ -288,7 +287,7 @@ const columns: ColumnDef<Member>[] = [
 
 export default function SociosDataTable({
   initialData,
-  title = "Socios",
+  title,
   subtitle,
 }: SociosDataTableProps) {
   const isMobile = useIsMobile()
@@ -350,19 +349,19 @@ export default function SociosDataTable({
   }
 
   return (
-    <section className="flex min-h-svh w-full justify-center bg-background px-4 py-10 text-foreground sm:py-16">
-      <div className="w-full max-w-6xl">
+    <section className="w-full">
+      <div className="w-full">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
             <div>
-              <h1 className="text-2xl font-semibold">{title}</h1>
+              <h1 className="text-2xl font-semibold">{title ?? ""}</h1>
               <p className="text-sm text-muted-foreground">
-                {subtitle ?? `${data.length} socios inscriptos en la sucursal`}
+                {subtitle ?? ""}
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative w-full sm:w-auto">
+          <div className="flex w-full flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap">
+            <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
               <RiSearchLine
                 className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
                 aria-hidden="true"
@@ -380,7 +379,12 @@ export default function SociosDataTable({
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" aria-label="Toggle columns">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  aria-label="Toggle columns"
+                >
                   <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
                   Columnas
                 </Button>
@@ -406,10 +410,6 @@ export default function SociosDataTable({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button size="sm">
-              <RiAddLine className="mr-1 size-3.5" aria-hidden="true" />
-              Nuevo Socio
-            </Button>
           </div>
         </div>
 
