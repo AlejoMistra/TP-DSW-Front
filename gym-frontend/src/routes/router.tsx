@@ -1,12 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom'
-import NotFoundPage from '@/pages/NotFoundPage'
-import RoleLayout from '@/layouts/RoleLayout'
+import NotFoundPage from '../pages/NotFoundPage'
+import RoleLayout from '../layouts/RoleLayout'
 import TemporalLanding from '../pages/TemporaryLandingPage'
-import { ClasesPage } from '@/pages/admin/ClasesPage'
-import SociosPage from '@/pages/admin/SociosPage'
-import RutinasPage from '@/pages/instructor/RutinasPage'
-import EjerciciosPage from '@/pages/instructor/EjerciciosPage'
-import ClassesPage from '@/pages/member/ClassesPage'
+import AdminClassesPage from '../pages/admin/ClassesPage'
+import MembersPage from '../pages/admin/MembersPage'
+import NewMemberPage from '../pages/admin/NewMemberPage'
+import RutinasPage from '../pages/instructor/RutinasPage'
+import EjerciciosPage from '../pages/instructor/EjerciciosPage'
+import MemberClassesPage from '../pages/member/ClassesPage'
 
 export const router = createBrowserRouter([
   {
@@ -17,8 +18,9 @@ export const router = createBrowserRouter([
     path: '/administrativo',
     element: <RoleLayout role="admin" />,
     children: [
-      { path: 'clases', element: <ClasesPage /> },
-      { path: 'socios', element: <SociosPage /> },
+      { path: 'clases', element: <AdminClassesPage /> },
+      { path: 'socios', element: <MembersPage /> },
+      { path: 'socios/nuevo', element: <NewMemberPage /> },
     ],
   },
   {
@@ -36,7 +38,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
       { path: 'rutinas', element: <RutinasPage /> },
-      { path: 'clases', element: <ClassesPage /> }
+      { path: 'clases', element: <MemberClassesPage /> }
     ],
   },
 
