@@ -49,22 +49,25 @@ export function ExerciseFormDialog({
   })
 
   useEffect(() => {
-    if (exercise) {
-      setFormData({
-        name: exercise.name,
-        muscleGroup: exercise.muscleGroup,
-        difficultyLevel: exercise.difficultyLevel,
-        description: exercise.description || '',
-      })
-    } else {
-      setFormData({
-        name: '',
-        muscleGroup: '',
-        difficultyLevel: 'BEGINNER',
-        description: '',
-      })
+    if (open) {
+      if (exercise) {
+        setFormData({
+          name: exercise.name,
+          muscleGroup: exercise.muscleGroup,
+          difficultyLevel: exercise.difficultyLevel,
+          description: exercise.description || '',
+        })
+      } else {
+        setFormData({
+          name: '',
+          muscleGroup: '',
+          difficultyLevel: 'BEGINNER',
+          description: '',
+        })
+      }
     }
-  }, [exercise])
+  }, [open, exercise])
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -95,6 +98,13 @@ export function ExerciseFormDialog({
         await exerciseService.create(dataToSubmit)
         toast.success('Ejercicio creado exitosamente')
       }
+      // Limpiamos el formulario:
+      setFormData({
+        name: '',
+        muscleGroup: '',
+        difficultyLevel: 'BEGINNER',
+        description: '',
+      })
       onOpenChange(false)
       onSuccess()
     } catch (err) {

@@ -9,7 +9,7 @@ import NewMemberPage from '../../pages/admin/members/NewMemberPage'
 import EditMemberPage from '@/pages/admin/members/EditMemberPage'
 import MemberDetailsPage from '@/pages/admin/members/MemberDetailsPage'
 import MembershipPlansPage from '../../pages/admin/MembershipPlansPage'
-import RutinasPage from '../../pages/instructor/RutinasPage'
+import RoutinesPage from '../../pages/instructor/RoutinesPage';
 import ExercisesPage from '../../pages/instructor/ExercisesPage'
 import MemberClassesPage from '../../pages/member/ClassesPage'
 
@@ -44,9 +44,9 @@ export const router = createBrowserRouter([
     element: <RoleLayout role="instructor" />,
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Instructor</div> },
-      { path: 'rutinas', element: <RutinasPage /> },
+      { path: 'rutinas', element: <RoutinesPage /> },
       { path: 'ejercicios', element: <ExercisesPage /> },
-      { path: 'exercises', element: <ExercisesPage />},
+      { path: 'exercises', element: <ExercisesPage /> },
     ],
   },
   {
@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
     element: <RoleLayout role="member" />,
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
-      { path: 'rutinas', element: <RutinasPage /> },
+      //{ path: 'rutinas', element: <RutinasPage /> },
       { path: 'clases', element: <MemberClassesPage /> }
     ],
   },
