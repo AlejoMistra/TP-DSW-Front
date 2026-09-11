@@ -59,6 +59,7 @@ type ExerciseDataTableProps = {
   exercises: Exercise[]
   onEdit: (exercise: Exercise) => void
   onDelete: (id: number) => void
+  onMultipleDelete?: (ids: number[]) => void
   loading?: boolean
 }
 
@@ -88,6 +89,7 @@ export function ExerciseDataTable({
   exercises,
   onEdit,
   onDelete,
+  onMultipleDelete,
   loading,
 }: ExerciseDataTableProps) {
   const isMobile = useIsMobile()
@@ -297,15 +299,10 @@ export function ExerciseDataTable({
   const pageCount = table.getPageCount()
 
   function handleRemove() {
-    const selectedIds = new Set(
-      table.getFilteredSelectedRowModel().rows.map((row) => row.id)
-    )
-    setData((prev) => prev.filter((row) => !selectedIds.has(row.id.toString())))
-    table.resetRowSelection()
-    toast("Ejercicios eliminados", {
-      description: `${selectedIds.size} ${selectedIds.size === 1 ? "ejercicio" : "ejercicios"} eliminados.`,
-    })
-  }
+  const selectedIds = table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
+  onMultipleDelete?.(selectedIds)
+  table.resetRowSelection()
+}
 
   if (loading) {
     return <div className="text-center py-8">Cargando ejercicios...</div>

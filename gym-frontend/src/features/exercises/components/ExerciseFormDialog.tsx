@@ -182,9 +182,10 @@ export function ExerciseFormDialog({
               <Textarea
                 id="description"
                 name="description"
-                placeholder="Descripción del ejercicio (opcional)"
+                placeholder="Descripción del ejercicio"
                 value={formData.description || ''}
                 onChange={handleChange}
+                required
               />
             </div>
           </div>
