@@ -6,6 +6,7 @@ import {
   Dumbbell,
   House,
   NotebookPen,
+  UserRound,
   Users,
 } from "lucide-react"
 
@@ -28,6 +29,7 @@ export const ROLE_NAVIGATION: Record<
       { to: "/administrativo/clases", label: "Clases", icon: Calendar },
       { to: "/administrativo/socios", label: "Socios", icon: Users },
       { to: "/administrativo/planes", label: "Planes", icon: CreditCard },
+      { to: "/administrativo/instructores", label: "Instructores", icon: UserRound },
     ],
   },
   instructor: {
