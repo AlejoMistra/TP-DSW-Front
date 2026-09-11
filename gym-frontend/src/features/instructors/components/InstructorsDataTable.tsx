@@ -1,0 +1,167 @@
+import {
+  RiDeleteBinLine,
+  RiMoreLine,
+  RiPencilLine,
+} from '@remixicon/react'
+
+import { Button } from '@/shared/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/components/ui/dropdown-menu'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/components/ui/table'
+
+import type { Instructor } from '@/features/instructors/models/Instructor'
+
+type InstructorsDataTableProps = {
+  instructors: Instructor[]
+  loading: boolean
+  onEdit: (instructor: Instructor) => void
+  onDelete: (id: number) => Promise<void>
+}
+
+export default function InstructorsDataTable({
+  instructors,
+  loading,
+  onEdit,
+  onDelete,
+}: InstructorsDataTableProps) {
+  async function handleDelete(instructor: Instructor) {
+    await onDelete(instructor.id)
+  }
+
+  return (
+    <div className="w-full">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold">
+            Listado de Instructores
+          </h2>
+
+          <p className="text-sm text-muted-foreground">
+            Instructores registrados en el sistema.
+          </p>
+        </div>
+      </div>
+
+      <div className="border border-border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+              <TableHead className="h-10 pl-4 text-left">
+                Nombre
+              </TableHead>
+
+              <TableHead className="h-10 text-left">
+                Apellido
+              </TableHead>
+
+              <TableHead className="h-10 text-left">
+                Email
+              </TableHead>
+
+              <TableHead className="h-10 text-left">
+                Teléfono
+              </TableHead>
+
+              <TableHead className="h-10 text-center">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {loading ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  colSpan={5}
+                  className="h-24 text-center text-sm text-muted-foreground"
+                >
+                  Cargando instructores...
+                </TableCell>
+              </TableRow>
+            ) : instructors.length > 0 ? (
+              instructors.map((instructor) => (
+                <TableRow
+                  key={instructor.id}
+                  className="border-b border-border transition-colors duration-100 last:border-b-0 hover:bg-muted/30"
+                >
+                  <TableCell className="py-3 pl-4 font-medium">
+                    {instructor.name}
+                  </TableCell>
+
+                  <TableCell className="py-3">
+                    {instructor.surname}
+                  </TableCell>
+
+                  <TableCell className="py-3 text-muted-foreground">
+                    {instructor.email}
+                  </TableCell>
+
+                  <TableCell className="py-3 text-muted-foreground">
+                    {instructor.phone || 'Sin teléfono'}
+                  </TableCell>
+
+                  <TableCell className="py-3 text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Acciones para ${instructor.name} ${instructor.surname}`}
+                        >
+                          <RiMoreLine
+                            className="size-4"
+                            aria-hidden="true"
+                          />
+                        </Button>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() => onEdit(instructor)}
+                        >
+                          <RiPencilLine aria-hidden="true" />
+                          Editar
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => handleDelete(instructor)}
+                        >
+                          <RiDeleteBinLine aria-hidden="true" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  colSpan={5}
+                  className="h-24 text-center text-sm text-muted-foreground"
+                >
+                  No hay instructores cargados.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
+}
