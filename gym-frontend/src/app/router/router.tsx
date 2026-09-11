@@ -11,7 +11,7 @@ import MemberDetailsPage from '@/pages/admin/members/MemberDetailsPage'
 import MembershipPlansPage from '../../pages/admin/MembershipPlansPage'
 import ClassScheduleFormPage from '../../pages/admin/classes/EditClassPage'
 import RutinasPage from '../../pages/instructor/RutinasPage'
-import EjerciciosPage from '../../pages/instructor/EjerciciosPage'
+import ExercisesPage from '../../pages/instructor/ExercisesPage'
 import MemberClassesPage from '../../pages/member/ClassesPage'
 
 
@@ -46,7 +46,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Instructor</div> },
       { path: 'rutinas', element: <RutinasPage /> },
-      { path: 'ejercicios', element: <EjerciciosPage /> },
+      { path: 'ejercicios', element: <ExercisesPage /> },
+      { path: 'exercises', element: <ExercisesPage />},
     ],
   },
   {
