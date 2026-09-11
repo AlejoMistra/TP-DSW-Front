@@ -1,5 +1,5 @@
 export interface Instructor {
-  id: string
+  id: number | string
   name: string
   surname: string
   email: string
