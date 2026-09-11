@@ -1,7 +1,7 @@
-import ClassDateSelector from '@/features/classes/components/ClassDateSelector'
-import ClassCategoryFilter from '@/features/classes/components/ClassCategoryFilter'
-import ClassCard from '@/features/classes/components/ClassCard'
-import { useMemberClasses } from '@/features/classes/hooks/useMemberClasses'
+import ClassDateSelector from '@/features/ClassSession/components/ClassDateSelector'
+import ClassCategoryFilter from '@/features/ClassSession/components/ClassCategoryFilter'
+import ClassSessionCard from '@/features/ClassSession/components/ClassSessionCard'
+import { useMemberClasses } from '@/features/ClassSession/hooks/useMemberClasses'
 
 export default function ClassesPage() {
   const {
@@ -38,7 +38,7 @@ export default function ClassesPage() {
         <main className="mt-8 px-4 md:px-8">
           <div className="flex flex-col gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {classes.map((cls) => (
-              <ClassCard
+              <ClassSessionCard
                 key={cls.id}
                 cls={cls}
                 onToggleReservation={handleToggleReservation}

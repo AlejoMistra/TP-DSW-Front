@@ -1,5 +1,5 @@
 import { Button } from '@/shared/components/ui/button'
-import type { ClassDateOption } from '../models/ClassSchedule'
+import type { ClassDateOption } from '../models/ClassSession'
 
 interface ClassDateSelectorProps {
   dates: ClassDateOption[]

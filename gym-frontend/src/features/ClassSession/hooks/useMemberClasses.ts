@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-import { type ClassSchedule, type ClassCategory, type ClassDateOption } from '../models/ClassSchedule'
+import { type ClassSchedule, type ClassCategory, type ClassDateOption } from '../models/ClassSession'
 import { classService } from '../api/classService'
 
 const DEFAULT_DATES: ClassDateOption[] = [
@@ -35,12 +35,12 @@ export function useMemberClasses() {
     loadClasses()
   }, [])
 
-  const handleToggleReservation = async (id: string) => {
+  const handleToggleReservation = async (id: string | number) => {
     try {
-      const updated = await classService.toggleReservation(id)
+      const updated = await classService.toggleReservation(String(id))
       const isNowReserved = updated.reserved || updated.status === 'RESERVADO'
       toast.success(isNowReserved ? 'Reserva confirmada' : 'Reserva cancelada')
-      setClasses((prev) => prev.map((c) => (c.id === id ? updated : c)))
+      setClasses((prev) => prev.map((c) => (String(c.id) === String(id) ? updated : c)))
     } catch {
       toast.error('Error al actualizar la reserva')
     }
