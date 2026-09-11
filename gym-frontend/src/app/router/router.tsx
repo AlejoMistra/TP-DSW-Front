@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import NotFoundPage from '../../pages/public/NotFoundPage'
 import LoginPage from '../../pages/auth/LoginPage'
 import RoleLayout from '../../layouts/RoleLayout'
@@ -9,7 +9,6 @@ import NewMemberPage from '../../pages/admin/members/NewMemberPage'
 import EditMemberPage from '@/pages/admin/members/EditMemberPage'
 import MemberDetailsPage from '@/pages/admin/members/MemberDetailsPage'
 import MembershipPlansPage from '../../pages/admin/MembershipPlansPage'
-import ClassScheduleFormPage from '../../pages/admin/classes/EditClassPage'
 import RutinasPage from '../../pages/instructor/RutinasPage'
 import ExercisesPage from '../../pages/instructor/ExercisesPage'
 import MemberClassesPage from '../../pages/member/ClassesPage'
@@ -31,8 +30,8 @@ export const router = createBrowserRouter([
     element: <RoleLayout role="admin" />,
     children: [
       { path: 'clases', element: <AdminClassesPage /> },
-      { path: 'clases/nueva', element: <ClassScheduleFormPage /> },
-      { path: 'clases/:id/editar', element: <ClassScheduleFormPage /> },
+      { path: 'clases/nueva', element: <Navigate to="/administrativo/clases" replace /> },
+      { path: 'clases/:id/editar', element: <Navigate to="/administrativo/clases" replace /> },
       { path: 'socios', element: <MembersPage /> },
       { path: 'socios/nuevo', element: <NewMemberPage /> },
       { path: 'socios/editar/:id', element: <EditMemberPage /> },
