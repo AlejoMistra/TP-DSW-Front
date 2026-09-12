@@ -1,5 +1,5 @@
 import { Button } from '@/shared/components/ui/button'
-import type { ClassCategory } from '../models/ClassSchedule'
+import type { ClassCategory } from '../models/ClassSession'
 
 interface ClassCategoryFilterProps {
   categories: ClassCategory[]

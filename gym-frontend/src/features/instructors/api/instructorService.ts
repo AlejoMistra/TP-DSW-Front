@@ -24,7 +24,7 @@ export const instructorService = {
     return response.json()
   },
 
-  async getById(id: number): Promise<Instructor> {
+  async getById(id: number | string): Promise<Instructor> {
     const response = await fetch(`${baseUrl}/api/instructors/${id}`)
 
     if (!response.ok) {

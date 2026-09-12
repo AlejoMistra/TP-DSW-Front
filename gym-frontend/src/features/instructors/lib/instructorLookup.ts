@@ -2,8 +2,12 @@ import type { Instructor } from '@/features/instructors/models/Instructor'
 
 export function getInstructorName(
   instructors: Instructor[],
-  instructorId: string | number,
+  instructorId?: string | number,
 ): string {
+  if (instructorId === undefined || instructorId === null) {
+    return 'Sin asignar'
+  }
+
   const found = instructors.find(
     (instructor) => String(instructor.id) === String(instructorId),
   )

@@ -2,14 +2,14 @@ import { User, Clock, Users } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
-import type { ClassSchedule } from '../models/ClassSchedule'
+import type { ClassSchedule } from '../models/ClassSession'
 
 interface ClassCardProps {
   cls: ClassSchedule
-  onToggleReservation: (id: string) => void
+  onToggleReservation: (id: string | number) => void
 }
 
-export function ClassCard({ cls, onToggleReservation }: ClassCardProps) {
+export function ClassSessionCard({ cls, onToggleReservation }: ClassCardProps) {
   const isReserved = cls.reserved || cls.status === 'RESERVADO'
   const capacityText = `${cls.currentCapacity ?? 0}/${cls.maxCapacity} Cupos`
 
@@ -58,4 +58,4 @@ export function ClassCard({ cls, onToggleReservation }: ClassCardProps) {
   )
 }
 
-export default ClassCard
+export default ClassSessionCard
