@@ -58,19 +58,19 @@ export default function InstructorsDataTable({
         <Table>
           <TableHeader>
             <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
-              <TableHead className="h-10 pl-4 text-left">
+              <TableHead className="h-10 pl-4 text-left text-sm font-medium tracking-wide text-muted-foreground uppercase">
                 Nombre
               </TableHead>
 
-              <TableHead className="h-10 text-left">
+              <TableHead className="h-10 pl-4 text-left text-sm font-medium tracking-wide text-muted-foreground uppercase">
                 Apellido
               </TableHead>
 
-              <TableHead className="h-10 text-left">
+              <TableHead className="h-10 pl-4 text-left text-sm font-medium tracking-wide text-muted-foreground uppercase">
                 Email
               </TableHead>
 
-              <TableHead className="h-10 text-left">
+              <TableHead className="h-10 pl-4 text-left text-sm font-medium tracking-wide text-muted-foreground uppercase">
                 Teléfono
               </TableHead>
 
