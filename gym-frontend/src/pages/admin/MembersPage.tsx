@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import MembersDataTable from '@/features/members/components/MembersDataTable'
 import MembersHeader from '@/features/members/components/MembersHeader'
+import ConfirmDeleteDialog from '@/shared/components/ConfirmDeleteDialog'
 import { useMembers } from '@/features/members/hooks/useMembers'
 
 export default function MembersPage() {
@@ -12,6 +13,10 @@ export default function MembersPage() {
     inactiveCount,
     totalCount,
     handleDelete,
+    deleteConfirm,
+    setDeleteConfirm,
+    confirmDelete,
+    isDeleting,
   } = useMembers()
 
   if (loading) {
@@ -28,6 +33,10 @@ export default function MembersPage() {
       </div>
     )
   }
+
+  const memberName = deleteConfirm.member
+    ? `${deleteConfirm.member.name} ${deleteConfirm.member.surname}`
+    : 'este miembro'
 
   return (
     <div className="space-y-4">
@@ -47,6 +56,16 @@ export default function MembersPage() {
           onDelete={handleDelete}
         />
       </div>
+
+      {/* Diálogo de confirmación de eliminación */}
+      <ConfirmDeleteDialog
+        open={deleteConfirm.open}
+        title={`¿Confirmás eliminar a ${memberName}?`}
+        description="Esta acción eliminará al socio del sistema y no se puede deshacer."
+        isLoading={isDeleting}
+        onClose={() => setDeleteConfirm({ open: false, member: null })}
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

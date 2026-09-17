@@ -26,7 +26,7 @@ import type { MembershipPlan } from "@/features/membershipPlans/models/Membershi
 type PlansDataTableProps = {
   plans: MembershipPlan[]
   onEdit: (plan: MembershipPlan) => void
-  onDelete: (id: number) => Promise<void>
+  onDelete: (id: number) => void
   title?: string
   subtitle?: string
 }
