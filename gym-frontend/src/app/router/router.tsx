@@ -12,6 +12,7 @@ import MembershipPlansPage from '../../pages/admin/MembershipPlansPage'
 import RoutinesPage from '../../pages/instructor/RoutinesPage';
 import ExercisesPage from '../../pages/instructor/ExercisesPage'
 import MemberClassesPage from '../../pages/member/ClassesPage'
+import InstructorsPage from '@/pages/admin/InstructorsPage'
 
 
 //TODO: Implementar lazy loading para las páginas de cada rol, para que no se carguen todas al inicio y solo se carguen cuando el usuario accede a la ruta correspondiente.
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { path: 'socios/editar/:id', element: <EditMemberPage /> },
       { path: 'socios/:id', element: <MemberDetailsPage /> },
       { path: 'planes', element: <MembershipPlansPage /> },
+      { path: 'instructores', element: <InstructorsPage /> },
     ],
   },
   {
