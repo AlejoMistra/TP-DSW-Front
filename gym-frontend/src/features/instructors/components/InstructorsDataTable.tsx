@@ -27,7 +27,7 @@ type InstructorsDataTableProps = {
   instructors: Instructor[]
   loading: boolean
   onEdit: (instructor: Instructor) => void
-  onDelete: (id: number) => Promise<void>
+  onDelete: (id: number) => void
 }
 
 export default function InstructorsDataTable({
