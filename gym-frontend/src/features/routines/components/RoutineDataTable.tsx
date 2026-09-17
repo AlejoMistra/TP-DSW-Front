@@ -26,8 +26,7 @@ import {
     RiSearchLine,
 } from '@remixicon/react';
 import { Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
+  
 import { cn } from '@/shared/utils/utils';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
