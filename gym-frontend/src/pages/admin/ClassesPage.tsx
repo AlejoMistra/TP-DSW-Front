@@ -9,8 +9,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui
 import ClassScheduleDataTable from "@/features/classSchedule/components/ClassScheduleDataTable"
 import ClassScheduleDialog from "@/features/classSchedule/components/ClassScheduleDialog"
 import WeeklyAgendaTab from "@/features/ClassSession/components/WeeklyAgendaTab"
+import { usePageTitle } from "@/shared/context/PageHeaderContext"
 
 export default function ClassesPage() {
+  usePageTitle("Gestión de Clases")
   const [classes, setClasses] = useState<ClassSchedule[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -89,18 +91,6 @@ export default function ClassesPage() {
 
   return (
     <div className="space-y-4">
-      {/* Top Banner */}
-      <section className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Gestión de Clases</h1>
-            <p className="max-w-2xl text-sm sm:text-base text-muted-foreground">
-              Configurá los tipos de clases y gestioná el cronograma semanal del gimnasio.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Tabs */}
       <Tabs defaultValue="agenda">
         <TabsList variant="line">

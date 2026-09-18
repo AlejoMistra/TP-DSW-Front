@@ -6,8 +6,8 @@ import {
   Dumbbell,
   House,
   NotebookPen,
-  UserRound,
   Users,
+  UserRoundGroup
 } from "lucide-react"
 
 export type AppRole = "admin" | "instructor" | "member"
@@ -26,10 +26,10 @@ export const ROLE_NAVIGATION: Record<
     title: "Administrativo",
     links: [
       { to: "/administrativo/", label: "Inicio", icon: House },
-      { to: "/administrativo/clases", label: "Clases", icon: Calendar },
       { to: "/administrativo/socios", label: "Socios", icon: Users },
+      { to: "/administrativo/instructores", label: "Instructores", icon: Users },
+      { to: "/administrativo/clases", label: "Clases", icon: Calendar },
       { to: "/administrativo/planes", label: "Planes", icon: CreditCard },
-      { to: "/administrativo/instructores", label: "Instructores", icon: UserRound },
     ],
   },
   instructor: {

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import ConfirmDeleteDialog from '@/shared/components/ConfirmDeleteDialog'
 import { useExercises } from '@/features/exercises/hooks/useExercises'
-import { ExerciseHeader } from '@/features/exercises/components/ExerciseHeader'
 import { ExerciseDataTable } from '@/features/exercises/components/ExerciseDataTable'
 import { ExerciseFormDialog } from '@/features/exercises/components/ExerciseFormDialog'
 import type { Exercise } from '@/features/exercises/models/Exercise'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function ExercisesPage() {
+  usePageTitle("Ejercicios")
   const {
     exercises,
     loading,
@@ -33,13 +34,14 @@ export default function ExercisesPage() {
 
   return (
     <div className="space-y-6">
-      <ExerciseHeader totalExercises={exercises.length} onNew={handleNewExercise} />
       <ExerciseDataTable
         exercises={exercises}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onMultipleDelete={handleMultipleDelete}
         loading={loading}
+        onNew={handleNewExercise}
+        totalExercises={exercises.length}
       />
       <ExerciseFormDialog
         open={dialogOpen}

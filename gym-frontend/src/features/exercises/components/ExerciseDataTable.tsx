@@ -26,6 +26,7 @@ import {
   RiPencilLine,
   RiSearchLine,
 } from "@remixicon/react"
+import { Plus } from "lucide-react"
 import { toast } from "sonner"
 
 import { cn } from "@/shared/utils/utils"
@@ -61,6 +62,8 @@ type ExerciseDataTableProps = {
   onDelete: (id: number) => void
   onMultipleDelete?: (ids: number[]) => void
   loading?: boolean
+  onNew?: () => void
+  totalExercises?: number
 }
 
 const COLUMN_LABELS: Record<string, string> = {
@@ -91,6 +94,8 @@ export function ExerciseDataTable({
   onDelete,
   onMultipleDelete,
   loading,
+  onNew,
+  totalExercises,
 }: ExerciseDataTableProps) {
   const isMobile = useIsMobile()
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -299,10 +304,10 @@ export function ExerciseDataTable({
   const pageCount = table.getPageCount()
 
   function handleRemove() {
-  const selectedIds = table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
-  onMultipleDelete?.(selectedIds)
-  table.resetRowSelection()
-}
+    const selectedIds = table.getFilteredSelectedRowModel().rows.map((row) => row.original.id)
+    onMultipleDelete?.(selectedIds)
+    table.resetRowSelection()
+  }
 
   if (loading) {
     return <div className="text-center py-8">Cargando ejercicios...</div>
@@ -315,56 +320,75 @@ export function ExerciseDataTable({
   return (
     <section className="w-full">
       <div className="w-full">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
-            <RiSearchLine
-              className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              value={nameFilter}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              placeholder="Buscar ejercicios..."
-              className="h-8 w-full sm:w-56 pl-8 text-sm"
-              aria-label="Buscar ejercicios por nombre o grupo muscular"
-            />
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
+              <RiSearchLine
+                className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <Input
+                type="search"
+                value={nameFilter}
+                onChange={(event) =>
+                  table.getColumn("name")?.setFilterValue(event.target.value)
+                }
+                placeholder="Buscar ejercicios..."
+                className="h-8 w-full sm:w-56 pl-8 text-sm"
+                aria-label="Buscar ejercicios por nombre o grupo muscular"
+              />
+            </div>
+            {totalExercises !== undefined && (
+              <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                Total: {totalExercises}
+              </Badge>
+            )}
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 h-8"
+                  aria-label="Toggle columns"
+                >
+                  <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
+                  Columnas
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Filtrar Columnas</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {table
+                    .getAllColumns()
+                    .filter((column) => column.getCanHide())
+                    .map((column) => (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(checked) =>
+                          column.toggleVisibility(checked === true)
+                        }
+                      >
+                        {COLUMN_LABELS[column.id] ?? column.id}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {onNew && (
               <Button
-                variant="outline"
-                size="lg"
-                className="shrink-0"
-                aria-label="Toggle columns"
+                size="sm"
+                className="h-8 shrink-0"
+                onClick={onNew}
               >
-                <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
-                Columnas
+                <Plus className="mr-1 size-3.5" />
+                Nuevo Ejercicio
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Filtrar Columnas</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {table
-                  .getAllColumns()
-                  .filter((column) => column.getCanHide())
-                  .map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(checked) =>
-                        column.toggleVisibility(checked === true)
-                      }
-                    >
-                      {COLUMN_LABELS[column.id] ?? column.id}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            )}
+          </div>
         </div>
 
         {selectedCount > 0 && (

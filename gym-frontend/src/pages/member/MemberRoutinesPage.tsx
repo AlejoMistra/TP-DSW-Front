@@ -7,6 +7,7 @@ import { useRoutines } from '@/features/routines/hooks/useRoutines'
 import { RoutineDetailsDialog } from '@/features/routines/components/RoutineDetailsDialog'
 import type { Routine } from '@/features/routines/models/Routine'
 import { ActiveRoutineTracker } from '@/features/routines/components/ActiveRoutineTracker'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function MemberRoutinesPage() {
   const { routines, loading } = useRoutines()
@@ -15,6 +16,8 @@ export default function MemberRoutinesPage() {
   const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+
+  usePageTitle(view === 'workout' ? 'Entrenamiento Activo' : 'Rutinas')
 
   // Si está en modo entrenamiento activo, renderizamos el tracker
   if (view === 'workout' && selectedRoutine) {
@@ -40,17 +43,6 @@ export default function MemberRoutinesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Encabezado */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Rutinas de Entrenamiento
-        </h1>
-        <p className="text-sm text-muted-foreground sm:text-base">
-          Explorá las rutinas del gimnasio y seleccioná una para iniciar tu
-          entrenamiento en vivo.
-        </p>
-      </div>
-
       {/* Buscador */}
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -104,9 +96,9 @@ export default function MemberRoutinesPage() {
                 </p>
 
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Dumbbell className="size-4 text-amber-400" />
+                  <Dumbbell className="size-4 text-primary" />
                   <span>
-                    {routine.routineExercises?.length || 0} ejercicios incluidos
+                    {routine.routineExercises?.length || 0} ejercicios
                   </span>
                 </div>
               </div>

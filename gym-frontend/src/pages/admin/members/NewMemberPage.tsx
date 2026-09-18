@@ -6,8 +6,10 @@ import MemberForm from '@/features/members/components/MemberForm'
 import PlanSelector from '@/features/membershipPlans/components/PlanSelector'
 import PaymentMethodSelector from '@/features/payments/components/PaymentForm'
 import { useNewMember } from '@/features/members/hooks/useNewMember'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function NewMemberPage() {
+  usePageTitle("Alta de Socio")
   const navigate = useNavigate()
   const {
     plans,
@@ -33,11 +35,6 @@ export default function NewMemberPage() {
             { label: 'Nuevo Socio' },
           ]}
         />
-        <section className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Nuevo Socio
-          </h1>
-        </section>
         <div className="rounded-xl border bg-background px-4 py-2 sm:px-6 text-center">
           <p>Cargando...</p>
         </div>
@@ -53,14 +50,6 @@ export default function NewMemberPage() {
           { label: 'Nuevo Socio' },
         ]}
       />
-      <section className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Nuevo Socio
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-          Completá los datos del socio, seleccioná un plan y definí el método de pago.
-        </p>
-      </section>
 
       <div>
         <MemberForm onSubmit={handleSubmit} />

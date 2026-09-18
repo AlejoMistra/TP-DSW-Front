@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useRoutines } from '@/features/routines/hooks/useRoutines';
-import { RoutineHeader } from '@/features/routines/components/RoutineHeader';
 import { RoutineDataTable } from '@/features/routines/components/RoutineDataTable';
 import { RoutineDetailsDialog } from '@/features/routines/components/RoutineDetailsDialog';
 import { RoutineForm } from '@/features/routines/components/RoutineForm';
 import ConfirmDeleteDialog from '@/shared/components/ConfirmDeleteDialog';
 import type { Routine } from '@/features/routines/models/Routine';
+import { usePageTitle } from '@/shared/context/PageHeaderContext';
 
 export default function RoutinesPage() {
     const {
@@ -24,6 +24,8 @@ export default function RoutinesPage() {
     const [view, setView] = useState<'list' | 'form'>('list');
     const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
+
+    usePageTitle(view === 'form' ? (selectedRoutine ? 'Editar Rutina' : 'Nueva Rutina') : 'Rutinas');
 
     const handleNew = () => {
         setSelectedRoutine(null);
@@ -60,11 +62,9 @@ export default function RoutinesPage() {
         );
     }
 
-    // Si está en modo listado, mostramos Header + Tabla + Modales
+    // Si está en modo listado, mostramos Tabla + Modales
     return (
         <div className="space-y-6">
-            <RoutineHeader totalRoutines={routines.length} onNew={handleNew} />
-
             <RoutineDataTable
                 routines={routines}
                 onView={handleView}
@@ -72,6 +72,8 @@ export default function RoutinesPage() {
                 onDelete={handleDelete}
                 onMultipleDelete={handleMultipleDelete}
                 loading={loading}
+                onNew={handleNew}
+                totalRoutines={routines.length}
             />
 
             {/* Modal para previsualizar los ejercicios de una rutina */}

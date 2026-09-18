@@ -4,6 +4,7 @@ import {
   RiMoreLine,
   RiPencilLine,
 } from "@remixicon/react"
+import { Plus } from "lucide-react"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -29,6 +30,8 @@ type PlansDataTableProps = {
   onDelete: (id: number) => Promise<void>
   title?: string
   subtitle?: string
+  onAddNew?: () => void
+  totalPlans?: number
 }
 
 // Formatea un número como precio.
@@ -38,7 +41,15 @@ function formatPrice(value: number) {
   )
 }
 
-export default function PlansDataTable({ plans, onEdit, onDelete, title, subtitle }: PlansDataTableProps) {
+export default function PlansDataTable({
+  plans,
+  onEdit,
+  onDelete,
+  title,
+  subtitle,
+  onAddNew,
+  totalPlans,
+}: PlansDataTableProps) {
   // Elimina un plan; el hook ya avisa el resultado con un toast.
   async function handleDelete(plan: MembershipPlan) {
     try {
@@ -50,13 +61,26 @@ export default function PlansDataTable({ plans, onEdit, onDelete, title, subtitl
 
   return (
     <div className="w-full">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <h1 className="text-2xl font-semibold">{title ?? ""}</h1>
           <p className="text-sm text-muted-foreground">
             {subtitle ?? ""}
           </p>
+          {totalPlans !== undefined && (
+            <div className="pt-1">
+              <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                Total de planes: {totalPlans}
+              </Badge>
+            </div>
+          )}
         </div>
+        {onAddNew && (
+          <Button onClick={onAddNew} className="w-full sm:w-auto">
+            <Plus className="mr-1 size-3.5" aria-hidden="true" />
+            Nuevo Plan
+          </Button>
+        )}
       </div>
       <div className="border border-border bg-card">
         <Table>

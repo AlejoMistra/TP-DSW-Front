@@ -3,9 +3,11 @@ import MemberDetailsHeader from '@/features/members/components/MemberDetailsHead
 import MemberPersonalDetails from '@/features/members/components/MemberPersonalDetails'
 import CurrentMembershipInfo from '@/features/memberships/components/CurrentMembershipInfo'
 import { useMemberDetails } from '@/features/members/hooks/useMemberDetails'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function MemberDetailsPage() {
   const { member, membership, plan, loading, refreshMembership } = useMemberDetails()
+  usePageTitle("Detalle de Socio")
 
   if (loading) {
     return (

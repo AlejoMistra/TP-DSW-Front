@@ -2,8 +2,10 @@ import ClassDateSelector from '@/features/ClassSession/components/ClassDateSelec
 import ClassCategoryFilter from '@/features/ClassSession/components/ClassCategoryFilter'
 import ClassSessionCard from '@/features/ClassSession/components/ClassSessionCard'
 import { useMemberClasses } from '@/features/ClassSession/hooks/useMemberClasses'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function ClassesPage() {
+  usePageTitle("Horario de Clases")
   const {
     dates,
     categories,
@@ -17,12 +19,7 @@ export default function ClassesPage() {
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto">
-        <section className="px-4 py-2 md:px-8">
-          <h2 className="text-4xl font-extrabold leading-tight mb-2">Reserva de Clases</h2>
-          <p>Encontrá tu próximo desafío.</p>
-        </section>
-
+      <div className="max-w-7xl mx-auto space-y-4">
         <ClassDateSelector
           dates={dates}
           selectedDate={selectedDate}

@@ -14,6 +14,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import {
+  RiAddLine,
   RiArrowDownLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
@@ -66,6 +67,10 @@ type MembersDataTableProps = {
   subtitle?: string
   onEdit?: (id: number) => void
   onDelete?: (id: number) => void
+  onNew?: () => void
+  activeCount?: number
+  inactiveCount?: number
+  totalCount?: number
 }
 
 const membershipStatusVariant = Object.fromEntries(
@@ -112,6 +117,10 @@ export default function MembersDataTable({
   subtitle,
   onEdit,
   onDelete,
+  onNew,
+  activeCount,
+  inactiveCount,
+  totalCount,
 }: MembersDataTableProps) {
   const navigate = useNavigate()
 
@@ -338,13 +347,32 @@ export default function MembersDataTable({
     <section className="w-full">
       <div className="w-full">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
             <div>
               <h1 className="text-2xl font-semibold">{title ?? ""}</h1>
               <p className="text-sm text-muted-foreground">
                 {subtitle ?? ""}
               </p>
             </div>
+            {(activeCount !== undefined || inactiveCount !== undefined || totalCount !== undefined) && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {activeCount !== undefined && (
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                    Socios activos: {activeCount}
+                  </Badge>
+                )}
+                {inactiveCount !== undefined && (
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                    Socios inactivos: {inactiveCount}
+                  </Badge>
+                )}
+                {totalCount !== undefined && (
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                    Total: {totalCount}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex w-full flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap">
             <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
@@ -396,6 +424,16 @@ export default function MembersDataTable({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+            {onNew && (
+              <Button
+                size="default"
+                className="shrink-0"
+                onClick={onNew}
+              >
+                <RiAddLine className="mr-1 size-3.5" aria-hidden="true" />
+                Nuevo Socio
+              </Button>
+            )}
           </div>
         </div>
 

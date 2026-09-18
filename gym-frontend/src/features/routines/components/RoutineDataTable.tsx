@@ -25,7 +25,7 @@ import {
     RiPencilLine,
     RiSearchLine,
 } from '@remixicon/react';
-import { Eye } from 'lucide-react';
+import { Eye, Plus } from 'lucide-react';
   
 import { cn } from '@/shared/utils/utils';
 import { Badge } from '@/shared/components/ui/badge';
@@ -60,6 +60,8 @@ type RoutineDataTableProps = {
     onDelete: (id: number) => void;
     onMultipleDelete?: (ids: number[]) => void;
     loading?: boolean;
+    onNew?: () => void;
+    totalRoutines?: number;
 };
 
 const COLUMN_LABELS: Record<string, string> = {
@@ -82,6 +84,8 @@ export function RoutineDataTable({
     onDelete,
     onMultipleDelete,
     loading,
+    onNew,
+    totalRoutines,
 }: RoutineDataTableProps) {
     const isMobile = useIsMobile();
     const [sorting, setSorting] = React.useState<SortingState>([{ id: 'name', desc: false }]);
@@ -267,46 +271,61 @@ export function RoutineDataTable({
     return (
         <section className="w-full">
             <div className="w-full">
-                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
-                        <RiSearchLine
-                            className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
-                            aria-hidden="true"
-                        />
-                        <Input
-                            type="search"
-                            value={nameFilter}
-                            onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
-                            placeholder="Buscar rutina..."
-                            className="h-8 w-full sm:w-56 pl-8 text-sm"
-                        />
+                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
+                            <RiSearchLine
+                                className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
+                                aria-hidden="true"
+                            />
+                            <Input
+                                type="search"
+                                value={nameFilter}
+                                onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+                                placeholder="Buscar rutina..."
+                                className="h-8 w-full sm:w-56 pl-8 text-sm"
+                            />
+                        </div>
+                        {totalRoutines !== undefined && (
+                            <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                                Total: {totalRoutines}
+                            </Badge>
+                        )}
                     </div>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="lg" className="shrink-0">
-                                <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
-                                Columnas
+                    <div className="flex items-center gap-2">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="shrink-0 h-8">
+                                    <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
+                                    Columnas
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-40">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuLabel>Filtrar Columnas</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    {table
+                                        .getAllColumns()
+                                        .filter((column) => column.getCanHide())
+                                        .map((column) => (
+                                            <DropdownMenuCheckboxItem
+                                                key={column.id}
+                                                checked={column.getIsVisible()}
+                                                onCheckedChange={(checked) => column.toggleVisibility(checked === true)}
+                                            >
+                                                {COLUMN_LABELS[column.id] ?? column.id}
+                                            </DropdownMenuCheckboxItem>
+                                        ))}
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        {onNew && (
+                            <Button size="sm" className="h-8 shrink-0" onClick={onNew}>
+                                <Plus className="mr-1 size-3.5" />
+                                Nueva Rutina
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuGroup>
-                                <DropdownMenuLabel>Filtrar Columnas</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                {table
-                                    .getAllColumns()
-                                    .filter((column) => column.getCanHide())
-                                    .map((column) => (
-                                        <DropdownMenuCheckboxItem
-                                            key={column.id}
-                                            checked={column.getIsVisible()}
-                                            onCheckedChange={(checked) => column.toggleVisibility(checked === true)}
-                                        >
-                                            {COLUMN_LABELS[column.id] ?? column.id}
-                                        </DropdownMenuCheckboxItem>
-                                    ))}
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        )}
+                    </div>
                 </div>
 
                 {selectedCount > 0 && (

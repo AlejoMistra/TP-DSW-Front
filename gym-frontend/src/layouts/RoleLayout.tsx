@@ -10,13 +10,11 @@ import { ROLE_NAVIGATION, type AppRole } from "@/config/navigation"
 //import { Avatar } from "@/components/ui/avatar"
 import { Bell, Settings, CircleUser } from "lucide-react"
 import { ThemeToggle } from "@/shared/components/ThemeToggle"
+import { PageHeaderProvider, usePageHeader } from "@/shared/context/PageHeaderContext"
 
-export default function RoleLayout({
-  role,
-}: {
-  role: AppRole
-}) {
+function RoleLayoutContent({ role }: { role: AppRole }) {
   const { links, title } = ROLE_NAVIGATION[role]
+  const { title: headerTitle } = usePageHeader()
   const systemName = "MyGymManager" // TODO: Move to config file
 
   return (
@@ -27,7 +25,7 @@ export default function RoleLayout({
         <SidebarInset className="flex min-h-screen flex-1 flex-col">
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="hidden md:inline-flex" />
-            <span className="text-2xl font-medium">Portal {title}</span>
+            <span className="text-2xl font-medium">{headerTitle || `Portal ${title}`}</span>
             <div className="ml-auto flex items-center gap-3">
               <ThemeToggle />
               <Bell className="h-5 w-5" /> {/* TODO: Implementar con componente: A notification icon component in React typically combines a SVG bell icon with an absolute-positioned badge element to display the unread alert count*/}
@@ -48,5 +46,17 @@ export default function RoleLayout({
         </SidebarInset>
       </div>
     </SidebarProvider>
+  )
+}
+
+export default function RoleLayout({
+  role,
+}: {
+  role: AppRole
+}) {
+  return (
+    <PageHeaderProvider>
+      <RoleLayoutContent role={role} />
+    </PageHeaderProvider>
   )
 }

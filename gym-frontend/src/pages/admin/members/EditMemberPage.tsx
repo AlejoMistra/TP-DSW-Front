@@ -3,8 +3,10 @@ import BreadCrumb from '@/shared/components/BreadCrumb'
 import { Button } from '@/shared/components/ui/button'
 import MemberForm from '@/features/members/components/MemberForm'
 import { useEditMember } from '@/features/members/hooks/useEditMember'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function EditMemberPage() {
+  usePageTitle("Editar Socio")
   const navigate = useNavigate()
   const { id, member, loading, handleSubmit } = useEditMember()
 
@@ -17,13 +19,8 @@ export default function EditMemberPage() {
             { label: 'Editar Socio' },
           ]}
         />
-        <section className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Editar Socio
-          </h1>
-        </section>
         <div className="rounded-xl border bg-background px-4 py-6 sm:px-6 text-center">
-          <p>Cargando...</p>
+          <p>Cargando datos del Socio...</p>
         </div>
       </div>
     )
@@ -56,15 +53,6 @@ export default function EditMemberPage() {
           { label: 'Editar' },
         ]}
       />
-
-      <section className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Edición de Socio
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-          Edita los datos del socio según sea necesario.
-        </p>
-      </section>
 
       <div>
         <MemberForm member={member} onSubmit={handleSubmit} />
