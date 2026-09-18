@@ -6,8 +6,7 @@ import {
   Dumbbell,
   House,
   NotebookPen,
-  Users,
-  UserRoundGroup
+  Users
 } from "lucide-react"
 
 export type AppRole = "admin" | "instructor" | "member"

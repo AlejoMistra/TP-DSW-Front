@@ -12,9 +12,16 @@ function Dialog({
 }
 
 function DialogTrigger({
+  className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+  return (
+    <DialogPrimitive.Trigger
+      data-slot="dialog-trigger"
+      className={cn("cursor-pointer", className)}
+      {...props}
+    />
+  )
 }
 
 function DialogPortal({
@@ -24,9 +31,16 @@ function DialogPortal({
 }
 
 function DialogClose({
+  className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
+  return (
+    <DialogPrimitive.Close
+      data-slot="dialog-close"
+      className={cn("cursor-pointer", className)}
+      {...props}
+    />
+  )
 }
 
 function DialogOverlay({
