@@ -15,7 +15,13 @@ export default function MembershipPlansPage() {
     handleEdit,
     handleDelete,
     handleSave,
+    deleteConfirm,
+    setDeleteConfirm,
+    confirmDelete,
+    isDeleting,
   } = useMembershipPlans()
+
+  const planName = deleteConfirm.plan ? deleteConfirm.plan.name : "este plan"
 
   return (
     <div className="space-y-4">
@@ -37,6 +43,16 @@ export default function MembershipPlansPage() {
         onOpenChange={setDialogOpen}
         planToEdit={planToEdit}
         onSave={handleSave}
+      />
+
+      {/* Diálogo de confirmación de eliminación */}
+      <ConfirmDeleteDialog
+        open={deleteConfirm.open}
+        title={`¿Confirmás eliminar el plan "${planName}"?`}
+        description="Esta acción eliminará el plan del sistema y no se puede deshacer."
+        isLoading={isDeleting}
+        onClose={() => setDeleteConfirm({ open: false, plan: null })}
+        onConfirm={confirmDelete}
       />
     </div>
   )

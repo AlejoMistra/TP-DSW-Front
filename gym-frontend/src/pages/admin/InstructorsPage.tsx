@@ -1,5 +1,6 @@
 import InstructorsDataTable from '@/features/instructors/components/InstructorsDataTable'
 import InstructorFormDialog from '@/features/instructors/components/InstructorFormDialog'
+import ConfirmDeleteDialog from '@/shared/components/ConfirmDeleteDialog'
 import { useInstructors } from '@/features/instructors/hooks/useInstructors'
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
@@ -15,7 +16,15 @@ export default function InstructorsPage() {
     handleEdit,
     handleDelete,
     handleSave,
+    deleteConfirm,
+    setDeleteConfirm,
+    confirmDelete,
+    isDeleting,
   } = useInstructors()
+
+  const instructorName = deleteConfirm.instructor
+    ? `${deleteConfirm.instructor.name} ${deleteConfirm.instructor.surname}`
+    : 'este instructor'
 
   return (
     <div className="space-y-4">
@@ -36,6 +45,16 @@ export default function InstructorsPage() {
         onOpenChange={setDialogOpen}
         instructorToEdit={instructorToEdit}
         onSave={handleSave}
+      />
+
+      {/* Modal de confirmación individual */}
+      <ConfirmDeleteDialog
+        open={deleteConfirm.open}
+        title={`¿Confirmás eliminar a ${instructorName}?`}
+        description="Esta acción eliminará al instructor del sistema y no se puede deshacer."
+        isLoading={isDeleting}
+        onClose={() => setDeleteConfirm({ open: false, instructor: null })}
+        onConfirm={confirmDelete}
       />
     </div>
   )
