@@ -1,18 +1,10 @@
 import {
   RiDeleteBinLine,
-  RiMoreLine,
   RiPencilLine,
 } from '@remixicon/react'
 import { Plus } from 'lucide-react'
 import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -93,8 +85,8 @@ export default function InstructorsDataTable({
                 Teléfono
               </TableHead>
 
-              <TableHead className="h-10 text-center">
-                <span className="sr-only">Acciones</span>
+              <TableHead className="h-10 text-center text-sm font-medium tracking-wide text-muted-foreground uppercase">
+                Acciones
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -132,39 +124,26 @@ export default function InstructorsDataTable({
                   </TableCell>
 
                   <TableCell className="py-3 text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label={`Acciones para ${instructor.name} ${instructor.surname}`}
-                        >
-                          <RiMoreLine
-                            className="size-4"
-                            aria-hidden="true"
-                          />
-                        </Button>
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem
-                          onClick={() => onEdit(instructor)}
-                        >
-                          <RiPencilLine aria-hidden="true" />
-                          Editar
-                        </DropdownMenuItem>
-
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => handleDelete(instructor)}
-                        >
-                          <RiDeleteBinLine aria-hidden="true" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Editar"
+                        onClick={() => onEdit(instructor)}
+                      >
+                        <RiPencilLine aria-hidden="true" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Eliminar"
+                        onClick={() => handleDelete(instructor)}
+                      >
+                        <RiDeleteBinLine aria-hidden="true" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

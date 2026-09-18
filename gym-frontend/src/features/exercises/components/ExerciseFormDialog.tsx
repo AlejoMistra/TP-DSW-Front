@@ -85,10 +85,10 @@ export function ExerciseFormDialog({
 
     try {
       const dataToSubmit: CreateExerciseInput = {
-        name: formData.name,
-        muscleGroup: formData.muscleGroup,
+        name: formData.name.trim(),
+        muscleGroup: formData.muscleGroup.trim(),
         difficultyLevel: formData.difficultyLevel,
-        description: formData.description,
+        description: formData.description.trim() || null,
       }
 
       if (exercise) {
@@ -188,14 +188,15 @@ export function ExerciseFormDialog({
             </div>
 
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="description">Descripción</Label>
+              <Label htmlFor="description">
+                Descripción <span className="text-muted-foreground text-xs font-normal">(opcional)</span>
+              </Label>
               <Textarea
                 id="description"
                 name="description"
                 placeholder="Descripción del ejercicio"
                 value={formData.description || ''}
                 onChange={handleChange}
-                required
               />
             </div>
           </div>
