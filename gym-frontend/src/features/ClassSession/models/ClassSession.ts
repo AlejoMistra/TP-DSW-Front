@@ -11,6 +11,25 @@ export type DayOfWeek =
   | 'Sábado'
   | 'Domingo'
 
+export const CATEGORY_LABELS: Record<string, string> = {
+  CARDIO: 'Cardio',
+  CROSSFIT: 'CrossFit',
+  DANCE: 'Dance',
+  FUNCTIONAL: 'Functional',
+  HIIT: 'HIIT',
+  PILATES: 'Pilates',
+  SPINNING: 'Spinning',
+  STRETCHING: 'Stretching',
+  YOGA: 'Yoga',
+  OTHER: 'Otro',
+}
+
+export function getCategoryLabel(category?: string | null): string {
+  if (!category) return 'General'
+  const upper = category.toUpperCase()
+  return CATEGORY_LABELS[upper] || category
+}
+
 export interface ClassSchedule {
   id: string | number
   name: string
@@ -33,6 +52,9 @@ export interface ClassSchedule {
 export interface ClassDateOption {
   day: string
   date: string
+  fullDate: string
+  month?: string
+  isToday?: boolean
   active?: boolean
 }
 
@@ -54,6 +76,22 @@ export interface ClassSession {
   // Populated relations
   classSchedule?: RealClassSchedule | ClassSchedule
   instructor?: Instructor | null
+}
+
+export interface MemberClassSession extends ClassSession {
+  userBookingId?: number | null
+  isReserved: boolean
+}
+
+export interface ClassBooking {
+  id: number
+  memberId: number
+  classSessionId: number
+  bookingDate?: string | Date
+  status: 'CONFIRMED' | 'CANCELLED'
+  createdAt?: string | Date
+  updatedAt?: string | Date
+  deletedAt?: string | Date | null
 }
 
 export interface CreateClassSessionInput {
