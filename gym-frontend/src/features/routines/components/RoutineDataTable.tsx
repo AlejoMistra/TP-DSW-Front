@@ -21,12 +21,11 @@ import {
     RiDeleteBinLine,
     RiExpandUpDownLine,
     RiLayoutColumnLine,
-    RiMoreLine,
     RiPencilLine,
     RiSearchLine,
 } from '@remixicon/react';
 import { Eye, Plus } from 'lucide-react';
-  
+
 import { cn } from '@/shared/utils/utils';
 import { Badge } from '@/shared/components/ui/badge';
 import { Button } from '@/shared/components/ui/button';
@@ -36,7 +35,6 @@ import {
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuGroup,
-    DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
@@ -68,7 +66,6 @@ const COLUMN_LABELS: Record<string, string> = {
     name: 'Rutina',
     difficulty: 'Dificultad',
     exercisesCount: 'Ejercicios',
-    description: 'Descripción',
 };
 
 function SortIcon({ sorted }: { sorted: false | 'asc' | 'desc' }) {
@@ -137,14 +134,23 @@ export function RoutineDataTable({
                     <SortIcon sorted={column.getIsSorted()} />
                 </button>
             ),
-            cell: ({ row }) => (
-                <div className="text-left font-medium text-base">
-                    <p className="truncate">{row.original.name}</p>
-                    {row.original.description && (
-                        <p className="truncate text-xs text-muted-foreground">{row.original.description}</p>
-                    )}
-                </div>
-            ),
+            cell: ({ row }) => {
+                const routine = row.original;
+                return (
+                    <div className="flex min-w-0 w-full items-center justify-start gap-3 text-left">
+                        <div className="min-w-0 text-left">
+                            <p className="truncate text-base leading-tight font-medium" title={routine.name}>
+                                {routine.name}
+                            </p>
+                            {routine.description && (
+                                <p className="truncate text-sm text-muted-foreground" title={routine.description}>
+                                    {routine.description}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                );
+            },
         },
         {
             accessorKey: 'difficulty',
@@ -155,20 +161,8 @@ export function RoutineDataTable({
             ),
             cell: ({ row }) => {
                 const diff = row.original.difficulty;
-                let variant: 'default' | 'outline' | 'destructive' = 'default';
-                let customClass = '';
-
-                if (diff === 'BEGINNER') {
-                    variant = 'default';
-                    customClass = 'bg-green-700 text-green-300';
-                } else if (diff === 'INTERMEDIATE') {
-                    variant = 'default';
-                } else if (diff === 'ADVANCED') {
-                    variant = 'destructive';
-                }
-
                 return (
-                    <Badge variant={variant} className={customClass ? `${customClass} text-sm` : 'text-sm'}>
+                    <Badge variant="secondary" className="text-sm">
                         {diff === 'BEGINNER' && 'Principiante'}
                         {diff === 'INTERMEDIATE' && 'Intermedio'}
                         {diff === 'ADVANCED' && 'Avanzado'}
@@ -192,36 +186,40 @@ export function RoutineDataTable({
             id: 'actions',
             enableSorting: false,
             enableHiding: false,
-            header: () => <span className="sr-only">Acciones</span>,
+            header: () => (
+                <span className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+                    Acciones
+                </span>
+            ),
             cell: ({ row }) => (
-                <div className="flex justify-center">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon-sm" aria-label="Acciones">
-                                <RiMoreLine className="size-4" aria-hidden="true" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-44">
-                            <DropdownMenuItem onClick={() => onView(row.original)}>
-                                <Eye className="size-4 mr-1.5" />
-                                Ver Detalle
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => onEdit(row.original)}
-                            >
-                                <RiPencilLine aria-hidden="true" />
-                                Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                variant="destructive"
-                                onClick={() => onDelete(row.original.id)}
-                            >
-                                <RiDeleteBinLine aria-hidden="true" />
-                                Eliminar
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                <div className="flex justify-center gap-1">
+                    <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Ver detalle"
+                        onClick={() => onView(row.original)}
+                    >
+                        <Eye aria-hidden="true" />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Editar"
+                        onClick={() => onEdit(row.original)}
+                    >
+                        <RiPencilLine aria-hidden="true" />
+                    </Button>
+                    <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Eliminar"
+                        onClick={() => onDelete(row.original.id)}
+                    >
+                        <RiDeleteBinLine aria-hidden="true" />
+                    </Button>
                 </div>
             ),
         },
@@ -283,11 +281,11 @@ export function RoutineDataTable({
                                 value={nameFilter}
                                 onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
                                 placeholder="Buscar rutina..."
-                                className="h-8 w-full sm:w-56 pl-8 text-sm"
+                                className="w-full sm:w-56 pl-8 text-sm"
                             />
                         </div>
                         {totalRoutines !== undefined && (
-                            <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                            <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
                                 Total: {totalRoutines}
                             </Badge>
                         )}
@@ -295,7 +293,7 @@ export function RoutineDataTable({
                     <div className="flex items-center gap-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="shrink-0 h-8">
+                                <Button variant="outline" className="shrink-0 h-8">
                                     <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
                                     Columnas
                                 </Button>
@@ -320,7 +318,7 @@ export function RoutineDataTable({
                             </DropdownMenuContent>
                         </DropdownMenu>
                         {onNew && (
-                            <Button size="sm" className="h-8 shrink-0" onClick={onNew}>
+                            <Button className="shrink-0" onClick={onNew}>
                                 <Plus className="mr-1 size-3.5" />
                                 Nueva Rutina
                             </Button>
@@ -368,8 +366,11 @@ export function RoutineDataTable({
                                             key={header.id}
                                             className={cn(
                                                 'h-10 text-center align-middle text-sm',
-                                                header.column.id === 'select' && 'pl-4 text-left',
-                                                header.column.id === 'name' && 'pl-2 text-left'
+                                                header.column.id === 'select' && 'w-px pl-4 text-left',
+                                                header.column.id === 'name' && 'w-full pl-2 text-left',
+                                                header.column.id === 'difficulty' && 'w-px whitespace-nowrap px-4 text-center',
+                                                header.column.id === 'exercisesCount' && 'w-px whitespace-nowrap px-4 text-center',
+                                                header.column.id === 'actions' && 'w-px whitespace-nowrap px-4 text-center'
                                             )}
                                         >
                                             {header.isPlaceholder
@@ -393,8 +394,11 @@ export function RoutineDataTable({
                                                 key={cell.id}
                                                 className={cn(
                                                     'py-3 text-center align-middle',
-                                                    cell.column.id === 'select' && 'pl-4 text-left',
-                                                    cell.column.id === 'name' && 'pl-2 text-left'
+                                                    cell.column.id === 'select' && 'w-px pl-4 text-left',
+                                                    cell.column.id === 'name' && 'w-full max-w-0 pl-2 text-left',
+                                                    cell.column.id === 'difficulty' && 'w-px whitespace-nowrap px-4 text-center',
+                                                    cell.column.id === 'exercisesCount' && 'w-px whitespace-nowrap px-4 text-center',
+                                                    cell.column.id === 'actions' && 'w-px whitespace-nowrap px-4 text-center'
                                                 )}
                                             >
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -405,7 +409,7 @@ export function RoutineDataTable({
                             ) : (
                                 <TableRow className="hover:bg-transparent">
                                     <TableCell
-                                        colSpan={columns.length}
+                                        colSpan={table.getVisibleFlatColumns().length}
                                         className="h-24 text-center text-sm text-muted-foreground"
                                     >
                                         No se encontraron rutinas.

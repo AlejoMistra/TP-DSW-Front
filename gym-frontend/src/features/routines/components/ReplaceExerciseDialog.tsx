@@ -10,39 +10,45 @@ import {
 import { Input } from '@/shared/components/ui/input';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
-import { Search, Plus, Check } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { cn } from '@/shared/utils/utils';
 import type { Exercise } from '@/features/exercises/models/Exercise';
 
-interface AddExerciseDialogProps {
+interface ReplaceExerciseDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    currentExerciseName?: string;
+    currentExerciseId?: number;
     availableExercises: Exercise[];
     existingExerciseIds?: number[];
-    onAddExercises: (exercises: Exercise[]) => void;
-    onSelect?: (exercise: Exercise) => void;
+    onReplace: (newExercise: Exercise) => void;
 }
 
-export function AddExerciseDialog({
+export function ReplaceExerciseDialog({
     open,
     onOpenChange,
+    currentExerciseName,
+    currentExerciseId,
     availableExercises,
     existingExerciseIds = [],
-    onAddExercises,
-    onSelect,
-}: AddExerciseDialogProps) {
+    onReplace,
+}: ReplaceExerciseDialogProps) {
     const [search, setSearch] = useState('');
-    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
-    // Reset selection and search state when dialog closes
     useEffect(() => {
         if (!open) {
-            setSelectedIds(new Set());
             setSearch('');
         }
     }, [open]);
 
-    const existingSet = useMemo(() => new Set(existingExerciseIds), [existingExerciseIds]);
+    // Exercises already in routine (except the one currently being replaced)
+    const existingSet = useMemo(() => {
+        const set = new Set(existingExerciseIds);
+        if (currentExerciseId) {
+            set.delete(currentExerciseId);
+        }
+        return set;
+    }, [existingExerciseIds, currentExerciseId]);
 
     const filtered = useMemo(() => {
         const q = search.toLowerCase().trim();
@@ -55,29 +61,9 @@ export function AddExerciseDialog({
         );
     }, [availableExercises, search]);
 
-    const toggleSelect = (id: number) => {
-        if (existingSet.has(id)) return;
-        setSelectedIds((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
-            return next;
-        });
-    };
-
-    const handleAdd = () => {
-        const toAdd = availableExercises.filter((ex) => selectedIds.has(ex.id));
-        if (toAdd.length === 0) return;
-
-        if (onAddExercises) {
-            onAddExercises(toAdd);
-        } else if (onSelect) {
-            toAdd.forEach((ex) => onSelect(ex));
-        }
-
+    const handleSelect = (exercise: Exercise) => {
+        if (existingSet.has(exercise.id)) return;
+        onReplace(exercise);
         onOpenChange(false);
     };
 
@@ -85,9 +71,19 @@ export function AddExerciseDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90dvh] flex flex-col p-4 sm:p-6 gap-0 overflow-hidden">
                 <DialogHeader className="shrink-0 pb-1">
-                    <DialogTitle className="text-xl font-bold">Añadir Ejercicios</DialogTitle>
+                    <DialogTitle className="text-xl font-bold">Reemplazar Ejercicio</DialogTitle>
                     <DialogDescription>
-                        Seleccioná uno o varios ejercicios para incorporarlos a la rutina.
+                        {currentExerciseName ? (
+                            <>
+                                Seleccioná el nuevo ejercicio para reemplazar{' '}
+                                <span className="font-semibold text-foreground">
+                                    {currentExerciseName}
+                                </span>
+                                .
+                            </>
+                        ) : (
+                            'Seleccioná el nuevo ejercicio para reemplazar el actual.'
+                        )}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -108,32 +104,36 @@ export function AddExerciseDialog({
                         </p>
                     ) : (
                         filtered.map((ex) => {
-                            const isAlreadyAdded = existingSet.has(ex.id);
-                            const isSelected = selectedIds.has(ex.id);
+                            const isAlreadyInRoutine = existingSet.has(ex.id);
+                            const isCurrent = ex.id === currentExerciseId;
 
                             return (
                                 <div
                                     key={ex.id}
-                                    role={isAlreadyAdded ? undefined : 'button'}
-                                    tabIndex={isAlreadyAdded ? undefined : 0}
+                                    role={isAlreadyInRoutine || isCurrent ? undefined : 'button'}
+                                    tabIndex={isAlreadyInRoutine || isCurrent ? undefined : 0}
                                     onKeyDown={(e) => {
-                                        if (!isAlreadyAdded && (e.key === 'Enter' || e.key === ' ')) {
+                                        if (
+                                            !isAlreadyInRoutine &&
+                                            !isCurrent &&
+                                            (e.key === 'Enter' || e.key === ' ')
+                                        ) {
                                             e.preventDefault();
-                                            toggleSelect(ex.id);
+                                            handleSelect(ex);
                                         }
                                     }}
                                     onClick={() => {
-                                        if (!isAlreadyAdded) {
-                                            toggleSelect(ex.id);
+                                        if (!isAlreadyInRoutine && !isCurrent) {
+                                            handleSelect(ex);
                                         }
                                     }}
                                     className={cn(
                                         'flex items-center justify-between gap-3 p-3 rounded-xl border transition-all text-left select-none',
-                                        isAlreadyAdded
-                                            ? 'opacity-60 bg-muted/20 border-border/50 cursor-not-allowed'
-                                            : isSelected
-                                                ? 'border-primary bg-primary/10 ring-1 ring-primary/40 cursor-pointer shadow-xs'
-                                                : 'border-border bg-card hover:bg-muted/40 hover:border-border/80 cursor-pointer'
+                                        isCurrent
+                                            ? 'opacity-60 bg-muted/20 border-border/50 cursor-default'
+                                            : isAlreadyInRoutine
+                                                ? 'opacity-60 bg-muted/20 border-border/50 cursor-not-allowed'
+                                                : 'border-border bg-card hover:bg-muted/40 hover:border-border/80 cursor-pointer shadow-xs'
                                     )}
                                 >
                                     <div className="min-w-0 flex-1">
@@ -149,24 +149,14 @@ export function AddExerciseDialog({
                                     </div>
 
                                     <div className="shrink-0 flex items-center">
-                                        {isAlreadyAdded ? (
+                                        {isCurrent ? (
+                                            <Badge variant="outline" className="text-xs font-normal py-1 px-2">
+                                                Actual
+                                            </Badge>
+                                        ) : isAlreadyInRoutine ? (
                                             <Badge variant="secondary" className="text-xs font-normal py-1 px-2">
                                                 Ya en la rutina
                                             </Badge>
-                                        ) : isSelected ? (
-                                            <Button
-                                                size="sm"
-                                                variant="default"
-                                                type="button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleSelect(ex.id);
-                                                }}
-                                                className="gap-1.5 text-xs font-medium"
-                                            >
-                                                <Check className="size-3.5" />
-                                                Seleccionado
-                                            </Button>
                                         ) : (
                                             <Button
                                                 size="sm"
@@ -174,11 +164,10 @@ export function AddExerciseDialog({
                                                 type="button"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    toggleSelect(ex.id);
+                                                    handleSelect(ex);
                                                 }}
                                                 className="gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
                                             >
-                                                <Plus className="size-3.5" />
                                                 Seleccionar
                                             </Button>
                                         )}
@@ -189,33 +178,15 @@ export function AddExerciseDialog({
                     )}
                 </div>
 
-                <DialogFooter className="shrink-0 -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 p-4 sm:px-6 sm:py-3.5 flex flex-row items-center justify-between sm:justify-between border-t border-border bg-muted/20 mt-auto">
-                    <span className="text-xs sm:text-sm text-muted-foreground font-medium">
-                        {selectedIds.size === 0
-                            ? 'Ninguno seleccionado'
-                            : `${selectedIds.size} seleccionado${selectedIds.size === 1 ? '' : 's'}`}
-                    </span>
-
-                    <div className="flex items-center gap-2">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onOpenChange(false)}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            type="button"
-                            size="sm"
-                            disabled={selectedIds.size === 0}
-                            onClick={handleAdd}
-                            className="gap-1.5"
-                        >
-                            <Plus className="size-3.5" />
-                            Agregar {selectedIds.size > 0 ? `(${selectedIds.size})` : ''}
-                        </Button>
-                    </div>
+                <DialogFooter className="shrink-0 -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 p-4 sm:px-6 sm:py-3.5 flex flex-row items-center justify-end border-t border-border bg-muted/20 mt-auto">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onOpenChange(false)}
+                    >
+                        Cancelar
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
