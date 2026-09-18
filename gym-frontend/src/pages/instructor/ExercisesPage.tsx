@@ -33,7 +33,7 @@ export default function ExercisesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col">
       <ExerciseDataTable
         exercises={exercises}
         onEdit={handleEdit}

@@ -90,7 +90,7 @@ export default function ClassesPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <>
       {/* Tabs */}
       <Tabs defaultValue="agenda">
         <TabsList variant="line">
@@ -130,6 +130,6 @@ export default function ClassesPage() {
           if (item) await handleDeleteSchedule(item)
         }}
       />
-    </div>
+    </>
   )
 }

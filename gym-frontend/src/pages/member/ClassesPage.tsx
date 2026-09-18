@@ -1,4 +1,4 @@
-import { Calendar, UserCheck } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import ClassDateSelector from '@/features/ClassSession/components/ClassDateSelector'
 import ClassCategoryFilter from '@/features/ClassSession/components/ClassCategoryFilter'
 import ClassSessionCard from '@/features/ClassSession/components/ClassSessionCard'
@@ -17,7 +17,6 @@ export default function ClassesPage() {
     setSelectedDate,
     classes,
     loading,
-    currentMember,
     selectedDayTotalSessions,
     actionLoadingId,
     handleToggleReservation,

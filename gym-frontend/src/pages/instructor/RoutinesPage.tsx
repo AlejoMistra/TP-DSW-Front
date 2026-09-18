@@ -20,7 +20,7 @@ export default function RoutinesPage() {
         isDeleting,
     } = useRoutines();
 
-    // Vista activa: 'list' (tabla) o 'form' (alta/edición Pro-Flow)
+    // Vista activa: 'list' (tabla) o 'form' (alta/edición)
     const [view, setView] = useState<'list' | 'form'>('list');
     const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
