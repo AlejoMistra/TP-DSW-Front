@@ -25,22 +25,14 @@ export function useMembers() {
         const data = await memberService.getAllMembersWithMembership();
         const extendedMembers: ExtendedMember[] = (
           data as MemberWithMembership[]
-        ).map((member) => {
-          const isCancelled = member.membership?.status === 'CANCELLED';
-          const effectiveStatus = isCancelled ? 'INACTIVE' : member.status;
-          return {
-            ...member,
-            status: effectiveStatus,
-            plan:
-              member.membership?.membershipPlan?.name || 'Plan no disponible',
-            nextExpiration: member.membership?.endDate || member.createdAt,
-            membershipStatus: isCancelled
-              ? 'INACTIVE'
-              : (member.membership
-                  ?.status as ExtendedMember['membershipStatus']) ||
-                member.status,
-          };
-        });
+        ).map((member) => ({
+          ...member,
+          plan: member.membership?.membershipPlan?.name || 'Plan no disponible',
+          nextExpiration: member.membership?.endDate || member.createdAt,
+          membershipStatus:
+            (member.membership?.status as ExtendedMember['membershipStatus']) ||
+            member.status,
+        }));
 
         setMembers(extendedMembers);
       } catch (err) {
