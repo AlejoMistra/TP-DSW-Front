@@ -9,8 +9,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/components/ui
 import ClassScheduleDataTable from "@/features/classSchedule/components/ClassScheduleDataTable"
 import ClassScheduleDialog from "@/features/classSchedule/components/ClassScheduleDialog"
 import WeeklyAgendaTab from "@/features/ClassSession/components/WeeklyAgendaTab"
+import { usePageTitle } from "@/shared/context/PageHeaderContext"
 
 export default function ClassesPage() {
+  usePageTitle("Gestión de Clases")
   const [classes, setClasses] = useState<ClassSchedule[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -88,60 +90,46 @@ export default function ClassesPage() {
   }
 
   return (
-    <div className="min-h-screen pb-16">
-      <div className="max-w-7xl mx-auto">
-        {/* Top Banner */}
-        <section className="rounded-xl border bg-background px-4 py-6 sm:px-6 sm:py-6">
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div className="space-y-2">
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">Gestión de Clases</h1>
-              <p className="max-w-2xl text-sm sm:text-base text-muted-foreground">
-                Configurá los tipos de clases y gestioná el cronograma semanal del gimnasio.
-              </p>
-            </div>
+    <>
+      {/* Tabs */}
+      <Tabs defaultValue="agenda">
+        <TabsList variant="line">
+          <TabsTrigger value="agenda">Cronograma Semanal</TabsTrigger>
+          <TabsTrigger value="classesType">Tipos de Clases</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="agenda">
+          <div className="rounded-xl border bg-background px-4 py-4 sm:px-6 sm:py-6">
+            <WeeklyAgendaTab />
           </div>
-        </section>
+        </TabsContent>
 
-        {/* Tabs */}
-        <Tabs defaultValue="agenda">
-          <TabsList variant="line">
-            <TabsTrigger value="agenda">Cronograma Semanal</TabsTrigger>
-            <TabsTrigger value="classesType">Tipos de Clases</TabsTrigger>
-          </TabsList>
+        <TabsContent value="classesType">
+          <div className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
+            <ClassScheduleDataTable
+              classes={classes}
+              isLoading={loading}
+              onEdit={handleOpenEdit}
+              onDelete={handleDeleteSchedule}
+              onAddNew={handleOpenCreate}
+              title="Tipos de Clases"
+              subtitle="Plantillas base para la programación de sesiones semanales"
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
 
-          <TabsContent value="agenda">
-            <div className="rounded-xl border bg-background px-4 py-4 sm:px-6 sm:py-6">
-              <WeeklyAgendaTab />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="classesType">
-            <div className="rounded-xl border bg-background px-4 py-2 sm:px-6 sm:py-6">
-              <ClassScheduleDataTable
-                classes={classes}
-                isLoading={loading}
-                onEdit={handleOpenEdit}
-                onDelete={handleDeleteSchedule}
-                onAddNew={handleOpenCreate}
-                title="Tipos de Clases"
-                subtitle="Plantillas base para la programación de sesiones semanales"
-              />
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Dialog for Creating / Editing ClassSchedule */}
-        <ClassScheduleDialog
-          open={isScheduleDialogOpen}
-          classSchedule={editingSchedule}
-          onClose={() => setIsScheduleDialogOpen(false)}
-          onSubmit={handleSubmitSchedule}
-          onDelete={async (id) => {
-            const item = classes.find((c) => String(c.id) === String(id))
-            if (item) await handleDeleteSchedule(item)
-          }}
-        />
-      </div>
-    </div>
+      {/* Dialog for Creating / Editing ClassSchedule */}
+      <ClassScheduleDialog
+        open={isScheduleDialogOpen}
+        classSchedule={editingSchedule}
+        onClose={() => setIsScheduleDialogOpen(false)}
+        onSubmit={handleSubmitSchedule}
+        onDelete={async (id) => {
+          const item = classes.find((c) => String(c.id) === String(id))
+          if (item) await handleDeleteSchedule(item)
+        }}
+      />
+    </>
   )
 }

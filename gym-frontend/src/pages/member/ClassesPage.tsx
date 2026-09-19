@@ -1,11 +1,13 @@
-import { Calendar, UserCheck } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import ClassDateSelector from '@/features/ClassSession/components/ClassDateSelector'
 import ClassCategoryFilter from '@/features/ClassSession/components/ClassCategoryFilter'
 import ClassSessionCard from '@/features/ClassSession/components/ClassSessionCard'
 import { useMemberClasses } from '@/features/ClassSession/hooks/useMemberClasses'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import { Button } from '@/shared/components/ui/button'
 
 export default function ClassesPage() {
+  usePageTitle("Horario de Clases")
   const {
     dates,
     categories,
@@ -15,48 +17,14 @@ export default function ClassesPage() {
     setSelectedDate,
     classes,
     loading,
-    currentMember,
     selectedDayTotalSessions,
     actionLoadingId,
     handleToggleReservation,
   } = useMemberClasses()
 
   return (
-    <div className="min-h-screen pb-16">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <section className="px-4 pt-6 pb-2 md:px-8">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-                Reserva de Clases
-              </h1>
-              <p className="text-md text-muted-foreground mt-1">
-                Encontrá tu próximo entrenamiento y reservá tu lugar en segundos.
-              </p>
-            </div>
-
-            {currentMember && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border/80 bg-card/60 backdrop-blur-xs text-xs">
-                <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <UserCheck className="size-4" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Socio logueado (temporal hasta implementar login)
-                  </p>
-                  <p className="font-semibold text-foreground">
-                    {currentMember.name} {currentMember.surname}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Date Selector */}
+    <div>
+      <div className="max-w-7xl mx-auto space-y-4">
         <ClassDateSelector
           dates={dates}
           selectedDate={selectedDate}

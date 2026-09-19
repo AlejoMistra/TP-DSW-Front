@@ -29,13 +29,13 @@ export function ClassDateSelector({
               key={d.fullDate}
               onClick={() => onSelectDate(d.fullDate)}
               className={`relative shrink-0 flex flex-col items-center justify-center min-w-17.5 h-21 rounded-2xl border cursor-pointer transition-all ${isActive
-                  ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary shadow-xs shadow-primary/20'
-                  : 'bg-card/80 hover:bg-card border-border/70 hover:border-border shadow-xs hover:shadow-md text-foreground'
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90 border-primary shadow-xs shadow-primary/20'
+                : 'bg-card/80 hover:bg-muted text-muted-foreground  hover:text-foreground shadow-xs hover:shadow-md border-border/70'
                 }`}
               variant="ghost"
             >
               <span
-                className={`text-sm font-bold tracking-wider uppercase mb-0.5 ${isActive ? 'text-primary-foreground/90' : 'text-muted-foreground'
+                className={`text-sm font-bold tracking-wider uppercase mb-0.5 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground'
                   }`}
               >
                 {d.isToday ? 'Hoy' : d.day}

@@ -14,22 +14,19 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import {
+  RiAddLine,
   RiArrowDownLine,
   RiArrowLeftSLine,
   RiArrowRightSLine,
   RiArrowUpLine,
   RiDeleteBinLine,
-  RiDownloadLine,
   RiExpandUpDownLine,
-  RiEyeLine,
-  RiLayoutColumnLine,
-  RiMoreLine,
   RiPencilLine,
-  RiSearchLine,
-  RiUserSettingsLine,
+  RiLayoutColumnLine,
+  RiSearchLine
 } from "@remixicon/react"
+import { Eye, Mail } from "lucide-react"
 import { toast } from "sonner"
-
 import { cn } from "@/shared/utils/utils"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
@@ -39,7 +36,6 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -66,6 +62,10 @@ type MembersDataTableProps = {
   subtitle?: string
   onEdit?: (id: number) => void
   onDelete?: (id: number) => void
+  onNew?: () => void
+  activeCount?: number
+  inactiveCount?: number
+  totalCount?: number
 }
 
 const membershipStatusVariant = Object.fromEntries(
@@ -112,6 +112,10 @@ export default function MembersDataTable({
   subtitle,
   onEdit,
   onDelete,
+  onNew,
+  activeCount,
+  inactiveCount,
+  totalCount,
 }: MembersDataTableProps) {
   const navigate = useNavigate()
 
@@ -256,39 +260,22 @@ export default function MembersDataTable({
       id: "actions",
       enableSorting: false,
       enableHiding: false,
-      header: () => <span className="sr-only">Actions</span>,
+      header: () => (
+        <span className="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+          Acciones
+        </span>
+      ),
       cell: ({ row }) => (
-        <div className="flex justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Actions for ${row.original.name}`}
-              >
-                <RiMoreLine className="size-4" aria-hidden="true" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={() => navigate(`/administrativo/socios/${row.original.id}`)}
-              >
-                <RiEyeLine aria-hidden="true" />
-                Ver detalles
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit?.(row.original.id)}>
-                <RiPencilLine aria-hidden="true" />
-                Editar
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => onDelete?.(row.original.id)}
-              >
-                <RiDeleteBinLine aria-hidden="true" />
-                Eliminar
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="flex justify-center gap-1">
+          <Button variant="ghost" size="icon-sm" className="cursor-pointer" title="Ver detalles" onClick={() => navigate(`/administrativo/socios/${row.original.id}`)}>
+            <Eye aria-hidden="true" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" className="cursor-pointer" title="Editar" onClick={() => onEdit?.(row.original.id)}>
+            <RiPencilLine aria-hidden="true" />
+          </Button>
+          <Button variant="destructive" size="icon-sm" className="cursor-pointer" title="Eliminar" onClick={() => onDelete?.(row.original.id)}>
+            <RiDeleteBinLine aria-hidden="true" />
+          </Button>
         </div>
       ),
     },
@@ -338,13 +325,32 @@ export default function MembersDataTable({
     <section className="w-full">
       <div className="w-full">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
             <div>
               <h1 className="text-2xl font-semibold">{title ?? ""}</h1>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-md text-muted-foreground">
                 {subtitle ?? ""}
               </p>
             </div>
+            {(activeCount !== undefined || inactiveCount !== undefined || totalCount !== undefined) && (
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                {activeCount !== undefined && (
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                    Socios activos: {activeCount}
+                  </Badge>
+                )}
+                {inactiveCount !== undefined && (
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                    Socios inactivos: {inactiveCount}
+                  </Badge>
+                )}
+                {totalCount !== undefined && (
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                    Total: {totalCount}
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex w-full flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap">
             <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
@@ -396,6 +402,16 @@ export default function MembersDataTable({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+            {onNew && (
+              <Button
+                size="default"
+                className="shrink-0"
+                onClick={onNew}
+              >
+                <RiAddLine className="mr-1 size-3.5" aria-hidden="true" />
+                Nuevo Socio
+              </Button>
+            )}
           </div>
         </div>
 
@@ -419,25 +435,13 @@ export default function MembersDataTable({
                 variant="outline"
                 size="sm"
                 onClick={() =>
-                  toast("Export started", {
-                    description: `Exporting ${selectedCount} members to CSV.`,
+                  toast("Enviando mail (Aún no implementado)", {
+                    description: `Enviando mails a ${selectedCount} socios.`,
                   })
                 }
               >
-                <RiDownloadLine className="size-3.5" aria-hidden="true" />
-                Exportar
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  toast("Role updated", {
-                    description: `Changed the role for ${selectedCount} members.`,
-                  })
-                }
-              >
-                <RiUserSettingsLine className="size-3.5" aria-hidden="true" />
-                Cambiar Plan
+                <Mail className="size-3.5" aria-hidden="true" />
+                Enviar Mail
               </Button>
               <Button
                 variant="outline"

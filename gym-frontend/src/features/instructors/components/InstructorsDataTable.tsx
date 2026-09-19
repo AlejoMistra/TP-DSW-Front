@@ -1,17 +1,10 @@
 import {
   RiDeleteBinLine,
-  RiMoreLine,
   RiPencilLine,
 } from '@remixicon/react'
-
+import { Plus } from 'lucide-react'
+import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -28,6 +21,8 @@ type InstructorsDataTableProps = {
   loading: boolean
   onEdit: (instructor: Instructor) => void
   onDelete: (id: number) => void
+  onAddNew?: () => void
+  totalInstructors?: number
 }
 
 export default function InstructorsDataTable({
@@ -35,6 +30,8 @@ export default function InstructorsDataTable({
   loading,
   onEdit,
   onDelete,
+  onAddNew,
+  totalInstructors,
 }: InstructorsDataTableProps) {
   async function handleDelete(instructor: Instructor) {
     await onDelete(instructor.id)
@@ -42,8 +39,8 @@ export default function InstructorsDataTable({
 
   return (
     <div className="w-full">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
           <h2 className="text-2xl font-semibold">
             Listado de Instructores
           </h2>
@@ -51,7 +48,21 @@ export default function InstructorsDataTable({
           <p className="text-sm text-muted-foreground">
             Instructores registrados en el sistema.
           </p>
+          {totalInstructors !== undefined && (
+            <div className="pt-1">
+              <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                Total de instructores: {totalInstructors}
+              </Badge>
+            </div>
+          )}
         </div>
+
+        {onAddNew && (
+          <Button onClick={onAddNew} className="w-full sm:w-auto">
+            <Plus className="mr-1 size-3.5" aria-hidden="true" />
+            Nuevo instructor
+          </Button>
+        )}
       </div>
 
       <div className="border border-border bg-card">
@@ -74,8 +85,8 @@ export default function InstructorsDataTable({
                 Teléfono
               </TableHead>
 
-              <TableHead className="h-10 text-center">
-                <span className="sr-only">Acciones</span>
+              <TableHead className="h-10 text-center text-sm font-medium tracking-wide text-muted-foreground uppercase">
+                Acciones
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -113,39 +124,26 @@ export default function InstructorsDataTable({
                   </TableCell>
 
                   <TableCell className="py-3 text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          aria-label={`Acciones para ${instructor.name} ${instructor.surname}`}
-                        >
-                          <RiMoreLine
-                            className="size-4"
-                            aria-hidden="true"
-                          />
-                        </Button>
-                      </DropdownMenuTrigger>
-
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem
-                          onClick={() => onEdit(instructor)}
-                        >
-                          <RiPencilLine aria-hidden="true" />
-                          Editar
-                        </DropdownMenuItem>
-
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => handleDelete(instructor)}
-                        >
-                          <RiDeleteBinLine aria-hidden="true" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Editar"
+                        onClick={() => onEdit(instructor)}
+                      >
+                        <RiPencilLine aria-hidden="true" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Eliminar"
+                        onClick={() => handleDelete(instructor)}
+                      >
+                        <RiDeleteBinLine aria-hidden="true" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

@@ -7,6 +7,7 @@ import { useRoutines } from '@/features/routines/hooks/useRoutines'
 import { RoutineDetailsDialog } from '@/features/routines/components/RoutineDetailsDialog'
 import type { Routine } from '@/features/routines/models/Routine'
 import { ActiveRoutineTracker } from '@/features/routines/components/ActiveRoutineTracker'
+import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function MemberRoutinesPage() {
   const { routines, loading } = useRoutines()
@@ -15,6 +16,8 @@ export default function MemberRoutinesPage() {
   const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+
+  usePageTitle(view === 'workout' ? 'Entrenamiento Activo' : 'Rutinas')
 
   // Si está en modo entrenamiento activo, renderizamos el tracker
   if (view === 'workout' && selectedRoutine) {
@@ -40,17 +43,6 @@ export default function MemberRoutinesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Encabezado */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Rutinas de Entrenamiento
-        </h1>
-        <p className="text-sm text-muted-foreground sm:text-base">
-          Explorá las rutinas del gimnasio y seleccioná una para iniciar tu
-          entrenamiento en vivo.
-        </p>
-      </div>
-
       {/* Buscador */}
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -76,7 +68,7 @@ export default function MemberRoutinesPage() {
           {filteredRoutines.map((routine) => (
             <div
               key={routine.id}
-              className="flex flex-col justify-between rounded-2xl border bg-card p-5 shadow-sm transition-all hover:border-amber-400/50 hover:shadow-md"
+              className="flex flex-col justify-between rounded-2xl border border-accent bg-card p-5 shadow-sm transition-all hover:border-primary/80 hover:shadow-md"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
@@ -84,13 +76,7 @@ export default function MemberRoutinesPage() {
                     {routine.name}
                   </h3>
                   <Badge
-                    variant={
-                      routine.difficulty === 'BEGINNER'
-                        ? 'default'
-                        : routine.difficulty === 'INTERMEDIATE'
-                          ? 'outline'
-                          : 'destructive'
-                    }
+                    variant="outline"
                     className="text-xs uppercase"
                   >
                     {routine.difficulty === 'BEGINNER' && 'Principiante'}
@@ -99,20 +85,23 @@ export default function MemberRoutinesPage() {
                   </Badge>
                 </div>
 
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p
+                  className="text-sm text-muted-foreground line-clamp-1"
+                  title={routine.description || undefined}
+                >
                   {routine.description || 'Sin descripción disponible.'}
                 </p>
 
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Dumbbell className="size-4 text-amber-400" />
+                  <Dumbbell className="size-4 text-primary" />
                   <span>
-                    {routine.routineExercises?.length || 0} ejercicios incluidos
+                    {routine.routineExercises?.length || 0} ejercicios
                   </span>
                 </div>
               </div>
 
               {/* Botones de acción */}
-              <div className="mt-5 flex items-center gap-2 pt-2 border-t">
+              < div className="mt-5 flex items-center gap-2 pt-2 border-t" >
                 <Button
                   variant="outline"
                   size="sm"
@@ -128,7 +117,7 @@ export default function MemberRoutinesPage() {
 
                 <Button
                   size="sm"
-                  className="flex-1 bg-amber-400 font-bold text-black hover:bg-amber-300"
+                  className="flex-1"
                   onClick={() => {
                     setSelectedRoutine(routine)
                     setView('workout')
@@ -139,8 +128,9 @@ export default function MemberRoutinesPage() {
                 </Button>
               </div>
             </div>
-          ))}
-        </div>
+          ))
+          }
+        </div >
       )}
 
       {/* Modal para ver detalles de los ejercicios antes de entrenar */}
@@ -149,6 +139,6 @@ export default function MemberRoutinesPage() {
         open={detailsOpen}
         onOpenChange={setDetailsOpen}
       />
-    </div>
+    </div >
   )
 }

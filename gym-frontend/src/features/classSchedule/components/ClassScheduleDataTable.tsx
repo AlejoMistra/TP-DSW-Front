@@ -1,15 +1,8 @@
 import { useState } from "react"
-import { RiDeleteBinLine, RiMoreLine, RiPencilLine } from "@remixicon/react"
+import { RiDeleteBinLine, RiPencilLine } from "@remixicon/react"
 import { Plus } from "lucide-react"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/shared/components/ui/dropdown-menu"
 import {
   Table,
   TableBody,
@@ -90,7 +83,7 @@ export function ClassScheduleDataTable({
                 Cupos Máximos
               </TableHead>
               <TableHead className="h-10 text-center font-bold text-xs uppercase tracking-wider text-muted-foreground">
-                <span className="sr-only">Acciones</span>
+                Acciones
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -155,27 +148,26 @@ export function ClassScheduleDataTable({
 
                   {/* Acciones */}
                   <TableCell className="py-3.5 text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon-sm" aria-label={`Acciones para ${item.name}`}>
-                          <RiMoreLine className="size-4" aria-hidden="true" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem onClick={() => onEdit(item)}>
-                          <RiPencilLine aria-hidden="true" className="size-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          variant="destructive"
-                          onClick={() => setItemToDelete(item)}
-                        >
-                          <RiDeleteBinLine aria-hidden="true" className="size-4 mr-2" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <div className="flex justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Editar"
+                        onClick={() => onEdit(item)}
+                      >
+                        <RiPencilLine aria-hidden="true" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Eliminar"
+                        onClick={() => setItemToDelete(item)}
+                      >
+                        <RiDeleteBinLine aria-hidden="true" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

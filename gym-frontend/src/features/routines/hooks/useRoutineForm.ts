@@ -73,18 +73,29 @@ export function useRoutineForm({ initialRoutine, onSuccess }: UseRoutineFormProp
         loadData();
     }, [initialRoutine?.id]);
 
-    const handleAddExercise = (exercise: Exercise) => {
-        const newItem: RoutineExerciseItem = {
+    const handleAddExercises = (newExercises: Exercise[]) => {
+        if (newExercises.length === 0) return;
+
+        const newItems: RoutineExerciseItem[] = newExercises.map((exercise, idx) => ({
             exerciseId: exercise.id,
             exercise,
-            order: exercises.length + 1,
+            order: exercises.length + idx + 1,
             sets: null,
             reps: null,
             weight: null,
             notes: '',
-        };
-        setExercises((prev) => [...prev, newItem]);
-        toast.success(`Ejercicio "${exercise.name}" agregado`);
+        }));
+
+        setExercises((prev) => [...prev, ...newItems]);
+        if (newExercises.length === 1) {
+            toast.success(`Ejercicio "${newExercises[0].name}" agregado`);
+        } else {
+            toast.success(`${newExercises.length} ejercicios agregados`);
+        }
+    };
+
+    const handleAddExercise = (exercise: Exercise) => {
+        handleAddExercises([exercise]);
     };
 
     const handleExerciseChange = (
@@ -104,6 +115,33 @@ export function useRoutineForm({ initialRoutine, onSuccess }: UseRoutineFormProp
             const filtered = prev.filter((_, i) => i !== index);
             return filtered.map((item, idx) => ({ ...item, order: idx + 1 }));
         });
+    };
+
+    const handleReorderExercises = (reordered: RoutineExerciseItem[]) => {
+        const withUpdatedOrder = reordered.map((item, idx) => ({
+            ...item,
+            order: idx + 1,
+        }));
+        setExercises(withUpdatedOrder);
+        toast.success('Orden de ejercicios actualizado');
+    };
+
+    const handleReplaceExercise = (index: number, newExercise: Exercise) => {
+        setExercises((prev) => {
+            const updated = [...prev];
+            if (!updated[index]) return prev;
+            updated[index] = {
+                ...updated[index],
+                exerciseId: newExercise.id,
+                exercise: newExercise,
+                sets: null,
+                reps: null,
+                weight: null,
+                notes: '',
+            };
+            return updated;
+        });
+        toast.success(`Ejercicio reemplazado por "${newExercise.name}"`);
     };
 
     const handleSubmit = async (e?: React.FormEvent) => {
@@ -184,8 +222,11 @@ export function useRoutineForm({ initialRoutine, onSuccess }: UseRoutineFormProp
         addExerciseOpen,
         setAddExerciseOpen,
         handleAddExercise,
+        handleAddExercises,
         handleExerciseChange,
         handleRemoveExercise,
+        handleReorderExercises,
+        handleReplaceExercise,
         handleSubmit,
     };
 }

@@ -132,7 +132,7 @@ export function ActiveRoutineTracker({
       {/* Header del Entrenamiento Actual y Tiempo */}
       <div className="flex items-center justify-between rounded-xl border border-border/80 bg-card p-4 shadow-sm">
         <div>
-          <span className="text-xs font-semibold tracking-wider text-amber-500 uppercase">
+          <span className="text-sm font-semibold tracking-wider text-primary uppercase">
             Entrenamiento Actual
           </span>
           <h2 className="text-xl font-bold text-foreground">
@@ -140,23 +140,23 @@ export function ActiveRoutineTracker({
           </h2>
         </div>
         <div className="text-right">
-          <span className="text-xs font-medium text-muted-foreground uppercase">
+          <span className="text-sm font-medium text-muted-foreground uppercase">
             Tiempo
           </span>
-          <p className="font-mono text-2xl font-bold tracking-tight text-amber-400">
+          <p className="font-mono text-2xl font-bold tracking-tight text-primary">
             {formatTime(totalSeconds)}
           </p>
         </div>
       </div>
 
       {/* Tarjeta: Cronómetro de Descanso */}
-      <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-muted/30 p-4">
+      <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-card p-4">
         <div className="flex items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400">
+          <div className="flex size-11 items-center justify-center rounded-xl bg-card text-primary">
             <Timer className="size-6" />
           </div>
           <div>
-            <span className="text-xs font-medium text-muted-foreground uppercase">
+            <span className="text-sm font-medium text-muted-foreground uppercase">
               Cronómetro de descanso
             </span>
             <p className="font-mono text-xl font-bold text-foreground">
@@ -185,7 +185,7 @@ export function ActiveRoutineTracker({
             type="button"
             size="icon"
             onClick={() => setIsResting(!isResting)}
-            className="size-11 rounded-full bg-amber-400 text-black shadow-md hover:bg-amber-300"
+            className="size-11 rounded-full"
           >
             {isResting ? (
               <Pause className="size-5 fill-current" />
@@ -215,41 +215,38 @@ export function ActiveRoutineTracker({
             return (
               <div
                 key={item.id || index}
-                className={`relative flex items-center justify-between rounded-2xl border p-4 transition-all duration-200 ${
-                  isDone
-                    ? 'border-amber-500/50 bg-amber-500/5 opacity-90'
-                    : 'border-border/80 bg-card hover:border-amber-500/30'
-                }`}
+                className={`relative flex items-center justify-between rounded-2xl border p-4 transition-all duration-200 ${isDone
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border/80 bg-card hover:border-primary/30'
+                  }`}
               >
                 {/* Lado izquierdo: Icono de ejercicio + Textos */}
                 <div className="flex items-center gap-3.5">
                   <div
-                    className={`flex size-12 items-center justify-center rounded-xl transition-colors ${
-                      isDone
-                        ? 'bg-amber-500/20 text-amber-400'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
+                    className={`flex size-12 items-center justify-center rounded-xl transition-colors ${isDone
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                      }`}
                   >
                     <Dumbbell className="size-6" />
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h4
-                        className={`font-semibold ${
-                          isDone
-                            ? 'text-muted-foreground line-through'
-                            : 'text-foreground'
-                        }`}
+                      <span
+                        className={`font-semibold text-lg ${isDone
+                          ? 'text-muted-foreground line-through'
+                          : 'text-foreground'
+                          }`}
                       >
                         {exerciseName}
-                      </h4>
-                      <span className="rounded-full bg-amber-400/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-400 uppercase">
+                      </span>
+                      <span className="rounded-full text-xs bg-foreground/10 px-2 py-0.5 font-semibold tracking-wider text-foreground uppercase">
                         {muscleGroup}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-4 text-sm">
                       <span className="text-muted-foreground">
                         SERIES:{' '}
                         <strong className="text-foreground font-semibold">
@@ -259,7 +256,7 @@ export function ActiveRoutineTracker({
                       {item.weight !== null && item.weight !== undefined && (
                         <span className="text-muted-foreground">
                           PESO:{' '}
-                          <strong className="text-amber-400 font-semibold">
+                          <strong className="text-primary font-semibold">
                             {item.weight} kg
                           </strong>
                         </span>
@@ -267,7 +264,7 @@ export function ActiveRoutineTracker({
                     </div>
 
                     {item.notes && (
-                      <p className="text-[11px] text-muted-foreground italic">
+                      <p className="text-sm text-muted-foreground italic">
                         {item.notes}
                       </p>
                     )}
@@ -278,16 +275,16 @@ export function ActiveRoutineTracker({
                 <button
                   type="button"
                   onClick={() => toggleExercise(item.id || index)}
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-                    isDone
-                      ? 'border-amber-400 bg-amber-400 text-black shadow-md'
-                      : 'border-muted-foreground/30 text-transparent hover:border-amber-400/60'
-                  }`}
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-full border-2 transition-all ${isDone
+                    ? 'border-primary bg-primary shadow-md'
+                    : 'border-muted-foreground/30 text-transparent hover:border-primary/60'
+                    }`}
                   aria-label={
                     isDone ? 'Marcar como pendiente' : 'Marcar como completado'
                   }
                 >
-                  <Check className="size-5 stroke-[3]" />
+                  <Check className={`size-5 stroke-3 ${isDone ? ' text-primary-foreground'
+                    : ''}`} />
                 </button>
               </div>
             )
