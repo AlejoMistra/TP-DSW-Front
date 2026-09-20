@@ -80,7 +80,7 @@ const membershipStatusVariant = Object.fromEntries(
 
 const COLUMN_LABELS: Record<string, string> = {
   name: "Socio",
-  docNumber: "DNI",
+  docNumber: "Documento",
   plan: "Plan",
   status: "Estado",
   nextExpiration: "Próximo Vencimiento",
@@ -212,7 +212,7 @@ export default function MembersDataTable({
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="-mx-1 inline-flex items-center gap-1 rounded-none px-1 text-sm font-medium tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
         >
-          DNI
+          Documento
           <SortIcon sorted={column.getIsSorted()} />
         </button>
       ),
@@ -266,20 +266,17 @@ export default function MembersDataTable({
         return true
       },
       cell: ({ row }) => {
-        const currentMembershipStatus = row.original.membershipStatus ?? row.original.status
-        const membershipStatus = MEMBERSHIP_STATUS.find(
-          (status) => status.id === currentMembershipStatus
-        )
+        const status = row.original.membershipStatus ?? row.original.status
 
-        return (
-          <Badge
-            variant={membershipStatus?.variant ?? membershipStatusVariant[currentMembershipStatus] ?? 'default'}
-            className="text-sm"
-          >
-            {membershipStatus?.label ?? (currentMembershipStatus === 'ACTIVE' ? 'Activo' : 'Inactivo')}
-          </Badge>
-        )
+        if (status === "ACTIVE") {
+          return <Badge variant="default" className="text-sm">Activo</Badge>
+        }
+        if (status === "EXPIRED") {
+          return <Badge variant="outline" className="text-sm">Vencido</Badge>
+        }
+        return <Badge variant="destructive" className="text-sm">Inactivo</Badge>
       },
+
     },
     {
       accessorKey: "nextExpiration",
@@ -397,7 +394,7 @@ export default function MembersDataTable({
             )}
           </div>
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-            {/* Buscador de Socios por Nombre, Email o DNI */}
+            {/* Buscador de Socios por Nombre, Email o documento */}
             <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
               <RiSearchLine
                 className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
@@ -409,9 +406,9 @@ export default function MembersDataTable({
                 onChange={(event) =>
                   table.getColumn("name")?.setFilterValue(event.target.value)
                 }
-                placeholder="Buscar socios o DNI..."
+                placeholder="Buscar socios o documento..."
                 className="h-8 w-full sm:w-52 pl-8 text-sm"
-                aria-label="Buscar socios por nombre, email o DNI"
+                aria-label="Buscar socios por nombre, email o documento"
               />
             </div>
 
