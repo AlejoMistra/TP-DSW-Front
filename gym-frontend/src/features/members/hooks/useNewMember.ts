@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { type CreateMemberInput, type UpdateMemberInput } from '@/features/members/models/Member'
+import { type CreateMemberInput } from '@/features/members/models/Member'
+import { type MemberFormValues } from '@/features/members/models/memberFormSchema'
 import { memberService } from '@/features/members/api/memberService'
 import { membershipPlanService } from '@/features/membershipPlans/api/membershipPlanService'
 import { type MembershipPlan } from '@/features/membershipPlans/models/MembershipPlan'
@@ -76,7 +77,7 @@ export function useNewMember() {
     return nextDueDate
   }, [includePayment, selectedPlanId, plans, activationDate, freeTrialExpirationDate])
 
-  const handleSubmit = async (data: CreateMemberInput | UpdateMemberInput) => {
+  const handleSubmit = async (data: MemberFormValues) => {
     try {
       if (!selectedPlanId) {
         toast.error('Debes seleccionar un plan')
@@ -84,7 +85,9 @@ export function useNewMember() {
       }
 
       const dataWithPlan: CreateMemberInput = {
-        ...(data as Omit<CreateMemberInput, 'membershipPlanId' | 'payment'>),
+        ...data,
+        birthDate: data.birthDate.toISOString().split('T')[0],
+        phone: data.phone || null,
         membershipPlanId: selectedPlanId,
         ...(includePayment
           ? {

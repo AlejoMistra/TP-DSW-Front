@@ -1,3 +1,4 @@
+import { Controller } from "react-hook-form"
 import { Input } from "@/shared/components/ui/input"
 import {
   Select,
@@ -6,65 +7,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select"
+import { FieldError } from "@/shared/components/ui/field"
 import { User } from "lucide-react"
-import { useState } from "react"
-import { type Member, type CreateMemberInput, type UpdateMemberInput, type DocType, type Status } from "../models/Member.ts"
+import { useMemberForm } from "../hooks/useMemberForm"
+import type { Member } from "../models/Member"
+import type { MemberFormValues } from "../models/memberFormSchema"
+import { BirthDateInput } from "./BirthDateInput"
 
 type MemberFormProps = {
   showActions?: boolean
   member?: Member
-  onSubmit: (data: CreateMemberInput | UpdateMemberInput) => Promise<void>
+  onSubmit: (data: MemberFormValues) => Promise<void> | void
 }
 
 export default function MemberForm({
   member,
   onSubmit,
 }: MemberFormProps) {
-  const [formData, setFormData] = useState<CreateMemberInput>({
-    name: member?.name || '',
-    surname: member?.surname || '',
-    email: member?.email || '',
-    phone: member?.phone || '',
-    docType: member?.docType || 'DNI',
-    docNumber: member?.docNumber || '',
-    birthDate: member?.birthDate?.split('T')[0] || '',
-    status: member?.status || 'ACTIVE',
-    membershipPlanId: 0,
-
-  })
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'membershipPlanId' ? parseInt(value) : value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    const dataToSubmit: CreateMemberInput | UpdateMemberInput = member
-      ? {
-        name: formData.name,
-        surname: formData.surname,
-        email: formData.email,
-        phone: formData.phone,
-        docType: formData.docType,
-        docNumber: formData.docNumber,
-        birthDate: formData.birthDate,
-        status: formData.status
-      }
-      : formData
-
-    // errors are surfaced via toast by the submit handler passed in
-    await onSubmit(dataToSubmit)
-  }
+  const {
+    register,
+    handleSubmit,
+    control,
+    trigger,
+    formState: { errors },
+  } = useMemberForm(member)
 
   return (
-    <form id="member-form" onSubmit={handleSubmit} className="rounded-xl border bg-background px-4 py-2 items-baseline sm:px-6 sm:py-6">
+    <form
+      id="member-form"
+      onSubmit={handleSubmit(onSubmit)}
+      className="rounded-xl border bg-background px-4 py-2 items-baseline sm:px-6 sm:py-6"
+    >
       <h3 className="mb-2 flex items-center gap-2 text-lg font-semibold">
         <User className="size-5" aria-hidden="true" />
         {member ? 'Editar socio' : 'Información del socio'}
@@ -77,11 +50,11 @@ export default function MemberForm({
           </label>
           <Input
             id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            {...register('name')}
+            aria-invalid={!!errors.name}
             required
           />
+          {errors.name && <FieldError>{errors.name.message}</FieldError>}
         </div>
 
         <div className="space-y-2">
@@ -90,25 +63,37 @@ export default function MemberForm({
           </label>
           <Input
             id="surname"
-            name="surname"
-            value={formData.surname}
-            onChange={handleChange}
-            required
+            {...register('surname')}
+            aria-invalid={!!errors.surname}
           />
+          {errors.surname && <FieldError>{errors.surname.message}</FieldError>}
         </div>
 
         <div className="space-y-2">
           <label htmlFor="birthDate" className="text-sm font-medium">
             Fecha de nacimiento
           </label>
-          <Input
-            id="birthDate"
+          <Controller
+            control={control}
             name="birthDate"
-            type="date"
-            value={formData.birthDate}
-            onChange={handleChange}
+            render={({ field }) => (
+              <BirthDateInput
+                id="birthDate"
+                value={field.value}
+                onChange={(date) => {
+                  field.onChange(date)
+                  if (errors.birthDate) {
+                    trigger('birthDate')
+                  }
+                }}
+                onBlur={field.onBlur}
+                error={!!errors.birthDate}
+              />
+            )}
           />
+          {errors.birthDate && <FieldError>{errors.birthDate.message}</FieldError>}
         </div>
+
 
         <div className="space-y-2">
           <label htmlFor="docNumber" className="text-sm font-medium">
@@ -116,31 +101,32 @@ export default function MemberForm({
           </label>
           <Input
             id="docNumber"
-            name="docNumber"
-            value={formData.docNumber}
-            onChange={handleChange}
-            required
+            {...register('docNumber')}
+            aria-invalid={!!errors.docNumber}
           />
+          {errors.docNumber && <FieldError>{errors.docNumber.message}</FieldError>}
         </div>
 
         <div className="space-y-2">
           <label htmlFor="docType" className="text-sm font-medium">
             Tipo de documento
           </label>
-          <Select
-            value={formData.docType}
-            onValueChange={(val) =>
-              setFormData((prev) => ({ ...prev, docType: val as DocType }))
-            }
-          >
-            <SelectTrigger id="docType" className="w-full">
-              <SelectValue placeholder="Tipo de documento" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="DNI">DNI</SelectItem>
-              <SelectItem value="PASAPORTE">Pasaporte</SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            control={control}
+            name="docType"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="docType" className="w-full">
+                  <SelectValue placeholder="Tipo de documento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DNI">DNI</SelectItem>
+                  <SelectItem value="PASAPORTE">Pasaporte</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.docType && <FieldError>{errors.docType.message}</FieldError>}
         </div>
 
         <div className="space-y-2">
@@ -149,12 +135,11 @@ export default function MemberForm({
           </label>
           <Input
             id="email"
-            name="email"
             type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
+            {...register('email')}
+            aria-invalid={!!errors.email}
           />
+          {errors.email && <FieldError>{errors.email.message}</FieldError>}
         </div>
 
         <div className="space-y-2">
@@ -163,36 +148,35 @@ export default function MemberForm({
           </label>
           <Input
             id="phone"
-            name="phone"
-            value={formData.phone || ''}
-            onChange={handleChange}
+            {...register('phone')}
+            aria-invalid={!!errors.phone}
           />
+          {errors.phone && <FieldError>{errors.phone.message}</FieldError>}
         </div>
 
         <div className="space-y-2">
           <label htmlFor="status" className="text-sm font-medium">
             Estado
           </label>
-          <Select
-            value={formData.status}
-            onValueChange={(val) =>
-              setFormData((prev) => ({
-                ...prev,
-                status: val as Status,
-              }))
-            }
-          >
-            <SelectTrigger id="status" className="w-full">
-              <SelectValue placeholder="Estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ACTIVE">Activo</SelectItem>
-              <SelectItem value="INACTIVE">Inactivo</SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            control={control}
+            name="status"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger id="status" className="w-full">
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">Activo</SelectItem>
+                  <SelectItem value="INACTIVE">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.status && <FieldError>{errors.status.message}</FieldError>}
         </div>
       </div>
-
     </form>
   )
 }
+
