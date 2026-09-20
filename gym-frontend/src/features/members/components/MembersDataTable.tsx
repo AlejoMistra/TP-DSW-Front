@@ -40,6 +40,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select"
 import { Input } from "@/shared/components/ui/input"
 import {
   Table,
@@ -54,7 +61,6 @@ import { useIsMobile } from "@/shared/hooks/use-mobile"
 import type { ExtendedMember } from "../models/ExtendedMember"
 import { MEMBERSHIP_STATUS } from '@/features/memberships/models/Membership'
 import { useNavigate } from 'react-router-dom'
-
 
 type MembersDataTableProps = {
   initialData: ExtendedMember[]
@@ -74,8 +80,9 @@ const membershipStatusVariant = Object.fromEntries(
 
 const COLUMN_LABELS: Record<string, string> = {
   name: "Socio",
-  status: "Estado",
+  docNumber: "Documento",
   plan: "Plan",
+  status: "Estado",
   nextExpiration: "Próximo Vencimiento",
 }
 
@@ -135,7 +142,6 @@ export default function MembersDataTable({
     setData(initialData)
   }, [initialData])
 
-
   const columns: ColumnDef<ExtendedMember>[] = [
     {
       id: "select",
@@ -182,7 +188,8 @@ export default function MembersDataTable({
         return (
           row.original.name.toLowerCase().includes(q) ||
           row.original.surname.toLowerCase().includes(q) ||
-          row.original.email.toLowerCase().includes(q)
+          row.original.email.toLowerCase().includes(q) ||
+          (row.original.docNumber ? row.original.docNumber.toLowerCase().includes(q) : false)
         )
       },
       cell: ({ row }) => {
@@ -196,6 +203,24 @@ export default function MembersDataTable({
           </div>
         )
       },
+    },
+    {
+      accessorKey: "docNumber",
+      header: ({ column }) => (
+        <button
+          type="button"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="-mx-1 inline-flex items-center gap-1 rounded-none px-1 text-sm font-medium tracking-wide text-muted-foreground uppercase transition-colors hover:text-foreground"
+        >
+          Documento
+          <SortIcon sorted={column.getIsSorted()} />
+        </button>
+      ),
+      cell: ({ row }) => (
+        <span className="text-base tabular-nums font-mono text-muted-foreground">
+          {row.original.docNumber || '-'}
+        </span>
+      ),
     },
     {
       accessorKey: "plan",
@@ -221,21 +246,37 @@ export default function MembersDataTable({
           Estado
         </span>
       ),
-      cell: ({ row }) => {
+      filterFn: (row, _id, value: string) => {
+        if (!value || value === "ALL") return true
         const currentMembershipStatus = row.original.membershipStatus ?? row.original.status
-        const membershipStatus = MEMBERSHIP_STATUS.find(
-          (status) => status.id === currentMembershipStatus
-        )
-
-        return (
-          <Badge
-            variant={membershipStatus?.variant ?? membershipStatusVariant[currentMembershipStatus] ?? 'default'}
-            className="text-sm"
-          >
-            {membershipStatus?.label ?? (currentMembershipStatus === 'ACTIVE' ? 'Activo' : 'Inactivo')}
-          </Badge>
-        )
+        const memberStatus = row.original.status
+        if (value === "ACTIVE") {
+          return currentMembershipStatus === "ACTIVE" && memberStatus === "ACTIVE"
+        }
+        if (value === "EXPIRED") {
+          return currentMembershipStatus === "EXPIRED"
+        }
+        if (value === "INACTIVE") {
+          return (
+            memberStatus === "INACTIVE" ||
+            currentMembershipStatus === "INACTIVE" ||
+            currentMembershipStatus === "CANCELLED"
+          )
+        }
+        return true
       },
+      cell: ({ row }) => {
+        const status = row.original.membershipStatus ?? row.original.status
+
+        if (status === "ACTIVE") {
+          return <Badge variant="default" className="text-sm">Activo</Badge>
+        }
+        if (status === "EXPIRED") {
+          return <Badge variant="outline" className="text-sm">Vencido</Badge>
+        }
+        return <Badge variant="destructive" className="text-sm">Inactivo</Badge>
+      },
+
     },
     {
       accessorKey: "nextExpiration",
@@ -352,7 +393,8 @@ export default function MembersDataTable({
               </div>
             )}
           </div>
-          <div className="flex w-full flex-nowrap items-center gap-2 sm:w-auto sm:flex-wrap">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            {/* Buscador de Socios por Nombre, Email o documento */}
             <div className="relative min-w-0 flex-1 sm:w-auto sm:flex-none">
               <RiSearchLine
                 className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground"
@@ -364,17 +406,37 @@ export default function MembersDataTable({
                 onChange={(event) =>
                   table.getColumn("name")?.setFilterValue(event.target.value)
                 }
-                placeholder="Buscar socios..."
-                className="h-8 w-full sm:w-56 pl-8 text-sm"
-                aria-label="Buscar socios por nombre o correo electrónico"
+                placeholder="Buscar socios o documento..."
+                className="h-8 w-full sm:w-52 pl-8 text-sm"
+                aria-label="Buscar socios por nombre, email o documento"
               />
             </div>
+
+            {/* Selector de Filtro de Estado */}
+            <Select
+              value={(table.getColumn("status")?.getFilterValue() as string) ?? "ALL"}
+              onValueChange={(val) => {
+                table.getColumn("status")?.setFilterValue(val === "ALL" ? undefined : val)
+              }}
+            >
+              <SelectTrigger className="h-8 w-[150px] text-sm">
+                <SelectValue placeholder="Estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">Todos los estados</SelectItem>
+                <SelectItem value="ACTIVE">Activos</SelectItem>
+                <SelectItem value="EXPIRED">Vencidos</SelectItem>
+                <SelectItem value="INACTIVE">Inactivos</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Selector de Columnas Visibles */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  size="lg"
-                  className="shrink-0"
+                  size="sm"
+                  className="h-8 shrink-0"
                   aria-label="Toggle columns"
                 >
                   <RiLayoutColumnLine className="size-3.5" aria-hidden="true" />
@@ -402,10 +464,12 @@ export default function MembersDataTable({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Botón Nuevo Socio */}
             {onNew && (
               <Button
-                size="default"
-                className="shrink-0"
+                size="sm"
+                className="h-8 shrink-0"
                 onClick={onNew}
               >
                 <RiAddLine className="mr-1 size-3.5" aria-hidden="true" />
