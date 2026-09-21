@@ -14,6 +14,7 @@ import ExercisesPage from '../../pages/instructor/ExercisesPage'
 import MemberClassesPage from '../../pages/member/ClassesPage'
 import InstructorsPage from '@/pages/admin/InstructorsPage'
 import MemberRoutinesPage from '../../pages/member/MemberRoutinesPage'
+import MemberProfilePage from '../../pages/member/MemberProfilePage'
 
 
 
@@ -58,8 +59,9 @@ export const router = createBrowserRouter([
     element: <RoleLayout role="member" />,
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
+      { path: 'perfil', element: <MemberProfilePage /> },
       { path: 'rutinas', element: <MemberRoutinesPage /> },
-      { path: 'clases', element: <MemberClassesPage /> }
+      { path: 'clases', element: <MemberClassesPage /> },
     ],
   },
 
