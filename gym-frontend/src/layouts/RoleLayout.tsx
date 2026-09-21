@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 import RoleBottomNav from "@/shared/components/RoleBottomNav"
 import RoleSidebar from "@/shared/components/RoleSidebar"
 import {
@@ -30,8 +30,20 @@ function RoleLayoutContent({ role }: { role: AppRole }) {
               <ThemeToggle />
               <Bell className="h-5 w-5" /> {/* TODO: Implementar con componente: A notification icon component in React typically combines a SVG bell icon with an absolute-positioned badge element to display the unread alert count*/}
               <Settings className="h-5 w-5" />
-              <CircleUser className="h-5 w-5" /> {/* TODO: Implementar con componente Avatar */}
-            </div>
+              {role === 'member' ? (
+                <Link
+                  to="/socio/perfil"
+                  aria-label="Ir a mi perfil"
+                  title="Mi perfil"
+                  className="rounded-md p-1 transition-colors hover:bg-muted"
+                >
+                  <CircleUser className="h-5 w-5" />
+                  {/* TODO: Implementar con componente Avatar */}
+                </Link>
+            ) : (
+              <CircleUser className="h-5 w-5" />
+              )}            
+              </div>
           </header>
 
           <main className="flex-1 overflow-auto p-4 pb-24 md:p-6 md:pb-6">

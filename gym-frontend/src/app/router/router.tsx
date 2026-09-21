@@ -15,6 +15,7 @@ import MemberClassesPage from '../../pages/member/ClassesPage'
 import InstructorsPage from '@/pages/admin/InstructorsPage'
 import MemberRoutinesPage from '../../pages/member/MemberRoutinesPage'
 import MemberProfilePage from '../../pages/member/MemberProfilePage'
+import MemberDataPage from '../../pages/member/profile/MemberDataPage'
 
 
 
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <div className="p-4 text-2xl font-bold">Inicio Socio</div> },
       { path: 'perfil', element: <MemberProfilePage /> },
+      { path: 'perfil/datos', element: <MemberDataPage /> },
       { path: 'rutinas', element: <MemberRoutinesPage /> },
       { path: 'clases', element: <MemberClassesPage /> },
     ],
