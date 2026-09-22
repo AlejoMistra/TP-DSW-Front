@@ -3,24 +3,52 @@ import {
   FileText,
   History,
 } from 'lucide-react'
+
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import ProfileSummary from '@/features/members/components/ProfileSummary'
 import ProfileNavigationCard from '@/features/members/components/ProfileNavigationCard'
+import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
 
 export default function MemberProfilePage() {
   usePageTitle('Mi Perfil')
 
-  // TODO: reemplazar estos datos por el socio obtenido
-  // desde el contexto de autenticación.
-  const member = {
-    name: 'Nombre del socio',
-    email: 'correo@ejemplo.com',
+  // Temporal hasta implementar autenticación.
+  const currentMemberId = 1
+
+  const {
+    member,
+    loading,
+    error,
+  } = useMemberProfileData(currentMemberId)
+
+  if (loading) {
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="rounded-2xl border border-border/70 bg-card/80 p-8 text-center">
+          <p className="text-muted-foreground">
+            Cargando tu perfil...
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !member) {
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="rounded-2xl border border-destructive/30 bg-card/80 p-8 text-center">
+          <p className="text-sm text-destructive">
+            {error || 'No se encontró la información del socio.'}
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <ProfileSummary
-        name={member.name}
+        name={`${member.name} ${member.surname}`}
         email={member.email}
       />
 
@@ -29,6 +57,7 @@ export default function MemberProfilePage() {
           <h2 className="text-xl font-bold tracking-tight">
             Mi cuenta
           </h2>
+
           <p className="text-sm text-muted-foreground">
             Consultá la información de tu cuenta y membresía.
           </p>
