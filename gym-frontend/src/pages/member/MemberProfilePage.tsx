@@ -1,7 +1,9 @@
 import {
   CreditCard,
   FileText,
+  HelpCircle,
   History,
+  Settings,
 } from 'lucide-react'
 
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
@@ -59,11 +61,11 @@ export default function MemberProfilePage() {
           </h2>
 
           <p className="text-sm text-muted-foreground">
-            Consultá la información de tu cuenta y membresía.
+            Consultá y administrá la información de tu cuenta.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <ProfileNavigationCard
             to="/socio/perfil/datos"
             title="Mis datos"
@@ -83,6 +85,20 @@ export default function MemberProfilePage() {
             title="Historial de pagos"
             description="Consultá tus pagos realizados."
             icon={History}
+          />
+
+          <ProfileNavigationCard
+            to="/socio/perfil/configuracion"
+            title="Configuración"
+            description="Personalizá tus preferencias."
+            icon={Settings}
+          />
+
+          <ProfileNavigationCard
+            to="/socio/perfil/soporte"
+            title="Soporte"
+            description="Encontrá ayuda y formas de contacto."
+            icon={HelpCircle}
           />
         </div>
       </section>
