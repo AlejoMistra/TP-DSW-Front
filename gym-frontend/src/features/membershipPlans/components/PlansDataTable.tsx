@@ -1,0 +1,143 @@
+"use client"
+import {
+  RiDeleteBinLine,
+  RiPencilLine,
+} from "@remixicon/react"
+import { Plus } from "lucide-react"
+import { Badge } from "@/shared/components/ui/badge"
+import { Button } from "@/shared/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/components/ui/table"
+import type { MembershipPlan } from "@/features/membershipPlans/models/MembershipPlan"
+
+type PlansDataTableProps = {
+  plans: MembershipPlan[]
+  onEdit: (plan: MembershipPlan) => void
+  onDelete: (id: number) => void
+  title?: string
+  subtitle?: string
+  onAddNew?: () => void
+  totalPlans?: number
+}
+
+// Formatea un número como precio.
+function formatPrice(value: number) {
+  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(
+    value
+  )
+}
+
+export default function PlansDataTable({
+  plans,
+  onEdit,
+  onDelete,
+  title,
+  subtitle,
+  onAddNew,
+  totalPlans,
+}: PlansDataTableProps) {
+  // Elimina un plan; el hook ya avisa el resultado con un toast.
+  async function handleDelete(plan: MembershipPlan) {
+    try {
+      await onDelete(plan.id)
+    } catch {
+      // error already surfaced via toast
+    }
+  }
+
+  return (
+    <div className="w-full">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold">{title ?? ""}</h1>
+          <p className="text-sm text-muted-foreground">
+            {subtitle ?? ""}
+          </p>
+          {totalPlans !== undefined && (
+            <div className="pt-1">
+              <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
+                Total de planes: {totalPlans}
+              </Badge>
+            </div>
+          )}
+        </div>
+        {onAddNew && (
+          <Button onClick={onAddNew} className="w-full sm:w-auto">
+            <Plus className="mr-1 size-3.5" aria-hidden="true" />
+            Nuevo Plan
+          </Button>
+        )}
+      </div>
+      <div className="border border-border bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+              <TableHead className="h-10 pl-4 text-left text-sm font-medium tracking-wide text-muted-foreground uppercase">Plan</TableHead>
+              <TableHead className="h-10 text-center text-sm font-medium tracking-wide text-muted-foreground uppercase">Precio</TableHead>
+              <TableHead className="h-10 text-center text-sm font-medium tracking-wide text-muted-foreground uppercase">Duración</TableHead>
+              <TableHead className="h-10 text-left text-sm font-medium tracking-wide text-muted-foreground uppercase">Descripción</TableHead>
+              <TableHead className="h-10 text-center text-sm font-medium tracking-wide text-muted-foreground uppercase">
+                Acciones
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {plans.length ? (
+              plans.map((plan) => (
+                <TableRow
+                  key={plan.id}
+                  className="border-b border-border transition-colors duration-100 last:border-b-0 hover:bg-muted/30"
+                >
+                  <TableCell className="py-3 pl-4 text-left text-base font-medium">{plan.name}</TableCell>
+                  <TableCell className="py-3 text-center">
+                    <Badge variant="secondary" className="text-sm">{formatPrice(plan.price)}</Badge>
+                  </TableCell>
+                  <TableCell className="py-3 text-center text-base text-muted-foreground">
+                    {plan.durationDays} días
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate py-3 text-left text-base text-muted-foreground">
+                    {plan.description}
+                  </TableCell>
+                  <TableCell className="py-3 text-center">
+                    <div className="flex justify-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Editar"
+                        onClick={() => onEdit(plan)}
+                      >
+                        <RiPencilLine aria-hidden="true" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        className="cursor-pointer"
+                        title="Eliminar"
+                        onClick={() => handleDelete(plan)}
+                      >
+                        <RiDeleteBinLine aria-hidden="true" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={5} className="h-24 text-center text-base text-muted-foreground">
+                  No hay planes cargados.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
+}
