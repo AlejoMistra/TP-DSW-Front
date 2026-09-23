@@ -1,6 +1,5 @@
-import { type ClassSchedule, type ClassCategory } from '../models/ClassSession'
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
+import { apiClient } from '@/shared/api/apiClient';
+import { type ClassSchedule, type ClassCategory } from '../models/ClassSession';
 
 const initialMemberClasses: ClassSchedule[] = [
   {
@@ -63,18 +62,17 @@ const initialMemberClasses: ClassSchedule[] = [
     reserved: false,
     status: 'CARDIO',
   },
-]
+];
 
-let memoryClasses: ClassSchedule[] = [...initialMemberClasses]
+let memoryClasses: ClassSchedule[] = [...initialMemberClasses];
 
 export const classService = {
   async getAll(): Promise<ClassSchedule[]> {
     try {
-      const response = await fetch(`${baseUrl}/api/classes`)
-      if (response.ok) {
-        return response.json()
-      }
-    } catch {
+      const response = await apiClient.get<ClassSchedule[]>('/api/classes');
+      return response.data;
+    }
+     catch {
       // Fallback
     }
     return memoryClasses
@@ -82,28 +80,20 @@ export const classService = {
 
   async getById(id: string): Promise<ClassSchedule> {
     try {
-      const response = await fetch(`${baseUrl}/api/classes/${id}`)
-      if (response.ok) {
-        return response.json()
-      }
+      const response = await apiClient.get<ClassSchedule>(`/api/classes/${id}`);
+      return response.data;
     } catch {
       // Fallback
     }
-    const found = memoryClasses.find((c) => c.id === id)
-    if (!found) throw new Error('Clase no encontrada')
-    return found
+    const found = memoryClasses.find((c) => c.id === id);
+    if (!found) throw new Error('Clase no encontrada');
+    return found;
   },
 
   async create(data: Partial<ClassSchedule>): Promise<ClassSchedule> {
     try {
-      const response = await fetch(`${baseUrl}/api/classes`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (response.ok) {
-        return response.json()
-      }
+      const response = await apiClient.post<ClassSchedule>('/api/classes', data);
+      return response.data;
     } catch {
       // Fallback
     }
@@ -117,74 +107,60 @@ export const classService = {
       startTime: data.startTime || '08:00',
       durationMinutes: data.durationMinutes || 45,
       maxCapacity: data.maxCapacity || 10,
-    }
-    memoryClasses.push(newClass)
-    return newClass
+    };
+    memoryClasses.push(newClass);
+    return newClass;
   },
 
   async update(id: string, data: Partial<ClassSchedule>): Promise<ClassSchedule> {
     try {
-      const response = await fetch(`${baseUrl}/api/classes/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (response.ok) {
-        return response.json()
-      }
+      const response = await apiClient.put<ClassSchedule>(`/api/classes/${id}`, data);
+      return response.data;
     } catch {
       // Fallback
     }
-    memoryClasses = memoryClasses.map((c) => (c.id === id ? { ...c, ...data } : c))
-    const updated = memoryClasses.find((c) => c.id === id)
-    if (!updated) throw new Error('Clase no encontrada')
-    return updated
+    memoryClasses = memoryClasses.map((c) => (c.id === id ? { ...c, ...data } : c));
+    const updated = memoryClasses.find((c) => c.id === id);
+    if (!updated) throw new Error('Clase no encontrada');
+    return updated;
   },
 
   async delete(id: string): Promise<void> {
     try {
-      const response = await fetch(`${baseUrl}/api/classes/${id}`, {
-        method: 'DELETE',
-      })
-      if (response.ok) {
-        return
-      }
+      await apiClient.delete(`/api/classes/${id}`);
+      return;
     } catch {
       // Fallback
     }
-    memoryClasses = memoryClasses.filter((c) => c.id !== id)
+    memoryClasses = memoryClasses.filter((c) => c.id !== id);
   },
 
   async toggleReservation(id: string): Promise<ClassSchedule> {
     try {
-      const response = await fetch(`${baseUrl}/api/classes/${id}/reserve`, {
-        method: 'POST',
-      })
-      if (response.ok) {
-        return response.json()
-      }
+      const response = await apiClient.post<ClassSchedule>(`/api/classes/${id}/reserve`);
+      return response.data;
     } catch {
       // Fallback
     }
 
     memoryClasses = memoryClasses.map((item) => {
       if (item.id === id) {
-        const isReserved = item.reserved || item.status === 'RESERVADO'
-        const newReserved = !isReserved
-        const currentCap = item.currentCapacity ?? 0
-        const newCap = newReserved ? currentCap + 1 : Math.max(0, currentCap - 1)
+        const isReserved = item.reserved || item.status === 'RESERVADO';
+        const newReserved = !isReserved;
+        const currentCap = item.currentCapacity ?? 0;
+        const newCap = newReserved ? currentCap + 1 : Math.max(0, currentCap - 1);
         return {
           ...item,
           reserved: newReserved,
           status: newReserved ? 'RESERVADO' : item.category.toUpperCase(),
           currentCapacity: newCap,
-        }
+        };
       }
-      return item
-    })
+      return item;
+    });
 
-    const updated = memoryClasses.find((c) => c.id === id)
-    if (!updated) throw new Error('Clase no encontrada')
-    return updated
+    const updated = memoryClasses.find((c) => c.id === id);
+    if (!updated) throw new Error('Clase no encontrada');
+    return updated;
   },
-}
+};

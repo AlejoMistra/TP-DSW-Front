@@ -1,89 +1,32 @@
+import { apiClient } from '@/shared/api/apiClient';
 import type {
   CreateInstructorInput,
   Instructor,
   UpdateInstructorInput,
-} from '@/features/instructors/models/Instructor'
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
-
-async function getErrorMessage(response: Response, fallback: string) {
-  const error = await response.json().catch(() => null)
-  return error?.message || error?.error || fallback
-}
+} from '@/features/instructors/models/Instructor';
 
 export const instructorService = {
   async getAll(): Promise<Instructor[]> {
-    const response = await fetch(`${baseUrl}/api/instructors`)
-
-    if (!response.ok) {
-      throw new Error(
-        await getErrorMessage(response, 'Error al obtener instructores'),
-      )
-    }
-
-    return response.json()
+    const response = await apiClient.get<Instructor[]>('/api/instructors');
+    return response.data;
   },
 
   async getById(id: number | string): Promise<Instructor> {
-    const response = await fetch(`${baseUrl}/api/instructors/${id}`)
-
-    if (!response.ok) {
-      throw new Error(
-        await getErrorMessage(response, 'Error al obtener el instructor'),
-      )
-    }
-
-    return response.json()
+    const response = await apiClient.get<Instructor>(`/api/instructors/${id}`);
+    return response.data;
   },
 
   async create(data: CreateInstructorInput): Promise<Instructor> {
-    const response = await fetch(`${baseUrl}/api/instructors`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-
-    if (!response.ok) {
-      throw new Error(
-        await getErrorMessage(response, 'Error al crear el instructor'),
-      )
-    }
-
-    return response.json()
+    const response = await apiClient.post<Instructor>('/api/instructors', data);
+    return response.data;
   },
 
-  async update(
-    id: number,
-    data: UpdateInstructorInput,
-  ): Promise<Instructor> {
-    const response = await fetch(`${baseUrl}/api/instructors/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-
-    if (!response.ok) {
-      throw new Error(
-        await getErrorMessage(response, 'Error al actualizar el instructor'),
-      )
-    }
-
-    return response.json()
+  async update(id: number, data: UpdateInstructorInput): Promise<Instructor> {
+    const response = await apiClient.put<Instructor>(`/api/instructors/${id}`, data);
+    return response.data;
   },
 
   async delete(id: number): Promise<void> {
-    const response = await fetch(`${baseUrl}/api/instructors/${id}`, {
-      method: 'DELETE',
-    })
-
-    if (!response.ok) {
-      throw new Error(
-        await getErrorMessage(response, 'Error al eliminar el instructor'),
-      )
-    }
+    await apiClient.delete(`/api/instructors/${id}`);
   },
-}
+};

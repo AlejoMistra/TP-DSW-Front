@@ -1,16 +1,10 @@
+import { apiClient } from '@/shared/api/apiClient';
 import { type Membership, type MembershipStatus } from '../models/Membership';
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
 export const membershipService = {
   async getMembershipByMemberId(memberId: number): Promise<Membership> {
-    const response = await fetch(
-      `${baseUrl}/api/memberships/member/${memberId}`,
-    );
-    if (!response.ok) {
-      throw new Error('Error al obtener membresía del miembro');
-    }
-    return response.json();
+    const response = await apiClient.get<Membership>(`/api/memberships/member/${memberId}`);
+    return response.data;
   },
 
   async create(data: {
@@ -21,17 +15,8 @@ export const membershipService = {
       method: string;
     };
   }): Promise<Membership> {
-    const response = await fetch(`${baseUrl}/api/memberships`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error('Error al crear membresía');
-    }
-    return response.json();
+    const response = await apiClient.post<Membership>('/api/memberships', data);
+    return response.data;
   },
 
   async update(
@@ -41,16 +26,7 @@ export const membershipService = {
       status?: MembershipStatus;
     },
   ): Promise<Membership> {
-    const response = await fetch(`${baseUrl}/api/memberships/${membershipId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error('Error al actualizar la membresía');
-    }
-    return response.json();
+    const response = await apiClient.patch<Membership>(`/api/memberships/${membershipId}`, data);
+    return response.data;
   },
 };
