@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { type Member, type UpdateMemberInput } from '@/features/members/models/Member'
+import { type Member } from '@/features/members/models/Member'
+import { type MemberFormValues } from '@/features/members/models/memberFormSchema'
 import { memberService } from '@/features/members/api/memberService'
 
 export function useEditMember() {
@@ -35,13 +36,17 @@ export function useEditMember() {
     loadMember()
   }, [id, navigate])
 
-  const handleSubmit = async (data: UpdateMemberInput) => {
+  const handleSubmit = async (data: MemberFormValues) => {
     try {
       if (!id) {
         throw new Error('ID de miembro no válido')
       }
 
-      await memberService.update(Number(id), data)
+      await memberService.update(Number(id), {
+        ...data,
+        birthDate: data.birthDate.toISOString().split('T')[0],
+        phone: data.phone || null,
+      })
 
       toast.success('Miembro actualizado exitosamente')
       navigate(`/administrativo/socios/${id}`)
