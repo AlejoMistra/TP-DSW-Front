@@ -59,7 +59,6 @@ import {
 import { useIsMobile } from "@/shared/hooks/use-mobile"
 
 import type { ExtendedMember } from "../models/ExtendedMember"
-import { MEMBERSHIP_STATUS } from '@/features/memberships/models/Membership'
 import { useNavigate } from 'react-router-dom'
 
 type MembersDataTableProps = {
@@ -73,10 +72,6 @@ type MembersDataTableProps = {
   inactiveCount?: number
   totalCount?: number
 }
-
-const membershipStatusVariant = Object.fromEntries(
-  MEMBERSHIP_STATUS.map((status) => [status.id, status.variant])
-) as Record<string, "default" | "outline" | "destructive">
 
 const COLUMN_LABELS: Record<string, string> = {
   name: "Socio",
@@ -369,24 +364,24 @@ export default function MembersDataTable({
           <div className="flex flex-col gap-2">
             <div>
               <h1 className="text-2xl font-semibold">{title ?? ""}</h1>
-              <p className="text-md text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {subtitle ?? ""}
               </p>
             </div>
             {(activeCount !== undefined || inactiveCount !== undefined || totalCount !== undefined) && (
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 {activeCount !== undefined && (
-                  <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
                     Socios activos: {activeCount}
                   </Badge>
                 )}
                 {inactiveCount !== undefined && (
-                  <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
                     Socios inactivos: {inactiveCount}
                   </Badge>
                 )}
                 {totalCount !== undefined && (
-                  <Badge variant="secondary" className="px-2.5 py-0.5 text-sm">
+                  <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
                     Total: {totalCount}
                   </Badge>
                 )}
@@ -419,7 +414,7 @@ export default function MembersDataTable({
                 table.getColumn("status")?.setFilterValue(val === "ALL" ? undefined : val)
               }}
             >
-              <SelectTrigger className="h-8 w-[150px] text-sm">
+              <SelectTrigger className="h-8 w-37 text-sm">
                 <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
@@ -469,7 +464,7 @@ export default function MembersDataTable({
             {onNew && (
               <Button
                 size="sm"
-                className="h-8 shrink-0"
+                className="h-8"
                 onClick={onNew}
               >
                 <RiAddLine className="mr-1 size-3.5" aria-hidden="true" />
