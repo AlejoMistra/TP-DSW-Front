@@ -1,6 +1,13 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
+export interface ApiErrorResponse {
+  statusCode: number;
+  code: string;
+  message: string;
+  details: Array<{ field?: string; message: string }> | null;
+}
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
 export const apiClient = axios.create({
@@ -19,14 +26,13 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
-// Intercepta las responses y normaliza errores globales
+// Intercepta las responses y normaliza errores globales con contrato unificado
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    
     if (axios.isAxiosError(error)) {
       const isLoginRequest = error.config?.url?.includes('/api/auth/login');
 
@@ -34,66 +40,40 @@ apiClient.interceptors.response.use(
       if (error.response?.status === 401 && !isLoginRequest) {
         localStorage.removeItem('gym_auth_token');
         localStorage.removeItem('gym_auth_user');
-        toast.error('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+        toast.error(
+          'Tu sesión ha expirado. Por favor inicia sesión nuevamente.',
+        );
         if (window.location.pathname !== '/') {
           window.location.href = '/';
         }
         return Promise.reject(error);
       }
 
-      //TODO: Actualmente la api responde con diferentes estructuras de error; ZodError, AppError con { error: "..." }, y mensajes estándar { message: "..." }. Por eso los if/if-else para normalizar el error. Revisar si vale la pena unificar la estructura de errores en el backend.
-      
-      // 2. Extracción y normalización del mensaje de error
-      const responseData = error.response?.data;
-      if (responseData && typeof responseData === 'object') {
-        // Error de Validaciones Zod: details: [{ field, message }] -> se queda con el primer mensaje solamente para mantener el toast simple
+      // 2. Normalización de error según ApiErrorResponse unificado
+      const data = error.response?.data as ApiErrorResponse | undefined;
+
+      if (data && typeof data === 'object') {
+        // Si hay detalles de validación Zod, priorizamos el primer detalle para el toast
         if (
-          'details' in responseData &&
-          Array.isArray(responseData.details) &&
-          responseData.details.length > 0
+          Array.isArray(data.details) &&
+          data.details.length > 0 &&
+          data.details[0].message
         ) {
-          const firstDetail = responseData.details[0];
-          if (
-            firstDetail &&
-            typeof firstDetail === 'object' &&
-            'message' in firstDetail &&
-            typeof firstDetail.message === 'string'
-          ) {
-            error.message = firstDetail.message;
-          }
-        }
-
-        // AppError del backend: { error: "..." }
-        else if (
-          'error' in responseData &&
-          typeof responseData.error === 'string' &&
-          responseData.error.trim().length > 0
-        ) {
-          error.message = responseData.error;
-        }
-
-        // Mensaje estándar: { message: "..." }
-        else if (
-          'message' in responseData &&
-          typeof responseData.message === 'string' &&
-          responseData.message.trim().length > 0
-        ) {
-          error.message = responseData.message;
-        }
-
-        // D) Error 500 del servidor sin mensaje
-        else if (error.response?.status && error.response.status >= 500) {
-          error.message = 'Error interno del servidor. Por favor intenta más tarde.';
+          error.message = data.details[0].message;
+        } else if (data.message) {
+          error.message = data.message;
+        } else if (error.response?.status && error.response.status >= 500) {
+          error.message =
+            'Error interno del servidor. Por favor intenta más tarde.';
         }
       } else if (!error.response) {
-        // E) Error de conexión o servidor caído
         error.message =
           'No se pudo conectar con el servidor. Revisa tu conexión a internet o intenta más tarde.';
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;
