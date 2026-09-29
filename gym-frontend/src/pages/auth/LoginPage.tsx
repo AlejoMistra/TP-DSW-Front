@@ -1,62 +1,30 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card.tsx";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/shared/components/ui/field.tsx";
-import { Input } from "@/shared/components/ui/input.tsx";
-import { Button } from "@/shared/components/ui/button.tsx";
+import { Navigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import LoginForm from '@/features/auth/components/LoginForm';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { getDefaultPathForRole } from '@/features/auth/models/auth';
 
 export default function LoginPage() {
-  return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 md:p-10">
+  const { isAuthenticated, user, isLoading } = useAuth();
 
-      <Card className="w-full max-w-md p-6 md:p-10 shadow-lg">
-        <CardHeader>
-          <CardTitle>Bienvenido a GymPass</CardTitle>
-          <CardDescription>Por favor, inicia sesión para continuar.</CardDescription>
+  if (!isLoading && isAuthenticated && user) {
+    return <Navigate to={getDefaultPathForRole(user.role)} replace />;
+  }
+
+  return (
+    <div className="flex min-h-screen w-full items-center justify-center p-6 md:p-10 bg-muted/20">
+      <Card className="w-full max-w-md p-6 md:p-8 shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Bienvenido a GymPass</CardTitle>
+          <CardDescription>
+            Ingresá tus credenciales para acceder al sistema.
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <form>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="email">Correo</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="nombre@correo.com"
-                  required
-                />
-              </Field>
-              <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Olvidé mi contraseña
-                  </a>
-                </div>
-                <Input id="password" type="password" required />
-              </Field>
-              <Field>
-                {/* <Button type="submit">Login</Button> */}
-                {/* Por ahora, el botón de login redirige a la landing temporal */}
-                <Button variant="default" type="button" onClick={() => window.location.href = '/project-overview'}>Ingresar</Button>
-              </Field>
-              {/* 
-                <Button variant="outline" type="button">
-                  Login with Google
-                </Button>
-              */}
-              <Field>
-                <FieldDescription className="text-center">
-                  Todavía no sos miembro? <a href="#">Conocé nuestros planes</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
+          <LoginForm />
         </CardContent>
-
       </Card>
     </div >
-  )
+  );
 }

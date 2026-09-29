@@ -1,3 +1,7 @@
+import type { PaymentMethod } from '@/features/payments/models/Payment';
+
+export type { PaymentMethod };
+
 export type Status = 'ACTIVE' | 'INACTIVE';
 export type DocType = 'DNI' | 'PASAPORTE';
 
@@ -14,7 +18,6 @@ export type Member = {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
-  nextExpiration?: string;
 };
 
 export type CreateMemberInput = {
@@ -33,13 +36,7 @@ export type CreateMemberInput = {
   };
 };
 
-export type PaymentMethod =
-  | 'CREDIT_CARD'
-  | 'DEBIT_CARD'
-  | 'TRANSFER'
-  | 'CASH'
-  | 'OTHER';
-
 export type UpdateMemberInput = Partial<
   Omit<Member, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
 >;
+

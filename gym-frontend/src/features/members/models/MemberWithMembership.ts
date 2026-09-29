@@ -1,23 +1,14 @@
 import type { Member } from './Member';
-
-export type MembershipPlanInfo = {
-  id: number;
-  name: string;
-  price: number;
-  durationDays: number;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-};
+import type { MembershipPlan } from '@/features/membershipPlans/models/MembershipPlan';
 
 export type MembershipInfo = {
   id: number;
   status: string;
-  membershipPlan: MembershipPlanInfo;
+  membershipPlan: MembershipPlan;
   endDate: string;
 } | null;
 
 export type MemberWithMembership = Member & {
   membership: MembershipInfo;
 };
+

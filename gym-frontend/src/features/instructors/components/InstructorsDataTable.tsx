@@ -39,30 +39,32 @@ export default function InstructorsDataTable({
 
   return (
     <div className="w-full">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold">
-            Listado de Instructores
-          </h2>
-
-          <p className="text-sm text-muted-foreground">
-            Instructores registrados en el sistema.
-          </p>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-2 sm:flex-1">
+          <div>
+            <h1 className="text-2xl font-semibold">
+              Listado de Instructores
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Instructores registrados en el sistema.
+            </p>
+          </div>
           {totalInstructors !== undefined && (
-            <div className="pt-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
               <Badge variant="secondary" className="px-2.5 py-0.5 text-xs">
                 Total de instructores: {totalInstructors}
               </Badge>
             </div>
           )}
         </div>
-
-        {onAddNew && (
-          <Button onClick={onAddNew} className="w-full sm:w-auto">
-            <Plus className="mr-1 size-3.5" aria-hidden="true" />
-            Nuevo instructor
-          </Button>
-        )}
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          {onAddNew && (
+            <Button size="sm" onClick={onAddNew} className="h-8">
+              <Plus className="mr-1 size-3.5" aria-hidden="true" />
+              Nuevo instructor
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="border border-border bg-card">
