@@ -6,14 +6,15 @@ import MemberForm from '@/features/members/components/MemberForm'
 import MemberPersonalDetails from '@/features/members/components/MemberPersonalDetails'
 import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
+import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 
 export default function MemberDataPage() {
   usePageTitle('Mis datos')
 
   const [isEditing, setIsEditing] = useState(false)
 
-  // Temporal hasta implementar autenticación.
-  const currentMemberId = 1
+  // Con este hook obtenemos el ID del socio actual desde el contexto de autenticación
+  const currentMemberId = useCurrentMemberId()
 
   const {
     member,

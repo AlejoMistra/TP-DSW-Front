@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { memberService } from '@/features/members/api/memberService'
-import type {
-  CreateMemberInput,
-  Member,
-  UpdateMemberInput,
-} from '@/features/members/models/Member'
+import type { Member } from '@/features/members/models/Member'
+import type { MemberFormValues } from '@/features/members/models/memberFormSchema'
 
 export function useMemberProfileData(memberId: number | null) {
   const [member, setMember] = useState<Member | null>(null)
@@ -61,9 +58,7 @@ export function useMemberProfileData(memberId: number | null) {
     }
   }, [memberId])
 
-  const handleSubmit = async (
-    data: CreateMemberInput | UpdateMemberInput,
-  ) => {
+  const handleSubmit = async (data: MemberFormValues) => {
     if (!memberId) {
       toast.error('No se encontró el socio autenticado')
       return

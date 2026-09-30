@@ -26,7 +26,7 @@ export function useMemberPayments(memberId: number | null) {
         const membership =
           await membershipService.getMembershipByMemberId(memberId)
 
-        const paymentData = await paymentService.getAll(
+        const paymentData = await paymentService.getAllByMembership(
           membership.id,
         )
 

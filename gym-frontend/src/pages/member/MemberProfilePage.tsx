@@ -3,19 +3,19 @@ import {
   FileText,
   HelpCircle,
   History,
-  Settings,
 } from 'lucide-react'
 
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import ProfileSummary from '@/features/members/components/ProfileSummary'
 import ProfileNavigationCard from '@/features/members/components/ProfileNavigationCard'
 import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
+import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 
 export default function MemberProfilePage() {
   usePageTitle('Mi Perfil')
 
-  // Temporal hasta implementar autenticación.
-  const currentMemberId = 1
+  // Con este hook obtenemos el ID del socio actual desde el contexto de autenticación
+  const currentMemberId = useCurrentMemberId()
 
   const {
     member,
@@ -85,13 +85,6 @@ export default function MemberProfilePage() {
             title="Historial de pagos"
             description="Consultá tus pagos realizados."
             icon={History}
-          />
-
-          <ProfileNavigationCard
-            to="/socio/perfil/configuracion"
-            title="Configuración"
-            description="Personalizá tus preferencias."
-            icon={Settings}
           />
 
           <ProfileNavigationCard

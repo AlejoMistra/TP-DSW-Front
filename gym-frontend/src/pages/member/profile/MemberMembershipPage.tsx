@@ -1,12 +1,13 @@
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import MemberMembershipCard from '@/features/memberships/components/MemberMembershipCard'
 import { useMemberMembership } from '@/features/memberships/hooks/useMemberMembership'
+import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 
 export default function MemberMembershipPage() {
   usePageTitle('Mi membresía')
 
-  // Temporal hasta implementar autenticación.
-  const currentMemberId = 1
+  // Con este hook obtenemos el ID del socio actual desde el contexto de autenticación
+  const currentMemberId = useCurrentMemberId()
 
   const {
     membership,
