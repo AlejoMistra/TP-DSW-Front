@@ -1,9 +1,13 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import type { RouteObject } from 'react-router-dom';
+import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import RoleLayout from '@/layouts/RoleLayout';
 import ProtectedRoute from '../ProtectedRoute';
-import MemberRoutinesPage from '@/pages/member/MemberRoutinesPage';
-import MemberClassesPage from '@/pages/member/ClassesPage';
+
+const MemberRoutinesPage = lazy(() => import('@/pages/member/MemberRoutinesPage'));
+const MemberClassesPage = lazy(() => import('@/pages/member/ClassesPage'));
 
 export const memberRoutes: RouteObject = {
   path: '/socio',
@@ -18,4 +22,3 @@ export const memberRoutes: RouteObject = {
     { path: 'clases', element: <MemberClassesPage /> },
   ],
 };
-
