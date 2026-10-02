@@ -4,6 +4,6 @@ export function formatDate(date: Date | string | undefined | null) {
   return new Intl.DateTimeFormat('es-AR', {
     day: '2-digit',
     month: 'short',
-    year: 'numeric',
+    year: '2-digit',
   }).format(parsed)
 }

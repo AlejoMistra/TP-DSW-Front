@@ -37,20 +37,16 @@ export const ROLE_NAVIGATION: Record<
     links: [
       { to: "/instructor/", label: "Inicio", icon: House },
       { to: "/instructor/rutinas", label: "Rutinas", icon: ClipboardList },
-      {
-        to: "/instructor/ejercicios",
-        label: "Ejercicios",
-        icon: NotebookPen,
-      },
+      { to: "/instructor/ejercicios", label: "Ejercicios", icon: NotebookPen},
     ],
   },
   member: {
     title: "Socio",
     links: [
       { to: "/socio/", label: "Inicio", icon: House },
-      { to: "/socio/perfil", label: "Perfil", icon: CircleUser },
       { to: "/socio/rutinas", label: "Rutinas", icon: Dumbbell },
       { to: "/socio/clases", label: "Clases", icon: Calendar },
+      { to: "/socio/perfil", label: "Perfil", icon: CircleUser },
     ],
   },
 }

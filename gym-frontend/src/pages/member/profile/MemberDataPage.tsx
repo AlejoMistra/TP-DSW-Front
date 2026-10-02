@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Pencil } from 'lucide-react'
+import BackButton from '@/shared/components/BackButton'
 
 import { Button } from '@/shared/components/ui/button'
 import MemberForm from '@/features/members/components/MemberForm'
@@ -50,6 +51,8 @@ export default function MemberDataPage() {
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
+      <BackButton to="/socio/perfil" />
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">

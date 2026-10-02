@@ -4,6 +4,7 @@ import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import MemberPaymentCard from '@/features/payments/components/MemberPaymentCard'
 import { useMemberPayments } from '@/features/payments/hooks/useMemberPayments'
 import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
+import BackButton from '@/shared/components/BackButton.tsx'
 
 export default function MemberPaymentsPage() {
   usePageTitle('Historial de pagos')
@@ -44,6 +45,10 @@ export default function MemberPaymentsPage() {
   return (
     <div className="mx-auto w-full max-w-4xl space-y-6">
       <div>
+        <BackButton
+          text="Volver"
+          to="/socio/perfil"
+        />
         <h1 className="text-2xl font-bold tracking-tight">
           Historial de pagos
         </h1>

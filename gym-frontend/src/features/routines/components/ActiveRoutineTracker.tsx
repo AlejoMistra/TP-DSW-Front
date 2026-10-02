@@ -5,7 +5,6 @@ import {
   Play,
   Pause,
   Check,
-  Dumbbell,
   ArrowLeft,
   Flag,
   Flame,

@@ -1,27 +1,44 @@
 import {
-  CreditCard,
   FileText,
   HelpCircle,
   History,
+  LogOut,
 } from 'lucide-react'
-
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import ProfileSummary from '@/features/members/components/ProfileSummary'
 import ProfileNavigationCard from '@/features/members/components/ProfileNavigationCard'
+import MemberMembershipCard from '@/features/memberships/components/MemberMembershipCard'
 import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
 import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
+import { Separator } from '@/shared/components/ui/separator'
+import { useAuth } from '@/features/auth/hooks/useAuth.ts'
+import { useNavigate } from 'react-router-dom'
+import { useMemberMembership } from '@/features/memberships/hooks/useMemberMembership'
 
 export default function MemberProfilePage() {
-  usePageTitle('Mi Perfil')
-
-  // Con este hook obtenemos el ID del socio actual desde el contexto de autenticación
+  usePageTitle('Mi Cuenta')
+  const { logout } = useAuth()
+  const navigate = useNavigate()
   const currentMemberId = useCurrentMemberId()
 
   const {
     member,
-    loading,
+    loading: memberLoading,
     error,
   } = useMemberProfileData(currentMemberId)
+
+  const {
+    membership,
+    plan,
+    loading: membershipLoading,
+  } = useMemberMembership(currentMemberId)
+
+  const loading = memberLoading || membershipLoading
+
+  const handleLogout = () => {
+    logout()
+    navigate('/', { replace: true })
+  }
 
   if (loading) {
     return (
@@ -54,30 +71,20 @@ export default function MemberProfilePage() {
         email={member.email}
       />
 
+      {membership && plan && (
+        <MemberMembershipCard
+          membership={membership}
+          plan={plan}
+        />
+      )}
+
       <section className="space-y-3">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">
-            Mi cuenta
-          </h2>
-
-          <p className="text-sm text-muted-foreground">
-            Consultá y administrá la información de tu cuenta.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           <ProfileNavigationCard
             to="/socio/perfil/datos"
             title="Mis datos"
             description="Consultá tu información personal."
             icon={FileText}
-          />
-
-          <ProfileNavigationCard
-            to="/socio/perfil/membresia"
-            title="Membresía"
-            description="Revisá tu plan y vencimiento."
-            icon={CreditCard}
           />
 
           <ProfileNavigationCard
@@ -95,6 +102,16 @@ export default function MemberProfilePage() {
           />
         </div>
       </section>
+
+      <Separator />
+
+      <div
+        className="flex items-center justify-center cursor-pointer px-2 text-destructive hover:opacity-80 transition-opacity md:justify-start"
+        onClick={handleLogout}
+      >
+        <LogOut className="mr-2 size-4" />
+        <span className="text-sm font-semibold">Cerrar sesión</span>
+      </div>
     </div>
   )
 }
