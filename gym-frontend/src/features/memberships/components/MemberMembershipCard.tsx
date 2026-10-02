@@ -1,12 +1,14 @@
-import { CalendarDays, CheckCircle2, Clock3 } from 'lucide-react'
+import { CalendarDays } from 'lucide-react'
 
 import { Badge } from '@/shared/components/ui/badge'
+import { Button } from '@/shared/components/ui/button'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/shared/components/ui/card'
+import { Progress } from '@/shared/components/ui/progress'
 
 import {
   MEMBERSHIP_STATUS,
@@ -18,11 +20,14 @@ import { formatDate } from '@/shared/utils/formatDate'
 type MemberMembershipCardProps = {
   membership: Membership
   plan: MembershipPlan
+  className?: string
 }
 
 function getRemainingDays(endDate: string) {
   const today = new Date()
+  today.setHours(0, 0, 0, 0)
   const expirationDate = new Date(endDate)
+  expirationDate.setHours(23, 59, 59, 999)
   const difference = expirationDate.getTime() - today.getTime()
 
   return Math.max(
@@ -31,100 +36,98 @@ function getRemainingDays(endDate: string) {
   )
 }
 
-function formatPrice(price: number) {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(price)
-}
-
 export default function MemberMembershipCard({
   membership,
   plan,
+  className,
 }: MemberMembershipCardProps) {
   const membershipStatus = MEMBERSHIP_STATUS.find(
     (status) => status.id === membership.status,
   )
 
-  const membershipLabel = membershipStatus?.label || 'Sin estado'
-  const membershipVariant = membershipStatus?.variant || 'outline'
+  const membershipLabel = membershipStatus?.label || 'Activo'
+  const isExpired = membership.status === 'EXPIRED' || membership.status === 'CANCELLED'
   const remainingDays = getRemainingDays(membership.endDate)
 
+  const totalPeriodDays = plan.durationDays > 0 ? plan.durationDays : 30
+
+  // Progress percentage decreases as expiration approaches
+  const progressPercentage = isExpired
+    ? 0
+    : Math.min(100, Math.max(0, Math.round((remainingDays / totalPeriodDays) * 100)))
+
   return (
-    <Card className="border-border/70 bg-card/80 shadow-sm">
-      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <CardTitle className="text-xl font-bold">
+    <Card
+      className={`relative overflow-hidden rounded-3xl border border-border/80 bg-card p-2 shadow-md transition-all hover:shadow-lg ${className || ''}`}
+    >
+      <CardHeader className="p-5 pb-3 md:p-4 md:pb-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
+            Membresía
+          </span>
+
+          <Badge
+            variant="default"
+            className="rounded-full px-3 py-0.5 text-xs font-extrabold tracking-wider uppercase"
+          >
+            {membershipLabel}
+          </Badge>
+        </div>
+
+        <div className="mt-2">
+          <CardTitle className="text-3xl tracking-tight text-foreground md:text-2xl">
             Plan {plan.name}
           </CardTitle>
-
-          <p className="text-sm text-muted-foreground">
-            {plan.description || 'Sin descripción disponible.'}
-          </p>
+          {plan.description && (
+            <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+              {plan.description}
+            </p>
+          )}
         </div>
-
-        <Badge
-          variant={membershipVariant}
-          className="w-fit px-3 py-1.5"
-        >
-          {membershipLabel}
-        </Badge>
       </CardHeader>
 
-      <CardContent className="space-y-5">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-4">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <CalendarDays className="size-5" />
-            </div>
-
-            <div>
-              <p className="text-xs text-muted-foreground">
-                Fecha de inicio
-              </p>
-              <p className="font-semibold">
-                {formatDate(membership.startDate)}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 rounded-xl border bg-muted/30 p-4">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
-              <Clock3 className="size-5" />
-            </div>
-
-            <div>
-              <p className="text-xs text-muted-foreground">
-                Próximo vencimiento
-              </p>
-              <p className="font-semibold">
-                {formatDate(membership.endDate)}
-              </p>
-            </div>
-          </div>
+      <CardContent className="space-y-4 p-4 pt-1 sm:p-5 sm:pt-2">
+        {/* Next expiration date */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <CalendarDays className="size-4 shrink-0 text-muted-foreground/80" />
+          <span>
+            Próximo vencimiento:{' '}
+            <strong className="font-bold text-foreground">
+              {formatDate(membership.endDate)}
+            </strong>
+          </span>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="size-5 text-primary" />
-
-            <div>
-              <p className="font-semibold">
-                {membership.status === 'ACTIVE'
-                  ? `Te quedan ${remainingDays} días`
-                  : 'Membresía no vigente'}
-              </p>
-
-              <p className="text-sm text-muted-foreground">
-                Estado actual de tu membresía
-              </p>
-            </div>
+        {/* Progress bar and days remaining */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex items-center justify-between text-xs font-semibold">
+            <span className="text-muted-foreground">
+              {isExpired
+                ? 'Membresía vencida'
+                : remainingDays === 0
+                  ? 'Vence hoy'
+                  : remainingDays === 1
+                    ? 'Queda 1 día restante'
+                    : `Días restantes: ${remainingDays}`}
+            </span>
           </div>
 
-          <p className="text-lg font-bold text-primary">
-            {formatPrice(plan.price)}
-          </p>
+          <Progress
+            value={progressPercentage}
+            className="h-2 w-full bg-muted/60"
+          />
+        </div>
+
+        {/* CTA Button: disabled as requested */}
+        <div className="pt-2">
+          <Button
+            type="button"
+            disabled
+            className="w-full h-12 rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 shadow-sm opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+            title="Próximamente disponible"
+          >
+            Renovar Membresía
+          </Button>
         </div>
       </CardContent>
     </Card>

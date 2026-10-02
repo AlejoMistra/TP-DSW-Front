@@ -1,8 +1,8 @@
 export const supportContact = {
   email: 'soporte@mygymmanager.com',
   phone: '+54 9 11 1234-5678',
-  address: 'Av. Siempre Viva 123, Buenos Aires',
-  hours: 'Lunes a viernes de 08:00 a 22:00',
+  address: 'Buenos Aires 1480, Rosario, Santa Fe',
+  hours: 'Lunes a Sábados de 08:00 a 22:00',
 }
 
 export const frequentlyAskedQuestions = [
