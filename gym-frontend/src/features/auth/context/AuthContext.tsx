@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: response.user.id,
         email: response.user.email,
         role: mapBackendRoleToAppRole(response.user.role),
+        memberId: response.user.memberId ?? null,
       };
 
       localStorage.setItem(TOKEN_KEY, response.token);
