@@ -153,7 +153,7 @@ export function ActiveRoutineTracker({
       <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-card p-4">
         <div className="flex items-center gap-3">
           <div className="flex size-11 items-center justify-center rounded-xl bg-card text-primary">
-            <Timer className="size-6" />
+            <Timer className="size-7" />
           </div>
           <div>
             <span className="text-sm font-medium text-muted-foreground uppercase">
@@ -177,7 +177,7 @@ export function ActiveRoutineTracker({
             }}
             className="size-10 rounded-full text-muted-foreground hover:text-foreground"
           >
-            <RotateCcw className="size-4" />
+            <RotateCcw className="size-5" />
           </Button>
 
           {/* Botón Play/Pause Amarillo */}
@@ -215,33 +215,24 @@ export function ActiveRoutineTracker({
             return (
               <div
                 key={item.id || index}
-                className={`relative flex items-center justify-between rounded-2xl border p-4 transition-all duration-200 ${isDone
+                className={`flex items-center justify-between rounded-2xl border p-4 transition-all duration-200 ${isDone
                   ? 'border-primary bg-primary/5'
                   : 'border-border/80 bg-card hover:border-primary/30'
                   }`}
               >
-                {/* Lado izquierdo: Icono de ejercicio + Textos */}
-                <div className="flex items-center gap-3.5">
-                  <div
-                    className={`flex size-12 items-center justify-center rounded-xl transition-colors ${isDone
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                      }`}
-                  >
-                    <Dumbbell className="size-6" />
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                {/* Lado izquierdo: ejercicio + Textos */}
+                <div className="flex min-w-0 flex-1 items-center gap-3.5">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex w-full items-center justify-between gap-2">
                       <span
-                        className={`font-semibold text-lg ${isDone
+                        className={`truncate font-semibold text-lg ${isDone
                           ? 'text-muted-foreground line-through'
                           : 'text-foreground'
                           }`}
                       >
                         {exerciseName}
                       </span>
-                      <span className="rounded-full text-xs bg-foreground/10 px-2 py-0.5 font-semibold tracking-wider text-foreground uppercase">
+                      <span className="shrink-0 rounded-full text-xs bg-foreground/10 px-2 py-0.5 font-semibold tracking-wider text-foreground uppercase">
                         {muscleGroup}
                       </span>
                     </div>
@@ -297,7 +288,7 @@ export function ActiveRoutineTracker({
         <Button
           type="button"
           onClick={handleFinalize}
-          className="h-14 w-full rounded-2xl bg-amber-400 text-base font-extrabold tracking-wider text-black shadow-lg transition-transform hover:scale-[1.01] hover:bg-amber-300"
+          className="h-14 w-full rounded-2xl text-base font-extrabold tracking-wider shadow-lg transition-transform hover:scale-[1.02]"
         >
           FINALIZAR ENTRENAMIENTO
           <Flag className="ml-2 size-5 fill-current" />

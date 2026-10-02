@@ -44,9 +44,6 @@ function RoleLayoutContent({ role }: { role: AppRole }) {
             <span className="text-2xl font-medium">{headerTitle || `Portal ${title}`}</span>
             <div className="ml-auto flex items-center gap-3">
               <ThemeToggle />
-              <Bell className="h-5 w-5 text-muted-foreground" />
-              <Settings className="h-5 w-5 text-muted-foreground" />
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
