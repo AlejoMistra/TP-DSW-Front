@@ -13,9 +13,14 @@ export const paymentService = {
     return response.data;
   },
 
+  async getAllByMembership(membershipId: number): Promise<Payment[]> {
+    const response = await apiClient.get<Payment[]>(`/api/memberships/${membershipId}/payments`);
+    return response.data
+  },
+
   async getById(id: number): Promise<Payment> {
     const response = await apiClient.get<Payment>(`/api/payments/${id}`);
-    return response.data;
+    return response.data
   },
 
   async create(data: CreatePaymentInput): Promise<Payment> {

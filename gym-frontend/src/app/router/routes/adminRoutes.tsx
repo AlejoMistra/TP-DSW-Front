@@ -1,14 +1,18 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import type { RouteObject } from 'react-router-dom';
+import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import RoleLayout from '@/layouts/RoleLayout';
 import ProtectedRoute from '../ProtectedRoute';
-import AdminClassesPage from '@/pages/admin/ClassesPage';
-import MembersPage from '@/pages/admin/MembersPage';
-import NewMemberPage from '@/pages/admin/members/NewMemberPage';
-import EditMemberPage from '@/pages/admin/members/EditMemberPage';
-import MemberDetailsPage from '@/pages/admin/members/MemberDetailsPage';
-import MembershipPlansPage from '@/pages/admin/MembershipPlansPage';
-import InstructorsPage from '@/pages/admin/InstructorsPage';
+
+const AdminClassesPage = lazy(() => import('@/pages/admin/ClassesPage'));
+const MembersPage = lazy(() => import('@/pages/admin/MembersPage'));
+const NewMemberPage = lazy(() => import('@/pages/admin/members/NewMemberPage'));
+const EditMemberPage = lazy(() => import('@/pages/admin/members/EditMemberPage'));
+const MemberDetailsPage = lazy(() => import('@/pages/admin/members/MemberDetailsPage'));
+const MembershipPlansPage = lazy(() => import('@/pages/admin/MembershipPlansPage'));
+const InstructorsPage = lazy(() => import('@/pages/admin/InstructorsPage'));
 
 export const adminRoutes: RouteObject = {
   path: '/administrativo',
