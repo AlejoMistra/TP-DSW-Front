@@ -6,6 +6,7 @@ export interface AuthUser {
   id: number;
   email: string;
   role: AppRole;
+  memberId: number | null;
 }
 
 export interface LoginCredentials {
@@ -19,6 +20,7 @@ export interface LoginResponse {
     id: number;
     email: string;
     role: BackendRole | AppRole;
+    memberId: number | null;
   };
 }
 

@@ -3,6 +3,7 @@ import {
   Calendar,
   ClipboardList,
   CreditCard,
+  CircleUser,
   Dumbbell,
   House,
   NotebookPen,
@@ -47,6 +48,7 @@ export const ROLE_NAVIGATION: Record<
     title: "Socio",
     links: [
       { to: "/socio/", label: "Inicio", icon: House },
+      { to: "/socio/perfil", label: "Perfil", icon: CircleUser },
       { to: "/socio/rutinas", label: "Rutinas", icon: Dumbbell },
       { to: "/socio/clases", label: "Clases", icon: Calendar },
     ],
