@@ -83,7 +83,7 @@ export function RoutineForm({ routine, onBack, onSuccess }: RoutineFormProps) {
                 {/* Selector de Instructor */}
                 <div className="space-y-1.5 bg-card/60 p-4 rounded-2xl border border-border/50">
                     <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground block">
-                        Instructor Responsable (Hasta implementar login)
+                        Instructor Responsable
                     </label>
                     <Select
                         value={instructorId ? String(instructorId) : ''}
