@@ -18,8 +18,9 @@ export interface CreateClassBookingInput {
 
 export const classBookingService = {
   async getAll(): Promise<ClassBooking[]> {
-    const response = await apiClient.get<ClassBooking[]>('/api/classBookings');
-    return response.data;
+    const response = await apiClient.get<ClassBooking[] | { items: ClassBooking[] }>('/api/classBookings');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number): Promise<ClassBooking> {
