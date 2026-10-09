@@ -7,8 +7,9 @@ import type {
 
 export const classScheduleService = {
   async getAll(): Promise<ClassSchedule[]> {
-    const response = await apiClient.get<ClassSchedule[]>('/api/classSchedules');
-    return response.data;
+    const response = await apiClient.get<ClassSchedule[] | { items: ClassSchedule[] }>('/api/classSchedules');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number | string): Promise<ClassSchedule> {

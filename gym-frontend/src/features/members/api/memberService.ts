@@ -7,13 +7,15 @@ import {
 
 export const memberService = {
   async getAllMembers(): Promise<Member[]> {
-    const response = await apiClient.get<Member[]>('/api/members');
-    return response.data;
+    const response = await apiClient.get<Member[] | { items: Member[] }>('/api/members');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getAllMembersWithMembership() {
     const response = await apiClient.get('/api/members/with-membership');
-    return response.data;
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getMemberById(id: number): Promise<Member> {

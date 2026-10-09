@@ -7,8 +7,9 @@ import {
 
 export const classSessionService = {
   async getAll(): Promise<ClassSession[]> {
-    const response = await apiClient.get<ClassSession[]>('/api/classSessions');
-    return response.data;
+    const response = await apiClient.get<ClassSession[] | { items: ClassSession[] }>('/api/classSessions');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number): Promise<ClassSession> {
