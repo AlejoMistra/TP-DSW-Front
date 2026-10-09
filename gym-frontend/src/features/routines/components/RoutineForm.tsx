@@ -3,13 +3,6 @@ import { ArrowLeft, Save, Plus } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/shared/components/ui/select';
 import { useRoutineForm } from '../hooks/useRoutineForm';
 import { RoutineExerciseItemCard } from './RoutineExerciseItemCard';
 import { AddExerciseDialog } from './AddExerciseDialog';
@@ -34,7 +27,6 @@ export function RoutineForm({ routine, onBack, onSuccess }: RoutineFormProps) {
         difficulty,
         setDifficulty,
         instructorId,
-        setInstructorId,
         instructors,
         exercises,
         availableExercises,
@@ -81,38 +73,17 @@ export function RoutineForm({ routine, onBack, onSuccess }: RoutineFormProps) {
             </header>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Selector de Instructor */}
+                {/* Instructor Responsable (Solo lectura) */}
                 <div className="space-y-1.5 bg-card/60 p-4 rounded-2xl border border-border/50">
-    <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground block">
-        Instructor Responsable
-    </label>
-    
-    {currentUser?.role === 'instructor' ? (
-        // Si es instructor: campo fijo de solo lectura con sus datos
-        <div className="flex items-center h-11 px-4 rounded-xl bg-muted/40 border border-border/60 text-sm font-medium text-foreground">
-            {instructors.find((i) => i.id === instructorId)?.name 
-                ? `${instructors.find((i) => i.id === instructorId)?.name} ${instructors.find((i) => i.id === instructorId)?.surname} (${currentUser.email})`
-                : currentUser?.email || 'Instructor actual'}
-        </div>
-    ) : (
-        // Si es admin: puede seleccionar cualquier instructor
-        <Select
-            value={instructorId ? String(instructorId) : ''}
-            onValueChange={(val) => setInstructorId(Number(val))}
-        >
-            <SelectTrigger className="w-full h-11 bg-background border-border">
-                <SelectValue placeholder="Seleccionar instructor..." />
-            </SelectTrigger>
-            <SelectContent>
-                {instructors.map((inst) => (
-                    <SelectItem key={inst.id} value={String(inst.id)}>
-                        {inst.name} {inst.surname} ({inst.email})
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-    )}
-</div>
+                    <label className="text-sm font-bold uppercase tracking-wider text-muted-foreground block">
+                        Instructor Responsable
+                    </label>
+                    <div className="flex items-center h-11 px-4 rounded-xl bg-muted/40 border border-border/60 text-sm font-medium text-foreground">
+                        {instructors.find((i) => i.id === instructorId)
+                            ? `${instructors.find((i) => i.id === instructorId)?.name} ${instructors.find((i) => i.id === instructorId)?.surname} (${currentUser?.email || ''})`
+                            : currentUser?.email || 'Instructor actual'}
+                    </div>
+                </div>
 
 
 

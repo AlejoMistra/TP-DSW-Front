@@ -63,8 +63,6 @@ export function useRoutineForm({
           );
           if (instructor) {
             setInstructorId(instructor.id);
-          } else {
-            setInstructorId(Number(instList[0].id));
           }
         }
 
