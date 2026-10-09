@@ -41,11 +41,13 @@ function RoleLayoutContent({ role }: { role: AppRole }) {
         <SidebarInset className="flex min-h-screen flex-1 flex-col">
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="hidden md:inline-flex" />
-            <span className="text-2xl font-medium">{headerTitle || `Portal ${title}`}</span>
-            <div className="ml-auto flex items-center gap-3">
+            <span className="text-lg sm:text-2xl font-medium truncate max-w-[200px] sm:max-w-none">
+              {headerTitle || `Portal ${title}`}
+            </span>
+            <div className="ml-auto flex items-center gap-2 sm:gap-3">
               <ThemeToggle />
-              <Bell className="h-5 w-5 text-muted-foreground" />
-              <Settings className="h-5 w-5 text-muted-foreground" />
+              <Bell className="hidden sm:block h-5 w-5 text-muted-foreground" />
+              <Settings className="hidden sm:block h-5 w-5 text-muted-foreground" />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

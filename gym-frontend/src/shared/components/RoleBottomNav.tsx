@@ -41,8 +41,11 @@ export default function RoleBottomNav({ links }: RoleBottomNavProps) {
                 cn(navItemBaseClass, isActive && "text-primary font-bold")
               }
             >
-              {Icon ? <Icon className="h-5 w-5" /> : null}
-              <span>{link.label}</span>
+              {Icon ? <Icon className="h-5 w-5 shrink-0" /> : null}
+              <span
+                className="truncate max-w-full px-0.5 text-center text-[9px] sm:text-[10px] leading-tight">
+                {link.label}
+              </span>
             </NavLink>
           )
         })}
