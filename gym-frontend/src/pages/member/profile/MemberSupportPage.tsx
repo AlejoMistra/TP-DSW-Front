@@ -21,7 +21,8 @@ import {
   frequentlyAskedQuestions,
   legalInformation,
   supportContact,
-} from '@/features/support/config/supportContent'
+} from '@/config/support/supportContent'
+import BackButton from '@/shared/components/BackButton.tsx'
 
 export default function MemberSupportPage() {
   usePageTitle('Soporte')
@@ -29,6 +30,10 @@ export default function MemberSupportPage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6">
       <div>
+        <BackButton
+          text="Volver"
+          to="/socio/perfil"
+        />
         <h1 className="text-2xl font-bold tracking-tight">
           Soporte
         </h1>
@@ -73,8 +78,6 @@ export default function MemberSupportPage() {
 
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <Phone className="size-5 text-primary" />
-
           <h2 className="text-xl font-bold">
             Contacto del gimnasio
           </h2>
@@ -82,11 +85,12 @@ export default function MemberSupportPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Card className="border-border/70 bg-card/80 shadow-sm">
+
             <CardContent className="space-y-3 p-5">
               <Mail className="size-6 text-primary" />
 
               <div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Email
                 </p>
 
@@ -105,7 +109,7 @@ export default function MemberSupportPage() {
               <Phone className="size-6 text-primary" />
 
               <div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Teléfono
                 </p>
 
@@ -124,7 +128,7 @@ export default function MemberSupportPage() {
               <MapPin className="size-6 text-primary" />
 
               <div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Dirección
                 </p>
 
@@ -140,7 +144,7 @@ export default function MemberSupportPage() {
               <Clock3 className="size-6 text-primary" />
 
               <div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Horarios
                 </p>
 
@@ -155,8 +159,6 @@ export default function MemberSupportPage() {
 
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <FileText className="size-5 text-primary" />
-
           <h2 className="text-xl font-bold">
             Información adicional
           </h2>
