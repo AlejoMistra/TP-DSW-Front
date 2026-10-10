@@ -7,8 +7,9 @@ import type {
 
 export const instructorService = {
   async getAll(): Promise<Instructor[]> {
-    const response = await apiClient.get<Instructor[]>('/api/instructors');
-    return response.data;
+    const response = await apiClient.get<Instructor[] | { items: Instructor[] }>('/api/instructors');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number | string): Promise<Instructor> {

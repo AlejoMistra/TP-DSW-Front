@@ -9,13 +9,15 @@ import type {
 export const paymentService = {
   async getAll(membershipId?: number): Promise<Payment[]> {
     const params = membershipId ? { membershipId } : undefined;
-    const response = await apiClient.get<Payment[]>('/api/payments', { params });
-    return response.data;
+    const response = await apiClient.get<Payment[] | { items: Payment[] }>('/api/payments', { params });
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getAllByMembership(membershipId: number): Promise<Payment[]> {
-    const response = await apiClient.get<Payment[]>(`/api/memberships/${membershipId}/payments`);
-    return response.data
+    const response = await apiClient.get<Payment[] | { items: Payment[] }>(`/api/memberships/${membershipId}/payments`);
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number): Promise<Payment> {
