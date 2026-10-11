@@ -14,6 +14,8 @@ import type { Instructor } from '@/features/instructors/models/Instructor'
 import { memberService } from '@/features/members/api/memberService'
 import type { Member } from '@/features/members/models/Member'
 import { parseDateString, toLocalDateString } from '../lib/dateUtils'
+import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
+
 
 function generateNextDays(count: number = 14): ClassDateOption[] {
   const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']
@@ -50,6 +52,7 @@ function normalizeDateStr(rawDate: string | Date | undefined | null): string {
 }
 
 export function useMemberClasses() {
+  const currentMemberId = useCurrentMemberId()
   const dates = useMemo(() => generateNextDays(14), [])
   const [selectedDate, setSelectedDate] = useState<string>(dates[0]?.fullDate || '')
   const [activeCategory, setActiveCategory] = useState<ClassCategory>('Todos')
@@ -62,73 +65,86 @@ export function useMemberClasses() {
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
 
   const loadData = useCallback(async () => {
-    try {
-      setLoading(true)
-      const [membersData, sessionsData, bookingsData, schedulesData, instructorsData] = await Promise.all([
-        memberService.getAllMembers().catch(() => [] as Member[]),
+  const memberId = currentMemberId
+
+  if (memberId === null) {
+    setCurrentMember(null)
+    setLoading(false)
+    return
+  }
+
+  try {
+    setLoading(true)
+
+    const [memberData, sessionsData, bookingsData, schedulesData, instructorsData] =
+      await Promise.all([
+        memberService.getMemberById(memberId),
         classSessionService.getAll().catch(() => []),
-        classBookingService.getAll().catch(() => []),
+        classBookingService.getMyBookings(),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
         instructorService.getAll().catch(() => [] as Instructor[]),
       ])
 
-      const active = membersData.find((m) => m.status === 'ACTIVE') || membersData[0] || null
-      setCurrentMember(active)
-      setBookings(bookingsData)
-      setSchedules(schedulesData)
+    setCurrentMember(memberData)
+    setBookings(bookingsData)
+    setSchedules(schedulesData)
 
-      // Schedule and instructor maps
-      const scheduleMap = new Map(schedulesData.map((s) => [String(s.id), s]))
-      const instructorMap = new Map(instructorsData.map((i) => [String(i.id), i]))
+    // Schedule and instructor maps
+    const scheduleMap = new Map(schedulesData.map((s) => [String(s.id), s]))
+    const instructorMap = new Map(instructorsData.map((i) => [String(i.id), i]))
 
-      // Map sessions with enriched relations and reservation status
-      const mapped: MemberClassSession[] = sessionsData.map((session) => {
-        const sched = session.classSchedule ?? scheduleMap.get(String(session.classScheduleId))
-        const inst =
-          session.instructor ??
-          (session.instructorId ? instructorMap.get(String(session.instructorId)) : null)
+    // Map sessions with enriched relations and reservation status
+    const mapped: MemberClassSession[] = sessionsData.map((session) => {
+      const sched = session.classSchedule ?? scheduleMap.get(String(session.classScheduleId))
+      const inst =
+        session.instructor ??
+        (session.instructorId ? instructorMap.get(String(session.instructorId)) : null)
 
-        const userBooking = active
-          ? bookingsData.find(
-              (b) =>
-                b.memberId === active.id &&
-                b.classSessionId === session.id &&
-                b.status === 'CONFIRMED' &&
-                !b.deletedAt
-            )
-          : undefined
+      const userBooking = bookingsData.find(
+        (b) =>
+          b.memberId === memberId &&
+          b.classSessionId === session.id &&
+          b.status === 'CONFIRMED' &&
+          !b.deletedAt
+      )
 
-        const confirmedBookings = bookingsData.filter(
-          (b) => b.classSessionId === session.id && b.status === 'CONFIRMED' && !b.deletedAt
-        )
+      const confirmedBookings = bookingsData.filter(
+        (b) => b.classSessionId === session.id && b.status === 'CONFIRMED' && !b.deletedAt
+      )
 
-        const maxCap = sched?.maxCapacity ?? 15
-        const remainingCapacity =
-          session.remainingCapacity !== undefined && session.remainingCapacity !== null
-            ? session.remainingCapacity
-            : Math.max(0, maxCap - confirmedBookings.length)
+      const maxCap = sched?.maxCapacity ?? 15
+      const remainingCapacity =
+        session.remainingCapacity !== undefined && session.remainingCapacity !== null
+          ? session.remainingCapacity
+          : Math.max(0, maxCap - confirmedBookings.length)
 
-        return {
-          ...session,
-          classSchedule: sched,
-          instructor: inst,
-          remainingCapacity,
-          isReserved: Boolean(userBooking),
-          userBookingId: userBooking?.id ?? null,
-        }
-      })
+      return {
+        ...session,
+        classSchedule: sched,
+        instructor: inst,
+        remainingCapacity,
+        isReserved: Boolean(userBooking),
+        userBookingId: userBooking?.id ?? null,
+      }
+    })
 
-      setRawSessions(mapped)
-    } catch {
-      toast.error('Error al cargar la información de clases')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    setRawSessions(mapped)
+  } catch {
+    toast.error('Error al cargar la información de clases')
+  } finally {
+    setLoading(false)
+  }
+}, [currentMemberId])
 
-  useEffect(() => {
-    loadData()
-  }, [loadData])
+useEffect(() => {
+  const timeoutId = window.setTimeout(() => {
+    void loadData()
+  }, 0)
+
+  return () => {
+    window.clearTimeout(timeoutId)
+  }
+}, [loadData])
 
   const handleToggleReservation = async (sessionId: number) => {
     if (!currentMember) {

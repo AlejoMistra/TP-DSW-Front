@@ -20,8 +20,17 @@ export const classBookingService = {
   async getAll(): Promise<ClassBooking[]> {
     const response = await apiClient.get<ClassBooking[] | { items: ClassBooking[] }>('/api/classBookings');
     const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    return data.items;
   },
+
+  async getMyBookings(): Promise<ClassBooking[]> {
+  const response = await apiClient.get<ClassBooking[]>('/api/classBookings/me');
+  return response.data;
+},
 
   async getById(id: number): Promise<ClassBooking> {
     const response = await apiClient.get<ClassBooking>(`/api/classBookings/${id}`);
