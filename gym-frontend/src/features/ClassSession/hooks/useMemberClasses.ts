@@ -1,36 +1,49 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { toast } from 'sonner'
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { toast } from 'sonner';
 import {
   type ClassDateOption,
   type ClassCategory,
   type MemberClassSession,
-} from '../models/ClassSession'
-import { classSessionService } from '../api/classSessionService'
-import { classBookingService, type ClassBooking } from '../api/classBookingService'
-import { classScheduleService } from '@/features/classSchedule/api/classScheduleService'
-import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule'
-import { instructorService } from '@/features/instructors/api/instructorService'
-import type { Instructor } from '@/features/instructors/models/Instructor'
-import { memberService } from '@/features/members/api/memberService'
-import type { Member } from '@/features/members/models/Member'
-import { parseDateString, toLocalDateString } from '../lib/dateUtils'
-import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
-
+} from '../models/ClassSession';
+import { classSessionService } from '../api/classSessionService';
+import { classBookingService } from '@/features/classBooking/api/classBookingService';
+import type { ClassBooking } from '@/features/classBooking/models/ClassBooking';
+import { classScheduleService } from '@/features/classSchedule/api/classScheduleService';
+import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule';
+import { instructorService } from '@/features/instructors/api/instructorService';
+import type { Instructor } from '@/features/instructors/models/Instructor';
+import { memberService } from '@/features/members/api/memberService';
+import type { Member } from '@/features/members/models/Member';
+import { parseDateString, toLocalDateString } from '../lib/dateUtils';
+import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId';
 
 function generateNextDays(count: number = 14): ClassDateOption[] {
-  const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']
-  const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-  const result: ClassDateOption[] = []
-  const today = new Date()
+  const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+  const months = [
+    'Ene',
+    'Feb',
+    'Mar',
+    'Abr',
+    'May',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dic',
+  ];
+  const result: ClassDateOption[] = [];
+  const today = new Date();
 
   for (let i = 0; i < count; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
 
-    const year = d.getFullYear()
-    const month = String(d.getMonth() + 1).padStart(2, '0')
-    const dateNum = String(d.getDate()).padStart(2, '0')
-    const fullDate = `${year}-${month}-${dateNum}`
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const dateNum = String(d.getDate()).padStart(2, '0');
+    const fullDate = `${year}-${month}-${dateNum}`;
 
     result.push({
       day: days[d.getDay()],
@@ -39,131 +52,133 @@ function generateNextDays(count: number = 14): ClassDateOption[] {
       month: months[d.getMonth()],
       isToday: i === 0,
       active: i === 0,
-    })
+    });
   }
 
-  return result
+  return result;
 }
 
 function normalizeDateStr(rawDate: string | Date | undefined | null): string {
-  if (!rawDate) return ''
-  const d = typeof rawDate === 'string' ? parseDateString(rawDate) : rawDate
-  return toLocalDateString(d)
+  if (!rawDate) return '';
+  const d = typeof rawDate === 'string' ? parseDateString(rawDate) : rawDate;
+  return toLocalDateString(d);
 }
 
 export function useMemberClasses() {
-  const currentMemberId = useCurrentMemberId()
-  const dates = useMemo(() => generateNextDays(14), [])
-  const [selectedDate, setSelectedDate] = useState<string>(dates[0]?.fullDate || '')
-  const [activeCategory, setActiveCategory] = useState<ClassCategory>('Todos')
+  const currentMemberId = useCurrentMemberId();
+  const dates = useMemo(() => generateNextDays(14), []);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    dates[0]?.fullDate || '',
+  );
+  const [activeCategory, setActiveCategory] = useState<ClassCategory>('Todos');
 
-  const [rawSessions, setRawSessions] = useState<MemberClassSession[]>([])
-  const [schedules, setSchedules] = useState<ClassSchedule[]>([])
-  const [bookings, setBookings] = useState<ClassBooking[]>([])
-  const [currentMember, setCurrentMember] = useState<Member | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null)
+  const [rawSessions, setRawSessions] = useState<MemberClassSession[]>([]);
+  const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
+  const [bookings, setBookings] = useState<ClassBooking[]>([]);
+  const [currentMember, setCurrentMember] = useState<Member | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
-  const memberId = currentMemberId
+    const memberId = currentMemberId;
 
-  if (memberId === null) {
-    setCurrentMember(null)
-    setLoading(false)
-    return
-  }
+    if (memberId === null) {
+      setCurrentMember(null);
+      setLoading(false);
+      return;
+    }
 
-  try {
-    setLoading(true)
+    try {
+      setLoading(true);
 
-    const [memberData, sessionsData, bookingsData, schedulesData, instructorsData] =
-      await Promise.all([
+      const [
+        memberData,
+        sessionsData,
+        bookingsData,
+        schedulesData,
+        instructorsData,
+      ] = await Promise.all([
         memberService.getMemberById(memberId),
         classSessionService.getAll().catch(() => []),
-        classBookingService.getMyBookings(),
+        classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
         instructorService.getAll().catch(() => [] as Instructor[]),
-      ])
+      ]);
 
-    setCurrentMember(memberData)
-    setBookings(bookingsData)
-    setSchedules(schedulesData)
+      setCurrentMember(memberData);
+      setBookings(bookingsData);
+      setSchedules(schedulesData);
 
-    // Schedule and instructor maps
-    const scheduleMap = new Map(schedulesData.map((s) => [String(s.id), s]))
-    const instructorMap = new Map(instructorsData.map((i) => [String(i.id), i]))
+      // Schedule and instructor maps
+      const scheduleMap = new Map(schedulesData.map((s) => [String(s.id), s]));
+      const instructorMap = new Map(
+        instructorsData.map((i) => [String(i.id), i]),
+      );
 
-    // Map sessions with enriched relations and reservation status
-    const mapped: MemberClassSession[] = sessionsData.map((session) => {
-      const sched = session.classSchedule ?? scheduleMap.get(String(session.classScheduleId))
-      const inst =
-        session.instructor ??
-        (session.instructorId ? instructorMap.get(String(session.instructorId)) : null)
+      // Map sessions with enriched relations and reservation status
+      const mapped: MemberClassSession[] = sessionsData.map((session) => {
+        const sched =
+          session.classSchedule ??
+          scheduleMap.get(String(session.classScheduleId));
+        const inst =
+          session.instructor ??
+          (session.instructorId
+            ? instructorMap.get(String(session.instructorId))
+            : null);
 
-      const userBooking = bookingsData.find(
-        (b) =>
-          b.memberId === memberId &&
-          b.classSessionId === session.id &&
-          b.status === 'CONFIRMED' &&
-          !b.deletedAt
-      )
+        const userBooking = bookingsData.find(
+          (b) =>
+            b.memberId === memberId &&
+            b.classSessionId === session.id &&
+            b.status === 'CONFIRMED' &&
+            !b.deletedAt,
+        );
 
-      const confirmedBookings = bookingsData.filter(
-        (b) => b.classSessionId === session.id && b.status === 'CONFIRMED' && !b.deletedAt
-      )
+        const remainingCapacity =
+          session.remainingCapacity ?? sched?.maxCapacity ?? 15;
 
-      const maxCap = sched?.maxCapacity ?? 15
-      const remainingCapacity =
-        session.remainingCapacity !== undefined && session.remainingCapacity !== null
-          ? session.remainingCapacity
-          : Math.max(0, maxCap - confirmedBookings.length)
+        return {
+          ...session,
+          classSchedule: sched,
+          instructor: inst,
+          remainingCapacity,
+          isReserved: Boolean(userBooking),
+          userBookingId: userBooking?.id ?? null,
+        };
+      });
 
-      return {
-        ...session,
-        classSchedule: sched,
-        instructor: inst,
-        remainingCapacity,
-        isReserved: Boolean(userBooking),
-        userBookingId: userBooking?.id ?? null,
-      }
-    })
+      setRawSessions(mapped);
+    } catch {
+      toast.error('Error al cargar la información de clases');
+    } finally {
+      setLoading(false);
+    }
+  }, [currentMemberId]);
 
-    setRawSessions(mapped)
-  } catch {
-    toast.error('Error al cargar la información de clases')
-  } finally {
-    setLoading(false)
-  }
-}, [currentMemberId])
-
-useEffect(() => {
-  const timeoutId = window.setTimeout(() => {
-    void loadData()
-  }, 0)
-
-  return () => {
-    window.clearTimeout(timeoutId)
-  }
-}, [loadData])
+  useEffect(() => {
+    void loadData();
+  }, [loadData]);
 
   const handleToggleReservation = async (sessionId: number) => {
     if (!currentMember) {
-      toast.error('No se encontró un socio activo para realizar la reserva')
-      return
+      toast.error('No se encontró un socio activo para realizar la reserva');
+      return;
     }
 
-    const targetSession = rawSessions.find((s) => s.id === sessionId)
-    if (!targetSession) return
+    const targetSession = rawSessions.find((s) => s.id === sessionId);
+    if (!targetSession) return;
 
-    setActionLoadingId(sessionId)
+    setActionLoadingId(sessionId);
     try {
-      const isReserved = targetSession.isReserved
+      const isReserved = targetSession.isReserved;
 
       if (isReserved && targetSession.userBookingId) {
-        await classBookingService.delete(targetSession.userBookingId)
-        toast.success('Reserva cancelada con éxito')
+        await classBookingService.delete(targetSession.userBookingId);
+        toast.success('Reserva cancelada con éxito');
 
-        setBookings((prev) => prev.filter((b) => b.id !== targetSession.userBookingId))
+        setBookings((prev) =>
+          prev.filter((b) => b.id !== targetSession.userBookingId),
+        );
         setRawSessions((prev) =>
           prev.map((s) =>
             s.id === sessionId
@@ -173,22 +188,22 @@ useEffect(() => {
                   userBookingId: null,
                   remainingCapacity: s.remainingCapacity + 1,
                 }
-              : s
-          )
-        )
+              : s,
+          ),
+        );
       } else {
         if (targetSession.remainingCapacity <= 0) {
-          toast.error('No hay cupos disponibles para esta clase')
-          return
+          toast.error('No hay cupos disponibles para esta clase');
+          return;
         }
 
         const newBooking = await classBookingService.create({
           memberId: currentMember.id,
           classSessionId: sessionId,
-        })
-        toast.success('¡Reserva confirmada con éxito!')
+        });
+        toast.success('¡Reserva confirmada con éxito!');
 
-        setBookings((prev) => [...prev, newBooking])
+        setBookings((prev) => [...prev, newBooking]);
         setRawSessions((prev) =>
           prev.map((s) =>
             s.id === sessionId
@@ -198,55 +213,57 @@ useEffect(() => {
                   userBookingId: newBooking.id,
                   remainingCapacity: Math.max(0, s.remainingCapacity - 1),
                 }
-              : s
-          )
-        )
+              : s,
+          ),
+        );
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Error al procesar la reserva'
-      toast.error(msg)
+      const msg =
+        err instanceof Error ? err.message : 'Error al procesar la reserva';
+      toast.error(msg);
     } finally {
-      setActionLoadingId(null)
+      setActionLoadingId(null);
     }
-  }
+  };
 
   const categories = useMemo(() => {
-    const catSet = new Set<string>()
-    catSet.add('Todos')
+    const catSet = new Set<string>();
+    catSet.add('Todos');
 
     schedules.forEach((s) => {
       if (s.category) {
-        catSet.add(s.category)
+        catSet.add(s.category);
       }
-    })
+    });
 
     rawSessions.forEach((s) => {
       if (s.classSchedule?.category) {
-        catSet.add(s.classSchedule.category)
+        catSet.add(s.classSchedule.category);
       }
-    })
+    });
 
-    return Array.from(catSet)
-  }, [schedules, rawSessions])
+    return Array.from(catSet);
+  }, [schedules, rawSessions]);
 
   const filteredClasses = useMemo(() => {
     return rawSessions
       .filter((s) => {
-        const matchesDate = normalizeDateStr(s.date) === selectedDate
-        const sessionCategory = s.classSchedule?.category
+        const matchesDate = normalizeDateStr(s.date) === selectedDate;
+        const sessionCategory = s.classSchedule?.category;
         const matchesCategory =
           activeCategory === 'Todos' ||
           sessionCategory?.toUpperCase() === activeCategory.toUpperCase() ||
-          sessionCategory === activeCategory
-        return matchesDate && matchesCategory
+          sessionCategory === activeCategory;
+        return matchesDate && matchesCategory;
       })
-      .sort((a, b) => a.startTime.localeCompare(b.startTime))
-  }, [rawSessions, selectedDate, activeCategory])
+      .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  }, [rawSessions, selectedDate, activeCategory]);
 
   // Count total sessions for the selected day regardless of category
   const selectedDayTotalSessions = useMemo(() => {
-    return rawSessions.filter((s) => normalizeDateStr(s.date) === selectedDate).length
-  }, [rawSessions, selectedDate])
+    return rawSessions.filter((s) => normalizeDateStr(s.date) === selectedDate)
+      .length;
+  }, [rawSessions, selectedDate]);
 
   return {
     dates,
@@ -263,5 +280,5 @@ useEffect(() => {
     actionLoadingId,
     handleToggleReservation,
     refreshClasses: loadData,
-  }
+  };
 }
