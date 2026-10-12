@@ -3,20 +3,16 @@ import { Receipt } from 'lucide-react'
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 import MemberPaymentCard from '@/features/payments/components/MemberPaymentCard'
 import { useMemberPayments } from '@/features/payments/hooks/useMemberPayments'
-import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 import BackButton from '@/shared/components/BackButton.tsx'
 
 export default function MemberPaymentsPage() {
   usePageTitle('Historial de pagos')
 
-  // Con este hook obtenemos el ID del socio actual desde el contexto de autenticación
-  const currentMemberId = useCurrentMemberId()
-
   const {
     payments,
     loading,
     error,
-  } = useMemberPayments(currentMemberId)
+  } = useMemberPayments()
 
   if (loading) {
     return (

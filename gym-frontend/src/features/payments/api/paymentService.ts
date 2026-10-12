@@ -7,22 +7,35 @@ import type {
 } from '../models/Payment';
 
 export const paymentService = {
+  async getMyPayments(): Promise<Payment[]> {
+    const response = await apiClient.get<Payment[] | { items: Payment[] }>(
+      '/api/payments/me',
+    );
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
+  },
+
   async getAll(membershipId?: number): Promise<Payment[]> {
     const params = membershipId ? { membershipId } : undefined;
-    const response = await apiClient.get<Payment[] | { items: Payment[] }>('/api/payments', { params });
+    const response = await apiClient.get<Payment[] | { items: Payment[] }>(
+      '/api/payments',
+      { params },
+    );
     const data = response.data;
     return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getAllByMembership(membershipId: number): Promise<Payment[]> {
-    const response = await apiClient.get<Payment[] | { items: Payment[] }>(`/api/memberships/${membershipId}/payments`);
+    const response = await apiClient.get<Payment[] | { items: Payment[] }>(
+      `/api/memberships/${membershipId}/payments`,
+    );
     const data = response.data;
     return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number): Promise<Payment> {
     const response = await apiClient.get<Payment>(`/api/payments/${id}`);
-    return response.data
+    return response.data;
   },
 
   async create(data: CreatePaymentInput): Promise<Payment> {
@@ -42,7 +55,10 @@ export const paymentService = {
   },
 
   async update(id: number, data: UpdatePaymentInput): Promise<Payment> {
-    const response = await apiClient.patch<Payment>(`/api/payments/${id}`, data);
+    const response = await apiClient.patch<Payment>(
+      `/api/payments/${id}`,
+      data,
+    );
     return response.data;
   },
 

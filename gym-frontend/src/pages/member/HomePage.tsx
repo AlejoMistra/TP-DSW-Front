@@ -24,14 +24,14 @@ export default function HomePage() {
   const {
     member,
     loading: memberLoading,
-  } = useMemberProfileData(currentMemberId)
+  } = useMemberProfileData()
 
   const {
     membership,
     plan,
     loading: membershipLoading,
     error: membershipError,
-  } = useMemberMembership(currentMemberId)
+  } = useMemberMembership()
 
   const loading = memberLoading || membershipLoading
 

@@ -40,3 +40,7 @@ export type UpdateMemberInput = Partial<
   Omit<Member, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
 >;
 
+export type UpdateMyProfileInput = Partial<
+  Omit<Member, 'id' | 'status' | 'createdAt' | 'updatedAt' | 'deletedAt'>
+>;
+
