@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import {
   AlertCircle,
-  AlertTriangle,
   Ban,
   RotateCcw,
   Trash2,
@@ -37,6 +36,7 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
 import { RecurrenceScopeDialog } from './RecurrenceScopeDialog'
+import { ConfirmDeleteDialog } from '@/shared/components/ConfirmDeleteDialog'
 
 export interface SessionFormValues {
   classScheduleId: number
@@ -119,7 +119,8 @@ export function SessionForm({
     session?.startTime || '08:00'
   )
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [pendingDeleteScope, setPendingDeleteScope] = useState<RecurrenceScope>('this')
 
   // Recurrence state for CREATE mode
   const [isRecurring, setIsRecurring] = useState(false)
@@ -266,8 +267,9 @@ export function SessionForm({
       }
       onClose()
     } else if (scopeActionType === 'delete') {
-      if (onDeleteSession) await onDeleteSession(selectedScope)
-      onClose()
+      setPendingDeleteScope(selectedScope)
+      setScopeDialogOpen(false)
+      setConfirmDeleteOpen(true)
     }
   }
 
@@ -276,7 +278,8 @@ export function SessionForm({
       setScopeActionType('delete')
       setScopeDialogOpen(true)
     } else {
-      setConfirmDelete(true)
+      setPendingDeleteScope('this')
+      setConfirmDeleteOpen(true)
     }
   }
 
@@ -293,11 +296,12 @@ export function SessionForm({
     }
   }
 
-  const handleDeleteSingle = async () => {
+  const handleDeleteConfirmed = async () => {
     if (!onDeleteSession) return
     setIsSubmitting(true)
     try {
-      await onDeleteSession('this')
+      await onDeleteSession(pendingDeleteScope)
+      setConfirmDeleteOpen(false)
       onClose()
     } finally {
       setIsSubmitting(false)
@@ -585,39 +589,6 @@ export function SessionForm({
             </div>
           )}
 
-          {/* Confirm Delete Banner (Edit mode single session) */}
-          {confirmDelete && (
-            <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm">
-              <div className="flex items-center gap-2 font-semibold text-destructive">
-                <AlertTriangle className="size-4 shrink-0" />
-                ¿Confirmás eliminar esta sesión?
-              </div>
-              <p className="mt-1 text-muted-foreground text-xs">
-                Esta acción no se puede deshacer.
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleDeleteSingle}
-                  disabled={isSubmitting}
-                  className="h-7 text-xs font-semibold"
-                >
-                  Sí, eliminar
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setConfirmDelete(false)}
-                  className="h-7 text-xs"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          )}
           </div>
 
           {/* Fixed Footer Actions (Pinned at the bottom) */}
@@ -716,6 +687,28 @@ export function SessionForm({
           </div>
         </form>
       </div>
+
+      {/* Modal de Confirmación Estándar para Clases (Puntuales o Series) */}
+      <ConfirmDeleteDialog
+        open={confirmDeleteOpen}
+        title={
+          pendingDeleteScope === 'all'
+            ? '¿Confirmás eliminar toda la serie periódica?'
+            : pendingDeleteScope === 'following'
+            ? '¿Confirmás eliminar esta y las siguientes clases?'
+            : '¿Confirmás eliminar esta clase?'
+        }
+        description={
+          pendingDeleteScope === 'all'
+            ? 'Esta acción dará de baja todas las clases activas de la serie periódica y cancelará sus reservas asociadas. No se puede deshacer.'
+            : pendingDeleteScope === 'following'
+            ? 'Esta acción dará de baja esta clase y todas las fechas siguientes de la serie, cancelando sus reservas asociadas. No se puede deshacer.'
+            : 'Esta acción dará de baja la sesión del cronograma y cancelará cualquier reserva confirmada de los socios. No se puede deshacer.'
+        }
+        isLoading={isSubmitting}
+        onClose={() => setConfirmDeleteOpen(false)}
+        onConfirm={handleDeleteConfirmed}
+      />
 
       {/* Modal de Alcance estilo Google Calendar (Para sesiones con recurrencia) */}
       {session && session.id && (

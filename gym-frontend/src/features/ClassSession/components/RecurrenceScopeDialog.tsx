@@ -172,7 +172,7 @@ export function RecurrenceScopeDialog({
             size="sm"
             onClick={handleConfirm}
             disabled={isSubmitting}
-            variant={actionType === 'delete' ? 'destructive' : 'default'}
+            variant="default"
             className="font-semibold"
           >
             {isSubmitting ? 'Procesando...' : 'Confirmar'}
