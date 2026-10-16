@@ -139,11 +139,11 @@ export function SessionForm({
   const [scopeDialogOpen, setScopeDialogOpen] = useState(false)
   const [scopeActionType, setScopeActionType] = useState<'edit' | 'cancel' | 'delete'>('edit')
 
-  // Maximum allowed end date (3 months from start date)
+  // Maximum allowed end date (1 month from start date)
   const maxEndDate = useMemo(() => {
     if (!date) return ''
     const d = parseDateString(date)
-    d.setMonth(d.getMonth() + 3)
+    d.setMonth(d.getMonth() + 1)
     return toLocalDateString(d)
   }, [date])
 
@@ -552,7 +552,7 @@ export function SessionForm({
                         Repetir hasta *
                       </Label>
                       <span className="text-[10px] text-muted-foreground">
-                        (Máximo 3 meses)
+                        (Máximo 1 mes)
                       </span>
                     </div>
                     <Input
