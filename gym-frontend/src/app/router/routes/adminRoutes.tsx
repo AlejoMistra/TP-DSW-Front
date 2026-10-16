@@ -6,6 +6,7 @@ import { Navigate } from 'react-router-dom';
 import RoleLayout from '@/layouts/RoleLayout';
 import ProtectedRoute from '../ProtectedRoute';
 
+const AdminHomePage = lazy(() => import('@/pages/admin/AdminHomePage'));
 const AdminClassesPage = lazy(() => import('@/pages/admin/ClassesPage'));
 const MembersPage = lazy(() => import('@/pages/admin/MembersPage'));
 const NewMemberPage = lazy(() => import('@/pages/admin/members/NewMemberPage'));
@@ -22,7 +23,8 @@ export const adminRoutes: RouteObject = {
     </ProtectedRoute>
   ),
   children: [
-    { index: true, element: <Navigate to="/administrativo/socios" replace /> },
+    { index: true, element: <Navigate to="menu" replace /> },
+    { path: 'menu', element: <AdminHomePage /> },
     { path: 'clases', element: <AdminClassesPage /> },
     { path: 'clases/nueva', element: <Navigate to="/administrativo/clases" replace /> },
     { path: 'clases/:id/editar', element: <Navigate to="/administrativo/clases" replace /> },
