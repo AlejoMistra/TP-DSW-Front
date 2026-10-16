@@ -77,21 +77,29 @@ export function RecurrenceScopeDialog({
     delete: 'Esta clase forma parte de una serie recurrente. Seleccioná qué clases querés eliminar:',
   };
 
+  const actionVerbs = {
+    edit: 'modifica',
+    cancel: 'cancela',
+    delete: 'elimina',
+  };
+
+  const actionVerb = actionVerbs[actionType];
+
   const options: { id: RecurrenceScope; title: string; description: string }[] = [
     {
       id: 'this',
       title: 'Solo esta clase',
-      description: 'Aplica solo a esta sesión particular. Se desvinculará de la serie como excepción independiente.',
+      description: `Se ${actionVerb} solo esta clase.`,
     },
     {
       id: 'following',
-      title: 'Esta y las clases siguientes',
-      description: 'Aplica a esta clase y a todas las fechas futuras de la serie. Las clases pasadas no se modifican.',
+      title: 'Esta y las siguientes',
+      description: `Se ${actionVerb} esta clase y las siguientes.`,
     },
     {
       id: 'all',
-      title: 'Todas las clases futuras',
-      description: 'Aplica a todas las clases pendientes de la serie desde hoy en adelante (preserva las ya dictadas).',
+      title: 'Todas las clases',
+      description: `Se ${actionVerb}n todas las clases, excepto las dictadas.`,
     },
   ];
 

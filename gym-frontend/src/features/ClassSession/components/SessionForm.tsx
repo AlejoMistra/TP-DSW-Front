@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import type {
   ClassSession,
-  RecurrenceFrequency,
   RecurrenceScope,
   RecurrenceInput,
 } from '../models/ClassSession'
@@ -124,7 +123,6 @@ export function SessionForm({
 
   // Recurrence state for CREATE mode
   const [isRecurring, setIsRecurring] = useState(false)
-  const [frequency, setFrequency] = useState<RecurrenceFrequency>('WEEKLY')
   const [selectedDays, setSelectedDays] = useState<number[]>(() => {
     const d = parseDateString(date || toLocalDateString(new Date()))
     const isoDay = d.getDay() === 0 ? 7 : d.getDay()
@@ -240,9 +238,9 @@ export function SessionForm({
 
       if (mode === 'create' && isRecurring) {
         payload.recurrence = {
-          frequency,
+          frequency: 'WEEKLY',
           interval: 1,
-          daysOfWeek: frequency === 'WEEKLY' ? selectedDays : undefined,
+          daysOfWeek: selectedDays,
           endDate,
         }
       }
@@ -515,54 +513,37 @@ export function SessionForm({
 
               {isRecurring && (
                 <div className="pt-2 border-t border-border/50 space-y-3">
-                  {/* Selector de frecuencia */}
+                  {/* Selector de días de la semana */}
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-bold text-muted-foreground">
-                      Frecuencia
-                    </Label>
-                    <Select
-                      value={frequency}
-                      onValueChange={(val) => setFrequency(val as RecurrenceFrequency)}
-                    >
-                      <SelectTrigger className="w-full h-8 text-xs font-medium">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="DAILY">Diaria (todos los días)</SelectItem>
-                        <SelectItem value="WEEKLY">Semanal (días específicos)</SelectItem>
-                        <SelectItem value="MONTHLY">Mensual (mismo día del mes)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Selector de días para SEMANAL */}
-                  {frequency === 'WEEKLY' && (
-                    <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
                       <Label className="text-xs font-bold text-muted-foreground">
                         Días de la semana
                       </Label>
-                      <div className="flex items-center justify-between gap-1 w-full">
-                        {WEEKDAY_OPTIONS.map((day) => {
-                          const isSelected = selectedDays.includes(day.value)
-                          return (
-                            <button
-                              key={day.value}
-                              type="button"
-                              onClick={() => toggleDay(day.value)}
-                              title={day.name}
-                              className={`h-8 flex-1 rounded-lg text-xs font-bold transition-all ${
-                                isSelected
-                                  ? 'bg-primary text-primary-foreground shadow-sm'
-                                  : 'border border-border/80 bg-muted/30 text-muted-foreground hover:bg-accent hover:text-foreground'
-                              }`}
-                            >
-                              {day.label}
-                            </button>
-                          )
-                        })}
-                      </div>
+                      <span className="text-[10px] text-muted-foreground">
+                        (Repetición semanal)
+                      </span>
                     </div>
-                  )}
+                    <div className="flex items-center justify-between gap-1 w-full">
+                      {WEEKDAY_OPTIONS.map((day) => {
+                        const isSelected = selectedDays.includes(day.value)
+                        return (
+                          <button
+                            key={day.value}
+                            type="button"
+                            onClick={() => toggleDay(day.value)}
+                            title={day.name}
+                            className={`h-8 flex-1 rounded-lg text-xs font-bold transition-all ${
+                              isSelected
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'border border-border/80 bg-muted/30 text-muted-foreground hover:bg-accent hover:text-foreground'
+                            }`}
+                          >
+                            {day.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
 
                   {/* Fecha de Fin */}
                   <div className="space-y-1.5">
@@ -693,17 +674,17 @@ export function SessionForm({
         open={confirmDeleteOpen}
         title={
           pendingDeleteScope === 'all'
-            ? '¿Confirmás eliminar toda la serie periódica?'
+            ? '¿Confirmás eliminar todas las clases?'
             : pendingDeleteScope === 'following'
-            ? '¿Confirmás eliminar esta y las siguientes clases?'
-            : '¿Confirmás eliminar esta clase?'
+            ? '¿Confirmás eliminar esta clase y las siguientes?'
+            : '¿Confirmás eliminar solo esta clase?'
         }
         description={
           pendingDeleteScope === 'all'
-            ? 'Esta acción dará de baja todas las clases activas de la serie periódica y cancelará sus reservas asociadas. No se puede deshacer.'
+            ? 'Se eliminarán todas las clases de la serie (excepto las dictadas) y se cancelarán las reservas asociadas.'
             : pendingDeleteScope === 'following'
-            ? 'Esta acción dará de baja esta clase y todas las fechas siguientes de la serie, cancelando sus reservas asociadas. No se puede deshacer.'
-            : 'Esta acción dará de baja la sesión del cronograma y cancelará cualquier reserva confirmada de los socios. No se puede deshacer.'
+            ? 'Se eliminará esta clase y las siguientes, cancelando las reservas asociadas.'
+            : 'Se eliminará solo esta clase del cronograma y se cancelarán las reservas asociadas.'
         }
         isLoading={isSubmitting}
         onClose={() => setConfirmDeleteOpen(false)}
