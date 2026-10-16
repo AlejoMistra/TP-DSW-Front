@@ -41,7 +41,7 @@ function RoleLayoutContent({ role }: { role: AppRole }) {
         <SidebarInset className="flex min-h-screen flex-1 flex-col">
           <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="hidden md:inline-flex" />
-            <span className="text-lg sm:text-2xl font-medium truncate max-w-[200px] sm:max-w-none">
+            <span className="text-lg sm:text-2xl font-medium truncate max-w-50 sm:max-w-none">
               {headerTitle || `Portal ${title}`}
             </span>
             <div className="ml-auto flex items-center gap-2 sm:gap-3">
@@ -84,7 +84,7 @@ function RoleLayoutContent({ role }: { role: AppRole }) {
           </main>
 
           <footer className="border-t px-4 py-3 pb-20 text-center text-sm text-muted-foreground md:pb-3">
-            © 2026 Gym Management
+            © 2026 MyGymManager
           </footer>
 
           <RoleBottomNav links={links} />
