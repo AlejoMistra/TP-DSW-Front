@@ -1,4 +1,8 @@
-import type { ClassSession, UpdateClassSessionInput } from '../models/ClassSession'
+import type {
+  ClassSession,
+  UpdateClassSessionInput,
+  RecurrenceScope,
+} from '../models/ClassSession'
 import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule'
 import type { Instructor } from '@/features/instructors/models/Instructor'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover'
@@ -19,9 +23,9 @@ interface SessionEditPopoverProps {
   onSelect: () => void
   onClose: () => void
   onSave: (payload: UpdateClassSessionInput) => Promise<any>
-  onCancelSession: () => Promise<void>
-  onRestoreSession: () => Promise<void>
-  onDeleteSession: () => Promise<void>
+  onCancelSession: (scope?: RecurrenceScope) => Promise<void>
+  onRestoreSession: (scope?: RecurrenceScope) => Promise<void>
+  onDeleteSession: (scope?: RecurrenceScope) => Promise<void>
 }
 
 export function SessionEditPopover({
@@ -40,10 +44,10 @@ export function SessionEditPopover({
 
   const handleFormSubmit = async (values: SessionFormValues) => {
     await onSave({
-      classScheduleId: values.classScheduleId,
       instructorId: values.instructorId,
       date: values.date,
       startTime: values.startTime,
+      scope: values.scope,
     })
   }
 
