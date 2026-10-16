@@ -341,9 +341,11 @@ export function SessionForm({
         )}
 
         {/* Main Form */}
-        <form onSubmit={handleFormSubmit} className="flex flex-col gap-4">
-          {/* Tipo de Clase */}
-          <div className="space-y-1.5">
+        <form onSubmit={handleFormSubmit} className="flex flex-col flex-1 min-h-0">
+          {/* Scrollable Form Fields */}
+          <div className="flex-1 overflow-y-auto space-y-4 pr-1 py-1 max-h-[55vh] sm:max-h-[60vh]">
+            {/* Tipo de Clase */}
+            <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Tipo de Clase *
@@ -389,10 +391,25 @@ export function SessionForm({
               onChange={(e) => {
                 const newDate = e.target.value
                 setDate(newDate)
-                if (mode === 'create') {
+                if (mode === 'create' && newDate) {
                   const d = parseDateString(newDate)
                   const isoDay = d.getDay() === 0 ? 7 : d.getDay()
-                  setSelectedDays([isoDay])
+                  setSelectedDays((prev) =>
+                    prev.length > 1
+                      ? prev.includes(isoDay)
+                        ? prev
+                        : [...prev, isoDay].sort((a, b) => a - b)
+                      : [isoDay]
+                  )
+                  // Ajustar endDate si es menor que la nueva fecha de inicio
+                  setEndDate((prevEnd) => {
+                    if (!prevEnd || prevEnd < newDate) {
+                      const nextM = new Date(d)
+                      nextM.setMonth(nextM.getMonth() + 1)
+                      return toLocalDateString(nextM)
+                    }
+                    return prevEnd
+                  })
                 }
               }}
               required
@@ -404,7 +421,7 @@ export function SessionForm({
             <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Horario
             </Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <span className="text-xs text-muted-foreground block mb-1">
                   Hora de Inicio *
@@ -520,7 +537,7 @@ export function SessionForm({
                       <Label className="text-xs font-bold text-muted-foreground">
                         Días de la semana
                       </Label>
-                      <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center justify-between gap-1 w-full">
                         {WEEKDAY_OPTIONS.map((day) => {
                           const isSelected = selectedDays.includes(day.value)
                           return (
@@ -529,7 +546,7 @@ export function SessionForm({
                               type="button"
                               onClick={() => toggleDay(day.value)}
                               title={day.name}
-                              className={`size-8 rounded-lg text-xs font-bold transition-all ${
+                              className={`h-8 flex-1 rounded-lg text-xs font-bold transition-all ${
                                 isSelected
                                   ? 'bg-primary text-primary-foreground shadow-sm'
                                   : 'border border-border/80 bg-muted/30 text-muted-foreground hover:bg-accent hover:text-foreground'
@@ -601,9 +618,10 @@ export function SessionForm({
               </div>
             </div>
           )}
+          </div>
 
-          {/* Footer Actions */}
-          <div className="flex items-center justify-between border-t border-border/60 pt-3 mt-1">
+          {/* Fixed Footer Actions (Pinned at the bottom) */}
+          <div className="shrink-0 flex items-center justify-between border-t border-border/60 pt-3 mt-2 bg-card">
             {mode === 'edit' ? (
               <>
                 {/* Advanced menu on the left */}

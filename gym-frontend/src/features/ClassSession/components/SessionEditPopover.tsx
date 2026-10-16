@@ -62,7 +62,7 @@ export function SessionEditPopover({
         />
 
         <Dialog open={isEditing} onOpenChange={(open) => !open && onClose()}>
-          <DialogContent className="max-w-md p-5 bg-card border border-border">
+          <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-4 sm:p-5 bg-card border border-border overflow-hidden">
             <DialogTitle className="sr-only">
               Editar Sesión: {session.classSchedule?.name ?? 'Clase'}
             </DialogTitle>
@@ -100,7 +100,7 @@ export function SessionEditPopover({
         side="right"
         align="start"
         sideOffset={8}
-        className="w-96 rounded-2xl border border-border/80 bg-card/98 p-4 shadow-2xl backdrop-blur-md"
+        className="w-96 max-h-[85vh] overflow-y-auto rounded-2xl border border-border/80 bg-card/98 p-4 shadow-2xl backdrop-blur-md"
       >
         <SessionForm
           mode="edit"

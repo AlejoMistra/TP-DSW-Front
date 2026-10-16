@@ -97,7 +97,7 @@ export function RecurrenceScopeDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-md p-6 bg-card border border-border/80 rounded-2xl shadow-2xl">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-card border border-border/80 rounded-2xl shadow-2xl">
         <DialogHeader>
           <div className="flex items-center gap-2 text-primary mb-1">
             <CalendarDays className="size-5" />

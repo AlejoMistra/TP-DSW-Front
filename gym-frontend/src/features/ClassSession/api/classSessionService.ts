@@ -10,7 +10,7 @@ export const classSessionService = {
   async getAll(): Promise<ClassSession[]> {
     const response = await apiClient.get<
       ClassSession[] | { items: ClassSession[] }
-    >('/api/classSessions');
+    >('/api/classSessions?limit=500');
     const data = response.data;
     return Array.isArray(data) ? data : (data as any)?.items || [];
   },
