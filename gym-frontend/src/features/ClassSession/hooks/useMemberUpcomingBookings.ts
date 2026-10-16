@@ -15,28 +15,24 @@ export interface UpcomingBookedClass extends MemberClassSession {
   formattedDate: string;
 }
 
-export function useMemberUpcomingBookings(memberId: number | null) {
+export function useMemberUpcomingBookings() {
   const [upcomingClasses, setUpcomingClasses] = useState<UpcomingBookedClass[]>(
     [],
   );
-  const [loading, setLoading] = useState(memberId !== null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   const refresh = useCallback(() => {
+    setLoading(true);
     setReloadKey((prev) => prev + 1);
   }, []);
 
   useEffect(() => {
-    if (!memberId) {
-      return;
-    }
-
     let cancelled = false;
 
     const fetchUpcoming = async () => {
       try {
-        setLoading(true);
         setError(null);
 
         const [bookings, sessions, schedules, instructors] = await Promise.all([
@@ -155,7 +151,7 @@ export function useMemberUpcomingBookings(memberId: number | null) {
     return () => {
       cancelled = true;
     };
-  }, [memberId, reloadKey]);
+  }, [reloadKey]);
 
   return {
     upcomingClasses,

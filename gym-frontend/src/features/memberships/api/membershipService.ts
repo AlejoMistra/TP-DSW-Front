@@ -2,6 +2,11 @@ import { apiClient } from '@/shared/api/apiClient';
 import { type Membership, type MembershipStatus } from '../models/Membership';
 
 export const membershipService = {
+  async getMyMembership(): Promise<Membership> {
+    const response = await apiClient.get<Membership>('/api/memberships/me');
+    return response.data;
+  },
+
   async getMembershipByMemberId(memberId: number): Promise<Membership> {
     const response = await apiClient.get<Membership>(`/api/memberships/member/${memberId}`);
     return response.data;

@@ -13,25 +13,22 @@ import MemberMembershipCard from '@/features/memberships/components/MemberMember
 import MemberUpcomingBookingsCard from '@/features/ClassSession/components/MemberUpcomingBookingsCard'
 import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
 import { useMemberMembership } from '@/features/memberships/hooks/useMemberMembership'
-import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 import { Card } from '@/shared/components/ui/card'
 
 export default function HomePage() {
   usePageTitle('Inicio')
 
-  const currentMemberId = useCurrentMemberId()
-
   const {
     member,
     loading: memberLoading,
-  } = useMemberProfileData(currentMemberId)
+  } = useMemberProfileData()
 
   const {
     membership,
     plan,
     loading: membershipLoading,
     error: membershipError,
-  } = useMemberMembership(currentMemberId)
+  } = useMemberMembership()
 
   const loading = memberLoading || membershipLoading
 
@@ -116,7 +113,7 @@ export default function HomePage() {
         )}
 
         {/* Widget de Próximas Clases Reservadas */}
-        <MemberUpcomingBookingsCard memberId={currentMemberId} />
+        <MemberUpcomingBookingsCard />
       </div>
 
       {/* Accesos Rápidos */}

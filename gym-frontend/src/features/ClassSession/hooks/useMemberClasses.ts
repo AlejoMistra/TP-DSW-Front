@@ -15,7 +15,6 @@ import type { Instructor } from '@/features/instructors/models/Instructor';
 import { memberService } from '@/features/members/api/memberService';
 import type { Member } from '@/features/members/models/Member';
 import { parseDateString, toLocalDateString } from '../lib/dateUtils';
-import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId';
 
 function generateNextDays(count: number = 14): ClassDateOption[] {
   const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
@@ -65,7 +64,6 @@ function normalizeDateStr(rawDate: string | Date | undefined | null): string {
 }
 
 export function useMemberClasses() {
-  const currentMemberId = useCurrentMemberId();
   const dates = useMemo(() => generateNextDays(14), []);
   const [selectedDate, setSelectedDate] = useState<string>(
     dates[0]?.fullDate || '',
@@ -80,14 +78,6 @@ export function useMemberClasses() {
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
-    const memberId = currentMemberId;
-
-    if (memberId === null) {
-      setCurrentMember(null);
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
 
@@ -98,7 +88,7 @@ export function useMemberClasses() {
         schedulesData,
         instructorsData,
       ] = await Promise.all([
-        memberService.getMemberById(memberId),
+        memberService.getMe(),
         classSessionService.getAll().catch(() => []),
         classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
@@ -128,7 +118,7 @@ export function useMemberClasses() {
 
         const userBooking = bookingsData.find(
           (b) =>
-            b.memberId === memberId &&
+            b.memberId === memberData.id &&
             b.classSessionId === session.id &&
             b.status === 'CONFIRMED' &&
             !b.deletedAt,
@@ -153,7 +143,7 @@ export function useMemberClasses() {
     } finally {
       setLoading(false);
     }
-  }, [currentMemberId]);
+  }, []);
 
   useEffect(() => {
     void loadData();
