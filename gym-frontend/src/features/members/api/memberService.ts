@@ -3,11 +3,24 @@ import {
   type Member,
   type CreateMemberInput,
   type UpdateMemberInput,
+  type UpdateMyProfileInput,
 } from '../models/Member';
 
 export const memberService = {
+  async getMe(): Promise<Member> {
+    const response = await apiClient.get<Member>('/api/members/me');
+    return response.data;
+  },
+
+  async updateMe(data: UpdateMyProfileInput): Promise<Member> {
+    const response = await apiClient.patch<Member>('/api/members/me', data);
+    return response.data;
+  },
+
   async getAllMembers(): Promise<Member[]> {
-    const response = await apiClient.get<Member[] | { items: Member[] }>('/api/members');
+    const response = await apiClient.get<Member[] | { items: Member[] }>(
+      '/api/members',
+    );
     const data = response.data;
     return Array.isArray(data) ? data : (data as any)?.items || [];
   },

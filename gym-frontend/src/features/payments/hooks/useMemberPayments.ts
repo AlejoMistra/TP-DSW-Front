@@ -1,76 +1,62 @@
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
-import { membershipService } from '@/features/memberships/api/membershipService'
-import { paymentService } from '@/features/payments/api/paymentService'
-import type { Payment } from '@/features/payments/models/Payment'
+import { paymentService } from '@/features/payments/api/paymentService';
+import type { Payment } from '@/features/payments/models/Payment';
 
-export function useMemberPayments(memberId: number | null) {
-  const [payments, setPayments] = useState<Payment[]>([])
-  const [loading, setLoading] = useState(memberId !== null)
-  const [error, setError] = useState<string | null>(
-    memberId === null
-      ? 'No se encontró el socio autenticado'
-      : null,
-  )
+export function useMemberPayments() {
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!memberId) {
-      return
-    }
-
-    let cancelled = false
+    let cancelled = false;
 
     const requestPayments = async () => {
       try {
-        const membership =
-          await membershipService.getMembershipByMemberId(memberId)
-
-        const paymentData = await paymentService.getAllByMembership(
-          membership.id,
-        )
+        const paymentData = await paymentService.getMyPayments();
 
         if (cancelled) {
-          return
+          return;
         }
 
         const orderedPayments = [...paymentData].sort(
           (firstPayment, secondPayment) =>
             new Date(secondPayment.paymentDate).getTime() -
             new Date(firstPayment.paymentDate).getTime(),
-        )
+        );
 
-        setPayments(orderedPayments)
-        setError(null)
+        setPayments(orderedPayments);
+        setError(null);
       } catch (err) {
         if (cancelled) {
-          return
+          return;
         }
 
         const message =
           err instanceof Error
             ? err.message
-            : 'Error al cargar el historial de pagos'
+            : 'Error al cargar el historial de pagos';
 
-        setError(message)
-        toast.error(message)
+        setError(message);
+        toast.error(message);
       } finally {
         if (!cancelled) {
-          setLoading(false)
+          setLoading(false);
         }
       }
-    }
+    };
 
-    void requestPayments()
+    void requestPayments();
 
     return () => {
-      cancelled = true
-    }
-  }, [memberId])
+      cancelled = true;
+    };
+  }, []);
 
   return {
     payments,
     loading,
     error,
-  }
+  };
 }

@@ -9,7 +9,6 @@ import ProfileSummary from '@/features/members/components/ProfileSummary'
 import ProfileNavigationCard from '@/features/members/components/ProfileNavigationCard'
 import MemberMembershipCard from '@/features/memberships/components/MemberMembershipCard'
 import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
-import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 import { Separator } from '@/shared/components/ui/separator'
 import { useAuth } from '@/features/auth/hooks/useAuth.ts'
 import { useNavigate } from 'react-router-dom'
@@ -19,19 +18,18 @@ export default function MemberProfilePage() {
   usePageTitle('Mi Cuenta')
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const currentMemberId = useCurrentMemberId()
 
   const {
     member,
     loading: memberLoading,
     error,
-  } = useMemberProfileData(currentMemberId)
+  } = useMemberProfileData()
 
   const {
     membership,
     plan,
     loading: membershipLoading,
-  } = useMemberMembership(currentMemberId)
+  } = useMemberMembership()
 
   const loading = memberLoading || membershipLoading
 
