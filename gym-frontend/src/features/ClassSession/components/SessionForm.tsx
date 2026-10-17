@@ -239,7 +239,6 @@ export function SessionForm({
       if (mode === 'create' && isRecurring) {
         payload.recurrence = {
           frequency: 'WEEKLY',
-          interval: 1,
           daysOfWeek: selectedDays,
           endDate,
         }
@@ -247,8 +246,9 @@ export function SessionForm({
 
       await onSubmit(payload)
       onClose()
-    } catch {
-      // Error manejado en hook padre
+    } catch (err) {
+      // Error manejado en hook padre con toast; relanzamos para evitar cierre del diálogo
+      throw err
     } finally {
       setIsSubmitting(false)
     }

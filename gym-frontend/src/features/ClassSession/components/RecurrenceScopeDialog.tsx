@@ -35,23 +35,23 @@ export function RecurrenceScopeDialog({
   // Consultar impacto cuando cambia el scope o se abre el diálogo
   useEffect(() => {
     if (!open || !sessionId) return;
-    let isMounted = true;
+    let isCurrentRequest = true;
     setLoadingImpact(true);
 
     classSessionService
       .getAffectedBookings(sessionId, scope)
       .then((data) => {
-        if (isMounted) setImpact(data);
+        if (isCurrentRequest) setImpact(data);
       })
       .catch(() => {
-        if (isMounted) setImpact(null);
+        if (isCurrentRequest) setImpact(null);
       })
       .finally(() => {
-        if (isMounted) setLoadingImpact(false);
+        if (isCurrentRequest) setLoadingImpact(false);
       });
 
     return () => {
-      isMounted = false;
+      isCurrentRequest = false;
     };
   }, [open, sessionId, scope]);
 

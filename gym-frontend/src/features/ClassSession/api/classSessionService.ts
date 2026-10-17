@@ -6,11 +6,19 @@ import {
   type RecurrenceScope,
 } from '../models/ClassSession';
 
+export interface GetAllClassSessionsParams {
+  date?: string;
+  page?: number;
+  limit?: number;
+}
+
 export const classSessionService = {
-  async getAll(): Promise<ClassSession[]> {
+  async getAll(params?: GetAllClassSessionsParams): Promise<ClassSession[]> {
     const response = await apiClient.get<
       ClassSession[] | { items: ClassSession[] }
-    >('/api/classSessions?limit=500');
+    >('/api/classSessions', {
+      params: { limit: 500, ...params },
+    });
     const data = response.data;
     return Array.isArray(data) ? data : (data as any)?.items || [];
   },

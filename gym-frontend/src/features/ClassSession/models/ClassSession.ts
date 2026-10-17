@@ -64,7 +64,6 @@ export type RecurrenceScope = 'this' | 'following' | 'all';
 
 export interface RecurrenceInput {
   frequency: RecurrenceFrequency;
-  interval?: number;
   daysOfWeek?: number[]; // 1 = Lunes ... 7 = Domingo
   endDate: string;
 }
