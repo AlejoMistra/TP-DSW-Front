@@ -26,7 +26,7 @@ const createClassSession = (
 })
 
 describe('ClassSessionCard', () => {
-  it('muestra el nombre, horario y botón para reservar una clase disponible', () => {
+  it('muestra el nombre, horario, cupos y botón para reservar una clase disponible', () => {
     const onToggleReservation = vi.fn()
     const classSession = createClassSession()
 
@@ -39,6 +39,8 @@ describe('ClassSessionCard', () => {
 
     expect(screen.getByText('Funcional')).toBeInTheDocument()
     expect(screen.getByText('18:00')).toBeInTheDocument()
+    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText(/de 15 libres/i)).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: 'Reservar' }),
     ).toBeInTheDocument()
@@ -70,7 +72,8 @@ describe('ClassSessionCard', () => {
     expect(onToggleReservation).toHaveBeenCalledWith(25)
   })
 
-  it('muestra agotado y deshabilita la reserva cuando no quedan cupos', () => {
+  it('muestra agotado, indica sin cupos y no dispara la reserva al clickear', async () => {
+    const user = userEvent.setup()
     const onToggleReservation = vi.fn()
     const classSession = createClassSession({
       remainingCapacity: 0,
@@ -84,11 +87,15 @@ describe('ClassSessionCard', () => {
       />,
     )
 
+    expect(screen.getByText('Sin cupos')).toBeInTheDocument()
+
     const button = screen.getByRole('button', {
       name: 'Agotado',
     })
 
     expect(button).toBeDisabled()
+
+    await user.click(button)
     expect(onToggleReservation).not.toHaveBeenCalled()
   })
 
@@ -120,7 +127,8 @@ describe('ClassSessionCard', () => {
     expect(onToggleReservation).toHaveBeenCalledWith(30)
   })
 
-  it('muestra cancelada y deshabilita la acción para una clase cancelada', () => {
+  it('muestra cancelada y no dispara acción al clickear para una clase cancelada', async () => {
+    const user = userEvent.setup()
     const onToggleReservation = vi.fn()
     const classSession = createClassSession({
       status: 'CANCELLED',
@@ -139,6 +147,76 @@ describe('ClassSessionCard', () => {
     })
 
     expect(button).toBeDisabled()
+
+    await user.click(button)
     expect(onToggleReservation).not.toHaveBeenCalled()
+  })
+
+  it('muestra el estado "Reservando..." y deshabilita el botón cuando isSubmitting es true al reservar', async () => {
+    const user = userEvent.setup()
+    const onToggleReservation = vi.fn()
+    const classSession = createClassSession({ isReserved: false })
+
+    render(
+      <ClassSessionCard
+        cls={classSession}
+        onToggleReservation={onToggleReservation}
+        isSubmitting={true}
+      />,
+    )
+
+    const button = screen.getByRole('button', {
+      name: /Reservando\.\.\./i,
+    })
+
+    expect(button).toBeDisabled()
+
+    await user.click(button)
+    expect(onToggleReservation).not.toHaveBeenCalled()
+  })
+
+  it('muestra el estado "Cancelando..." y deshabilita el botón cuando isSubmitting es true al cancelar', async () => {
+    const user = userEvent.setup()
+    const onToggleReservation = vi.fn()
+    const classSession = createClassSession({ isReserved: true })
+
+    render(
+      <ClassSessionCard
+        cls={classSession}
+        onToggleReservation={onToggleReservation}
+        isSubmitting={true}
+      />,
+    )
+
+    const button = screen.getByRole('button', {
+      name: /Cancelando\.\.\./i,
+    })
+
+    expect(button).toBeDisabled()
+
+    await user.click(button)
+    expect(onToggleReservation).not.toHaveBeenCalled()
+  })
+
+  it('muestra el nombre del instructor asignado con el prefijo Profe', () => {
+    const onToggleReservation = vi.fn()
+    const classSession = createClassSession({
+      instructor: {
+        id: 1,
+        name: 'Carlos',
+        surname: 'Gómez',
+        email: 'carlos@gym.com',
+        phone: '123456789',
+      },
+    })
+
+    render(
+      <ClassSessionCard
+        cls={classSession}
+        onToggleReservation={onToggleReservation}
+      />,
+    )
+
+    expect(screen.getByText('Profe Carlos Gómez')).toBeInTheDocument()
   })
 })
