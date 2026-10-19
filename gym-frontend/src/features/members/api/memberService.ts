@@ -30,7 +30,12 @@ export const memberService = {
     );
     const data = response.data;
     if (Array.isArray(data)) return data;
-    if (data && typeof data === 'object' && 'items' in data && Array.isArray(data.items)) {
+    if (
+      data &&
+      typeof data === 'object' &&
+      'items' in data &&
+      Array.isArray(data.items)
+    ) {
       return data.items;
     }
     return [];
@@ -44,10 +49,34 @@ export const memberService = {
     >('/api/members/with-membership', { params });
     const data = response.data;
     if (Array.isArray(data)) return data;
-    if (data && typeof data === 'object' && 'items' in data && Array.isArray(data.items)) {
+    if (
+      data &&
+      typeof data === 'object' &&
+      'items' in data &&
+      Array.isArray(data.items)
+    ) {
       return data.items;
     }
     return [];
+  },
+
+  async getMembersWithMembershipPaginated(
+    params?: GetAllMembersWithMembershipParams,
+  ): Promise<{ items: MemberWithMembership[]; total: number }> {
+    const response = await apiClient.get<
+      MemberWithMembership[] | { items: MemberWithMembership[]; total?: number }
+    >('/api/members/with-membership', { params });
+    const data = response.data;
+    if (
+      data &&
+      typeof data === 'object' &&
+      'items' in data &&
+      Array.isArray(data.items)
+    ) {
+      return { items: data.items, total: data.total ?? data.items.length };
+    }
+    const items = Array.isArray(data) ? data : [];
+    return { items, total: items.length };
   },
 
   async getMemberById(id: number): Promise<Member> {

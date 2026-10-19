@@ -11,7 +11,7 @@ export function ExpiredMembershipsPanel() {
 
   return (
     <SectionCard
-      title="Membresias Vencidas"
+      title="Membresías Vencidas"
       subtitle="Membresías vencidas para cobrar"
       icon={AlertTriangle}
       headerAction={{

@@ -4,7 +4,7 @@ import { ExpiredMembershipsPanel } from '@/features/dashboard/components/Expired
 import { TodaySessionsPanel } from '@/features/dashboard/components/TodaySessionsPanel';
 
 export default function AdminHomePage() {
-  usePageTitle('Menu administrativo');
+  usePageTitle('Menú administrativo');
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 sm:space-y-6 pb-6">

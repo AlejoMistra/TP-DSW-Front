@@ -8,6 +8,12 @@ export interface SessionItemProps {
   className?: string;
 }
 
+const occupancyStyles: Record<string, string> = {
+  FULL: 'bg-destructive/15 text-destructive border-destructive/30 font-semibold',
+  NEARLY_FULL: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 font-semibold',
+  AVAILABLE: 'border-border/60 text-muted-foreground',
+};
+
 export function SessionItem({
   session,
   onClick,
@@ -43,7 +49,10 @@ export function SessionItem({
       <div className="shrink-0">
         <Badge
           variant="secondary"
-          className="text-xs font-medium px-2.5 py-1 border border-border/60"
+          className={cn(
+            'text-xs px-2.5 py-1 border transition-colors',
+            occupancyStyles[session.occupancyStatus] || occupancyStyles.AVAILABLE
+          )}
         >
           {session.currentCapacity} / {session.maxCapacity} cupos
         </Badge>

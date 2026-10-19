@@ -4,11 +4,15 @@ import { memberService } from '@/features/members/api/memberService';
 
 function calculateDaysExpired(endDateStr?: string): number {
   if (!endDateStr) return 0;
-  const endDate = new Date(endDateStr);
-  const now = new Date();
-  const endUtc = Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-  const nowUtc = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const diffDays = Math.floor((nowUtc - endUtc) / (1000 * 60 * 60 * 24));
+  const match = endDateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return 0;
+  const [, y, m, d] = match;
+  const endDate = new Date(Number(y), Number(m) - 1, Number(d));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const diffDays = Math.floor(
+    (today.getTime() - endDate.getTime()) / (1000 * 60 * 60 * 24),
+  );
   return Math.max(0, diffDays);
 }
 
@@ -36,10 +40,11 @@ export function useExpiringMemberships() {
 
     const loadData = async () => {
       try {
-        const members = await memberService.getAllMembersWithMembership({
-          membershipStatus: 'EXPIRED',
-          limit: 20,
-        });
+        const { items: members, total } =
+          await memberService.getMembersWithMembershipPaginated({
+            membershipStatus: 'EXPIRED',
+            limit: 20,
+          });
 
         if (cancelled) return;
 
@@ -58,7 +63,7 @@ export function useExpiringMemberships() {
         });
 
         setItems(mapped);
-        setTotalCount(members.length);
+        setTotalCount(total);
         setError(null);
       } catch {
         if (!cancelled) {
