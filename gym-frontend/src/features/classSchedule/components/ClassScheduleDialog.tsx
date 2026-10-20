@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDeleteDialog } from '@/shared/components/ConfirmDeleteDialog'
 import type {
@@ -6,10 +8,15 @@ import type {
   CategoryEnum,
   CreateClassScheduleInput,
 } from '../models/ClassSchedule'
+import {
+  classScheduleFormSchema,
+  type ClassScheduleFormValues,
+} from '../models/classScheduleFormSchema'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Textarea } from '@/shared/components/ui/textarea'
+import { FieldError } from '@/shared/components/ui/field'
 import {
   Dialog,
   DialogContent,
@@ -54,64 +61,72 @@ export function ClassScheduleDialog({
   onDelete,
 }: ClassScheduleDialogProps) {
   const isEditing = Boolean(classSchedule)
-
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState<CategoryEnum>('HIIT')
-  const [durationMinutes, setDurationMinutes] = useState('45')
-  const [maxCapacity, setMaxCapacity] = useState('15')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ClassScheduleFormValues>({
+    resolver: zodResolver(classScheduleFormSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      name: '',
+      category: 'HIIT',
+      durationMinutes: 45,
+      maxCapacity: 15,
+      description: '',
+    },
+  })
 
   useEffect(() => {
     if (open) {
       if (classSchedule) {
-        setName(classSchedule.name || '')
-        setDescription(classSchedule.description || '')
-        setCategory(classSchedule.category || 'HIIT')
-        setDurationMinutes(String(classSchedule.durationMinutes || 45))
-        setMaxCapacity(String(classSchedule.maxCapacity || 15))
+        reset({
+          name: classSchedule.name || '',
+          category: (classSchedule.category as any) || 'HIIT',
+          durationMinutes: classSchedule.durationMinutes || 45,
+          maxCapacity: classSchedule.maxCapacity || 15,
+          description: classSchedule.description || '',
+        })
       } else {
-        setName('')
-        setDescription('')
-        setCategory('HIIT')
-        setDurationMinutes('45')
-        setMaxCapacity('15')
+        reset({
+          name: '',
+          category: 'HIIT',
+          durationMinutes: 45,
+          maxCapacity: 15,
+          description: '',
+        })
       }
       setConfirmDelete(false)
     }
-  }, [open, classSchedule])
+  }, [open, classSchedule, reset])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!name.trim()) return
-
-    setIsSubmitting(true)
+  const onFormSubmit = async (data: ClassScheduleFormValues) => {
     try {
       await onSubmit({
-        name: name.trim(),
-        description: description.trim() || null,
-        category,
-        durationMinutes: Number(durationMinutes) || 45,
-        maxCapacity: Number(maxCapacity) || 15,
+        name: data.name.trim(),
+        description: data.description?.trim() || null,
+        category: data.category,
+        durationMinutes: Number(data.durationMinutes),
+        maxCapacity: Number(data.maxCapacity),
       })
       onClose()
     } catch {
-      // Handled by parent toasts
-    } finally {
-      setIsSubmitting(false)
+      // Manejado por toast superior
     }
   }
 
   const handleDelete = async () => {
     if (!classSchedule || !onDelete) return
-    setIsSubmitting(true)
     try {
       await onDelete(classSchedule.id)
       setConfirmDelete(false)
       onClose()
-    } finally {
-      setIsSubmitting(false)
+    } catch {
+      // Error manejado por onDelete
     }
   }
 
@@ -134,18 +149,19 @@ export function ClassScheduleDialog({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+          <form noValidate onSubmit={handleSubmit(onFormSubmit)} className="mt-4 flex flex-col gap-4">
             {/* Nombre */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Nombre de la Clase *
               </Label>
               <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                {...register('name')}
                 placeholder="Ej. HIIT Warriors, Yoga Flow"
-                required
+                disabled={isSubmitting}
+                aria-invalid={!!errors.name}
               />
+              {errors.name && <FieldError>{errors.name.message}</FieldError>}
             </div>
 
             {/* Categoría */}
@@ -153,35 +169,48 @@ export function ClassScheduleDialog({
               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Categoría *
               </Label>
-              <Select
-                value={category}
-                onValueChange={(val) => setCategory(val as CategoryEnum)}
-                required
-              >
-                <SelectTrigger className="w-full h-9 font-medium">
-                  <SelectValue placeholder="Seleccioná una categoría" />
-                </SelectTrigger>
-                <SelectContent>
-                  {CLASS_CATEGORIES.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="category"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger className="w-full h-9 font-medium">
+                      <SelectValue placeholder="Seleccioná una categoría" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CLASS_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {cat.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.category && (
+                <FieldError>{errors.category.message}</FieldError>
+              )}
             </div>
 
             {/* Descripción */}
             <div className="space-y-1.5">
               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Descripción (Opcional)
+                Descripción (Opcional, máx 1000 caracteres)
               </Label>
               <Textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                {...register('description')}
                 placeholder="Detalles sobre los ejercicios, intensidad o nivel requerido..."
                 rows={2}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.description}
               />
+              {errors.description && (
+                <FieldError>{errors.description.message}</FieldError>
+              )}
             </div>
 
             {/* Duración y Cupos */}
@@ -194,10 +223,13 @@ export function ClassScheduleDialog({
                   type="number"
                   min={5}
                   max={300}
-                  value={durationMinutes}
-                  onChange={(e) => setDurationMinutes(e.target.value)}
-                  required
+                  {...register('durationMinutes', { valueAsNumber: true })}
+                  disabled={isSubmitting}
+                  aria-invalid={!!errors.durationMinutes}
                 />
+                {errors.durationMinutes && (
+                  <FieldError>{errors.durationMinutes.message}</FieldError>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -208,10 +240,13 @@ export function ClassScheduleDialog({
                   type="number"
                   min={1}
                   max={500}
-                  value={maxCapacity}
-                  onChange={(e) => setMaxCapacity(e.target.value)}
-                  required
+                  {...register('maxCapacity', { valueAsNumber: true })}
+                  disabled={isSubmitting}
+                  aria-invalid={!!errors.maxCapacity}
                 />
+                {errors.maxCapacity && (
+                  <FieldError>{errors.maxCapacity.message}</FieldError>
+                )}
               </div>
             </div>
 
@@ -223,6 +258,7 @@ export function ClassScheduleDialog({
                   variant="ghost"
                   size="sm"
                   onClick={() => setConfirmDelete(true)}
+                  disabled={isSubmitting}
                   className="text-xs text-destructive hover:bg-destructive/10 hover:text-destructive gap-1.5"
                 >
                   <Trash2 className="size-3.5" />
@@ -245,7 +281,7 @@ export function ClassScheduleDialog({
                 <Button
                   type="submit"
                   size="sm"
-                  disabled={isSubmitting || !name.trim()}
+                  disabled={isSubmitting}
                 >
                   {isSubmitting
                     ? 'Guardando...'

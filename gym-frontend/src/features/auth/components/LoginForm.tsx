@@ -1,31 +1,45 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Button } from '@/shared/components/ui/button';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 import { useAuth } from '../hooks/useAuth';
 import { getDefaultPathForRole } from '../models/auth';
+import { loginSchema, type LoginFormValues } from '../models/authSchemas';
 import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 export default function LoginForm() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPendingActivation, setIsPendingActivation] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const emailValue = watch('email');
+
+  const onSubmit = async (data: LoginFormValues) => {
     setErrorMessage(null);
     setIsPendingActivation(false);
-    setIsSubmitting(true);
 
     try {
-      const authUser = await login({ email, password });
+      const authUser = await login({ email: data.email, password: data.password });
       navigate(getDefaultPathForRole(authUser.role), { replace: true });
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -43,13 +57,11 @@ export default function LoginForm() {
       } else {
         setErrorMessage('Ocurrió un error inesperado al iniciar sesión');
       }
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {errorMessage && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive flex items-start gap-2">
           <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
@@ -58,7 +70,7 @@ export default function LoginForm() {
             {isPendingActivation && (
               <div className="mt-2">
                 <Link
-                  to={`/activar-cuenta?email=${encodeURIComponent(email)}`}
+                  to={`/activar-cuenta?email=${encodeURIComponent(emailValue || '')}`}
                   className="inline-flex items-center gap-1 font-semibold text-primary underline underline-offset-4 hover:opacity-80"
                 >
                   Activar mi cuenta ahora
@@ -77,12 +89,12 @@ export default function LoginForm() {
             id="email"
             type="email"
             placeholder="ejemplo@gimnasio.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
             autoComplete="email"
             disabled={isSubmitting}
+            aria-invalid={!!errors.email}
+            {...register('email')}
           />
+          {errors.email && <FieldError>{errors.email.message}</FieldError>}
         </Field>
 
         <Field>
@@ -98,12 +110,12 @@ export default function LoginForm() {
           <Input
             id="password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
             autoComplete="current-password"
             disabled={isSubmitting}
+            aria-invalid={!!errors.password}
+            {...register('password')}
           />
+          {errors.password && <FieldError>{errors.password.message}</FieldError>}
         </Field>
 
         <Field className="pt-2">

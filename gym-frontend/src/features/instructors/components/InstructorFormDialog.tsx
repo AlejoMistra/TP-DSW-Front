@@ -1,5 +1,6 @@
-import { useState } from 'react'
-
+import { useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
   DialogContent,
@@ -11,47 +12,28 @@ import {
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-
+import { FieldError } from '@/shared/components/ui/field'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select'
 import type {
   CreateInstructorInput,
   Instructor,
 } from '@/features/instructors/models/Instructor'
+import {
+  instructorFormSchema,
+  type InstructorFormValues,
+} from '../models/instructorFormSchema'
 
 type InstructorFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   instructorToEdit: Instructor | null
-  onSave: (
-    data: CreateInstructorInput,
-    id?: number,
-  ) => Promise<void>
-}
-
-type FormState = {
-  name: string
-  surname: string
-  email: string
-  phone: string
-}
-
-const emptyForm: FormState = {
-  name: '',
-  surname: '',
-  email: '',
-  phone: '',
-}
-
-function getInitialForm(instructor: Instructor | null): FormState {
-  if (!instructor) {
-    return emptyForm
-  }
-
-  return {
-    name: instructor.name,
-    surname: instructor.surname,
-    email: instructor.email,
-    phone: instructor.phone ?? '',
-  }
+  onSave: (data: CreateInstructorInput, id?: number) => Promise<void>
 }
 
 export default function InstructorFormDialog({
@@ -60,38 +42,62 @@ export default function InstructorFormDialog({
   instructorToEdit,
   onSave,
 }: InstructorFormDialogProps) {
-  const [form, setForm] = useState<FormState>(() =>
-    getInitialForm(instructorToEdit),
-  )
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
   const isEditing = instructorToEdit !== null
 
-  function updateField(field: keyof FormState, value: string) {
-    setForm((previous) => ({
-      ...previous,
-      [field]: value,
-    }))
-  }
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<InstructorFormValues>({
+    resolver: zodResolver(instructorFormSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      name: '',
+      surname: '',
+      email: '',
+      phone: '',
+      docType: 'DNI',
+      docNumber: '',
+    },
+  })
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
+  useEffect(() => {
+    if (open) {
+      if (instructorToEdit) {
+        reset({
+          name: instructorToEdit.name,
+          surname: instructorToEdit.surname,
+          email: instructorToEdit.email,
+          phone: instructorToEdit.phone ?? '',
+          docType: instructorToEdit.docType ?? 'DNI',
+          docNumber: instructorToEdit.docNumber ?? '',
+        })
+      } else {
+        reset({
+          name: '',
+          surname: '',
+          email: '',
+          phone: '',
+          docType: 'DNI',
+          docNumber: '',
+        })
+      }
+    }
+  }, [open, instructorToEdit, reset])
 
-    const data: CreateInstructorInput = {
-      name: form.name.trim(),
-      surname: form.surname.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim() || null,
+  async function onSubmit(data: InstructorFormValues) {
+    const payload: CreateInstructorInput = {
+      name: data.name.trim(),
+      surname: data.surname.trim(),
+      email: data.email.trim(),
+      phone: data.phone?.trim() || null,
+      docType: data.docType,
+      docNumber: data.docNumber.trim(),
     }
 
-    try {
-      setIsSubmitting(true)
-
-      await onSave(data, instructorToEdit?.id)
-    } finally {
-      setIsSubmitting(false)
-    }
+    await onSave(payload, instructorToEdit?.id)
   }
 
   return (
@@ -101,7 +107,6 @@ export default function InstructorFormDialog({
           <DialogTitle>
             {isEditing ? 'Editar instructor' : 'Nuevo instructor'}
           </DialogTitle>
-
           <DialogDescription>
             {isEditing
               ? 'Modificá los datos del instructor seleccionado.'
@@ -109,82 +114,94 @@ export default function InstructorFormDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="instructor-name">
-              Nombre
-            </Label>
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="instructor-name">Nombre</Label>
+              <Input
+                id="instructor-name"
+                {...register('name')}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.name}
+              />
+              {errors.name && <FieldError>{errors.name.message}</FieldError>}
+            </div>
 
-            <Input
-              id="instructor-name"
-              value={form.name}
-              onChange={(event) =>
-                updateField('name', event.target.value)
-              }
-              minLength={2}
-              maxLength={100}
-              required
-              disabled={isSubmitting}
-            />
+            <div className="space-y-1.5">
+              <Label htmlFor="instructor-surname">Apellido</Label>
+              <Input
+                id="instructor-surname"
+                {...register('surname')}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.surname}
+              />
+              {errors.surname && <FieldError>{errors.surname.message}</FieldError>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="instructor-docType">Tipo de documento</Label>
+              <Controller
+                control={control}
+                name="docType"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger id="instructor-docType" className="w-full">
+                      <SelectValue placeholder="Tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="DNI">DNI</SelectItem>
+                      <SelectItem value="PASAPORTE">Pasaporte</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.docType && <FieldError>{errors.docType.message}</FieldError>}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="instructor-docNumber">Nº de documento</Label>
+              <Input
+                id="instructor-docNumber"
+                {...register('docNumber')}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.docNumber}
+              />
+              {errors.docNumber && <FieldError>{errors.docNumber.message}</FieldError>}
+            </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="instructor-surname">
-              Apellido
-            </Label>
-
-            <Input
-              id="instructor-surname"
-              value={form.surname}
-              onChange={(event) =>
-                updateField('surname', event.target.value)
-              }
-              minLength={2}
-              maxLength={100}
-              required
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="instructor-email">
-              Email
-            </Label>
-
+            <Label htmlFor="instructor-email">Email</Label>
             <Input
               id="instructor-email"
               type="email"
-              value={form.email}
-              onChange={(event) =>
-                updateField('email', event.target.value)
-              }
-              required
+              {...register('email')}
               disabled={isSubmitting}
+              aria-invalid={!!errors.email}
             />
+            {errors.email && <FieldError>{errors.email.message}</FieldError>}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="instructor-phone">
-              Teléfono
-            </Label>
-
+            <Label htmlFor="instructor-phone">Teléfono</Label>
             <Input
               id="instructor-phone"
               type="tel"
-              value={form.phone}
-              onChange={(event) =>
-                updateField('phone', event.target.value)
-              }
-              pattern="[0-9]{7,15}"
-              minLength={7}
-              maxLength={15}
               placeholder="Ej: 1122334455"
+              {...register('phone')}
               disabled={isSubmitting}
+              aria-invalid={!!errors.phone}
             />
-
             <p className="text-xs text-muted-foreground">
               Opcional. Debe contener entre 7 y 15 dígitos.
             </p>
+            {errors.phone && <FieldError>{errors.phone.message}</FieldError>}
           </div>
 
           <DialogFooter>
@@ -196,7 +213,6 @@ export default function InstructorFormDialog({
             >
               Cancelar
             </Button>
-
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
                 ? 'Guardando...'
