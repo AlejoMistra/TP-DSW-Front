@@ -3,19 +3,80 @@ import {
   type Member,
   type CreateMemberInput,
   type UpdateMemberInput,
+  type UpdateMyProfileInput,
 } from '../models/Member';
+import type { MemberWithMembership } from '../models/MemberWithMembership';
+
+export interface GetAllMembersWithMembershipParams {
+  membershipStatus?: string;
+  page?: number;
+  limit?: number;
+}
 
 export const memberService = {
-  async getAllMembers(): Promise<Member[]> {
-    const response = await apiClient.get<Member[] | { items: Member[] }>('/api/members');
-    const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+  async getMe(): Promise<Member> {
+    const response = await apiClient.get<Member>('/api/members/me');
+    return response.data;
   },
 
-  async getAllMembersWithMembership() {
-    const response = await apiClient.get('/api/members/with-membership');
+  async updateMe(data: UpdateMyProfileInput): Promise<Member> {
+    const response = await apiClient.patch<Member>('/api/members/me', data);
+    return response.data;
+  },
+
+  async getAllMembers(): Promise<Member[]> {
+    const response = await apiClient.get<Member[] | { items: Member[] }>(
+      '/api/members',
+    );
     const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+    if (Array.isArray(data)) return data;
+    if (
+      data &&
+      typeof data === 'object' &&
+      'items' in data &&
+      Array.isArray(data.items)
+    ) {
+      return data.items;
+    }
+    return [];
+  },
+
+  async getAllMembersWithMembership(
+    params?: GetAllMembersWithMembershipParams,
+  ): Promise<MemberWithMembership[]> {
+    const response = await apiClient.get<
+      MemberWithMembership[] | { items: MemberWithMembership[] }
+    >('/api/members/with-membership', { params });
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (
+      data &&
+      typeof data === 'object' &&
+      'items' in data &&
+      Array.isArray(data.items)
+    ) {
+      return data.items;
+    }
+    return [];
+  },
+
+  async getMembersWithMembershipPaginated(
+    params?: GetAllMembersWithMembershipParams,
+  ): Promise<{ items: MemberWithMembership[]; total: number }> {
+    const response = await apiClient.get<
+      MemberWithMembership[] | { items: MemberWithMembership[]; total?: number }
+    >('/api/members/with-membership', { params });
+    const data = response.data;
+    if (
+      data &&
+      typeof data === 'object' &&
+      'items' in data &&
+      Array.isArray(data.items)
+    ) {
+      return { items: data.items, total: data.total ?? data.items.length };
+    }
+    const items = Array.isArray(data) ? data : [];
+    return { items, total: items.length };
   },
 
   async getMemberById(id: number): Promise<Member> {

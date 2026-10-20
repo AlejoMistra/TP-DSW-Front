@@ -20,7 +20,11 @@ export const classSessionService = {
       params: { limit: 500, ...params },
     });
     const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && 'items' in data && Array.isArray(data.items)) {
+      return data.items;
+    }
+    return [];
   },
 
   async getById(id: number): Promise<ClassSession> {

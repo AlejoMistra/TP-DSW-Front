@@ -6,17 +6,15 @@ import {
 } from '../hooks/useMemberUpcomingBookings'
 
 interface MemberUpcomingBookingsCardProps {
-  memberId: number | null
   maxItems?: number
   className?: string
 }
 
 export default function MemberUpcomingBookingsCard({
-  memberId,
   maxItems = 3,
   className,
 }: MemberUpcomingBookingsCardProps) {
-  const { upcomingClasses, loading } = useMemberUpcomingBookings(memberId)
+  const { upcomingClasses, loading } = useMemberUpcomingBookings()
 
   const displayedClasses = upcomingClasses.slice(0, maxItems)
 

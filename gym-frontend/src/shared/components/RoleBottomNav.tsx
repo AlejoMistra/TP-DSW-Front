@@ -25,7 +25,6 @@ export default function RoleBottomNav({ links }: RoleBottomNavProps) {
             <NavLink
               key={link.to}
               to={link.to}
-              end={link.to.endsWith("/")}
               className={({ isActive }) =>
                 cn(navItemBaseClass, isActive && "text-primary font-bold")
               }

@@ -1,10 +1,8 @@
-import { Link } from 'react-router-dom'
 import {
   Dumbbell,
   Calendar,
   CreditCard,
-  LifeBuoy,
-  ChevronRight,
+  Info,
   ShieldAlert,
 } from 'lucide-react'
 
@@ -13,25 +11,23 @@ import MemberMembershipCard from '@/features/memberships/components/MemberMember
 import MemberUpcomingBookingsCard from '@/features/ClassSession/components/MemberUpcomingBookingsCard'
 import { useMemberProfileData } from '@/features/members/hooks/useMemberProfileData'
 import { useMemberMembership } from '@/features/memberships/hooks/useMemberMembership'
-import { useCurrentMemberId } from '@/features/auth/hooks/useCurrentMemberId'
 import { Card } from '@/shared/components/ui/card'
+import { QuickActionCard } from '@/shared/components/QuickActionCard'
 
 export default function HomePage() {
   usePageTitle('Inicio')
 
-  const currentMemberId = useCurrentMemberId()
-
   const {
     member,
     loading: memberLoading,
-  } = useMemberProfileData(currentMemberId)
+  } = useMemberProfileData()
 
   const {
     membership,
     plan,
     loading: membershipLoading,
     error: membershipError,
-  } = useMemberMembership(currentMemberId)
+  } = useMemberMembership()
 
   const loading = memberLoading || membershipLoading
 
@@ -41,28 +37,24 @@ export default function HomePage() {
       description: 'Rutinas personalizadas',
       icon: Dumbbell,
       to: '/socio/rutinas',
-      color: 'bg-primary/15 text-primary',
     },
     {
       title: 'Horario de Clases',
       description: 'Cronograma y reservas',
       icon: Calendar,
       to: '/socio/clases',
-      color: 'bg-primary/15 text-primary',
     },
     {
       title: 'Mis Pagos',
       description: 'Facturas e historial',
       icon: CreditCard,
       to: '/socio/perfil/pagos',
-      color: 'bg-primary/15 text-primary',
     },
     {
       title: 'Soporte y Ayuda',
       description: 'Preguntas y consultas',
-      icon: LifeBuoy,
+      icon: Info,
       to: '/socio/perfil/soporte',
-      color: 'bg-primary/15 text-primary',
     },
   ]
 
@@ -116,7 +108,7 @@ export default function HomePage() {
         )}
 
         {/* Widget de Próximas Clases Reservadas */}
-        <MemberUpcomingBookingsCard memberId={currentMemberId} />
+        <MemberUpcomingBookingsCard />
       </div>
 
       {/* Accesos Rápidos */}
@@ -125,35 +117,16 @@ export default function HomePage() {
           Accesos Rápidos
         </h2>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {quickActions.map((action) => {
-            const Icon = action.icon
-            return (
-              <Link
-                key={action.to}
-                to={action.to}
-                className="group flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 shadow-xs transition-all hover:border-border hover:shadow-md hover:-translate-y-0.5"
-              >
-                <div className="flex items-center justify-between">
-                  <div
-                    className={`flex size-10 items-center justify-center rounded-xl ${action.color} transition-transform group-hover:scale-105`}
-                  >
-                    <Icon className="size-5" />
-                  </div>
-                  <ChevronRight className="size-4 text-muted-foreground opacity-60 transition-transform group-hover:translate-x-1 group-hover:opacity-100" />
-                </div>
-
-                <div className="mt-4">
-                  <h3 className="text-sm font-bold text-foreground">
-                    {action.title}
-                  </h3>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    {action.description}
-                  </p>
-                </div>
-              </Link>
-            )
-          })}
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((action) => (
+            <QuickActionCard
+              key={action.to}
+              title={action.title}
+              description={action.description}
+              icon={action.icon}
+              to={action.to}
+            />
+          ))}
         </div>
       </div>
     </div>

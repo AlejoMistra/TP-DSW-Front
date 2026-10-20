@@ -46,7 +46,7 @@ export function mapBackendRoleToAppRole(role: string): AppRole {
 export function getDefaultPathForRole(role: AppRole): string {
   switch (role) {
     case 'admin':
-      return '/administrativo/socios';
+      return '/administrativo/menu';
     case 'instructor':
       return '/instructor/rutinas';
     case 'member':
@@ -55,4 +55,3 @@ export function getDefaultPathForRole(role: AppRole): string {
       return '/';
   }
 }
-
