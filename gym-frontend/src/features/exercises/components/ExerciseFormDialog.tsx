@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Button } from '@/shared/components/ui/button'
 import {
@@ -11,6 +13,7 @@ import {
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Textarea } from '@/shared/components/ui/textarea'
+import { FieldError } from '@/shared/components/ui/field'
 import {
   Select,
   SelectContent,
@@ -21,6 +24,10 @@ import {
 import { Dumbbell } from 'lucide-react'
 import { exerciseService } from '../api/exerciseService'
 import type { Exercise, CreateExerciseInput } from '../models/Exercise'
+import {
+  exerciseFormSchema,
+  type ExerciseFormValues,
+} from '../models/exerciseFormSchema'
 
 interface ExerciseFormDialogProps {
   open: boolean
@@ -35,30 +42,34 @@ export function ExerciseFormDialog({
   exercise,
   onSuccess,
 }: ExerciseFormDialogProps) {
-  const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState<{
-    name: string
-    muscleGroup: string
-    difficultyLevel: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'
-    description: string
-  }>({
-    name: '',
-    muscleGroup: '',
-    difficultyLevel: 'BEGINNER',
-    description: '',
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ExerciseFormValues>({
+    resolver: zodResolver(exerciseFormSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      name: '',
+      muscleGroup: '',
+      difficultyLevel: 'BEGINNER',
+      description: '',
+    },
   })
 
   useEffect(() => {
     if (open) {
       if (exercise) {
-        setFormData({
+        reset({
           name: exercise.name,
           muscleGroup: exercise.muscleGroup,
           difficultyLevel: exercise.difficultyLevel,
           description: exercise.description || '',
         })
       } else {
-        setFormData({
+        reset({
           name: '',
           muscleGroup: '',
           difficultyLevel: 'BEGINNER',
@@ -66,29 +77,15 @@ export function ExerciseFormDialog({
         })
       }
     }
-  }, [open, exercise])
+  }, [open, exercise, reset])
 
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
+  const onSubmit = async (data: ExerciseFormValues) => {
     try {
       const dataToSubmit: CreateExerciseInput = {
-        name: formData.name.trim(),
-        muscleGroup: formData.muscleGroup.trim(),
-        difficultyLevel: formData.difficultyLevel,
-        description: formData.description.trim() || null,
+        name: data.name.trim(),
+        muscleGroup: data.muscleGroup.trim(),
+        difficultyLevel: data.difficultyLevel,
+        description: data.description?.trim() || null,
       }
 
       if (exercise) {
@@ -98,36 +95,16 @@ export function ExerciseFormDialog({
         await exerciseService.create(dataToSubmit)
         toast.success('Ejercicio creado exitosamente')
       }
-      // Limpiamos el formulario:
-      setFormData({
-        name: '',
-        muscleGroup: '',
-        difficultyLevel: 'BEGINNER',
-        description: '',
-      })
+
       onOpenChange(false)
       onSuccess()
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al guardar')
-    } finally {
-      setLoading(false)
     }
-  }
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      setFormData({
-        name: '',
-        muscleGroup: '',
-        difficultyLevel: 'BEGINNER',
-        description: '',
-      })
-    }
-    onOpenChange(newOpen)
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -135,78 +112,99 @@ export function ExerciseFormDialog({
             {exercise ? 'Editar Ejercicio' : 'Nuevo Ejercicio'}
           </DialogTitle>
           <DialogDescription>
-            {exercise ? 'Modifica los datos del ejercicio' : 'Crea un nuevo ejercicio'}
+            {exercise
+              ? 'Modifica los datos del ejercicio'
+              : 'Crea un nuevo ejercicio'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="name">Nombre *</Label>
               <Input
                 id="name"
-                name="name"
                 placeholder="Ej: Flexiones"
-                value={formData.name}
-                onChange={handleChange}
-                required
+                {...register('name')}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.name}
               />
+              {errors.name && <FieldError>{errors.name.message}</FieldError>}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label htmlFor="muscleGroup">Grupo Muscular *</Label>
               <Input
                 id="muscleGroup"
-                name="muscleGroup"
                 placeholder="Ej: Pecho"
-                value={formData.muscleGroup}
-                onChange={handleChange}
-                required
+                {...register('muscleGroup')}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.muscleGroup}
               />
+              {errors.muscleGroup && (
+                <FieldError>{errors.muscleGroup.message}</FieldError>
+              )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="difficultyLevel">Dificultad *</Label>
-              <Select
-                value={formData.difficultyLevel}
-                onValueChange={(value) =>
-                  setFormData({
-                    ...formData,
-                    difficultyLevel: value as 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED',
-                  })
-                }
-              >
-                <SelectTrigger id="difficultyLevel" className="w-full">
-                  <SelectValue placeholder="Selecciona dificultad" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="BEGINNER">Principiante</SelectItem>
-                  <SelectItem value="INTERMEDIATE">Intermedio</SelectItem>
-                  <SelectItem value="ADVANCED">Avanzado</SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="difficultyLevel"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isSubmitting}
+                  >
+                    <SelectTrigger id="difficultyLevel" className="w-full">
+                      <SelectValue placeholder="Selecciona dificultad" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="BEGINNER">Principiante</SelectItem>
+                      <SelectItem value="INTERMEDIATE">Intermedio</SelectItem>
+                      <SelectItem value="ADVANCED">Avanzado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.difficultyLevel && (
+                <FieldError>{errors.difficultyLevel.message}</FieldError>
+              )}
             </div>
 
-            <div className="space-y-2 sm:col-span-2">
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="description">
-                Descripción <span className="text-muted-foreground text-xs font-normal">(opcional)</span>
+                Descripción{' '}
+                <span className="text-muted-foreground text-xs font-normal">
+                  (opcional, máx 1000 caracteres)
+                </span>
               </Label>
               <Textarea
                 id="description"
-                name="description"
                 placeholder="Descripción del ejercicio"
-                value={formData.description || ''}
-                onChange={handleChange}
+                rows={3}
+                {...register('description')}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.description}
               />
+              {errors.description && (
+                <FieldError>{errors.description.message}</FieldError>
+              )}
             </div>
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Guardando...' : 'Guardar'}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Guardando...' : 'Guardar'}
             </Button>
           </div>
         </form>
@@ -214,3 +212,4 @@ export function ExerciseFormDialog({
     </Dialog>
   )
 }
+export default ExerciseFormDialog

@@ -1,4 +1,6 @@
-import { useState } from "react"
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
   DialogContent,
@@ -6,117 +8,171 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/shared/components/ui/dialog"
-import { Button } from "@/shared/components/ui/button"
-import { Input } from "@/shared/components/ui/input"
-import { Label } from "@/shared/components/ui/label"
-import { Textarea } from "@/shared/components/ui/textarea"
-import type { CreateMembershipPlanInput, MembershipPlan } from "@/features/membershipPlans/models/MembershipPlan"
+} from '@/shared/components/ui/dialog'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Textarea } from '@/shared/components/ui/textarea'
+import { FieldError } from '@/shared/components/ui/field'
+import type {
+  CreateMembershipPlanInput,
+  MembershipPlan,
+} from '@/features/membershipPlans/models/MembershipPlan'
+import {
+  membershipPlanFormSchema,
+  type MembershipPlanFormValues,
+} from '../models/membershipPlanFormSchema'
 
 type MembershipPlanFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   planToEdit?: MembershipPlan | null
-  onSave: (plan: CreateMembershipPlanInput, id?: number) => Promise<void>
+  onSave: (plan: CreateMembershipPlanInput, id?: number) => Promise<any>
 }
 
-// Formulario de alta/edición de un plan, dentro de un modal.
 export default function MembershipPlanFormDialog({
   open,
   onOpenChange,
   planToEdit,
   onSave,
 }: MembershipPlanFormDialogProps) {
-  const [form, setForm] = useState({
-    name: planToEdit?.name ?? "",
-    price: planToEdit ? String(planToEdit.price) : "",
-    durationDays: planToEdit ? String(planToEdit.durationDays) : "",
-    description: planToEdit?.description ?? "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<MembershipPlanFormValues>({
+    resolver: zodResolver(membershipPlanFormSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      name: '',
+      price: undefined,
+      durationDays: undefined,
+      description: '',
+    },
   })
 
-  // Actualiza un campo puntual del formulario sin pisar los demás.
-  function updateField(field: keyof typeof form, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }))
-  }
+  useEffect(() => {
+    if (open) {
+      if (planToEdit) {
+        reset({
+          name: planToEdit.name,
+          price: planToEdit.price,
+          durationDays: planToEdit.durationDays,
+          description: planToEdit.description ?? '',
+        })
+      } else {
+        reset({
+          name: '',
+          price: undefined,
+          durationDays: undefined,
+          description: '',
+        })
+      }
+    }
+  }, [open, planToEdit, reset])
 
-  function handleSubmit(e: React.SubmitEvent) {
-    e.preventDefault()
-    const { name, price, durationDays, description } = form
-    onSave(
-      {
-        name,
-        price: Number(price),
-        durationDays: Number(durationDays),
-        description,
-      },
-      planToEdit?.id
-    )
-    onOpenChange(false)
+  async function onSubmit(data: MembershipPlanFormValues) {
+    try {
+      await onSave(
+        {
+          name: data.name.trim(),
+          price: Number(data.price),
+          durationDays: Number(data.durationDays),
+          description: data.description?.trim() || undefined,
+        },
+        planToEdit?.id,
+      )
+      onOpenChange(false)
+    } catch {
+      // Si falla onSave, el modal permanece abierto para que el usuario pueda corregir
+    }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{planToEdit ? "Editar Plan" : "Nuevo Plan"}</DialogTitle>
+          <DialogTitle>{planToEdit ? 'Editar Plan' : 'Nuevo Plan'}</DialogTitle>
           <DialogDescription>
             {planToEdit
-              ? "Modificá los datos del plan seleccionado."
-              : "Completá los datos para crear un plan nuevo."}
+              ? 'Modificá los datos del plan seleccionado.'
+              : 'Completá los datos para crear un plan nuevo.'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="name">Nombre</Label>
+            <Label htmlFor="plan-name">Nombre</Label>
             <Input
-              id="name"
-              value={form.name}
-              onChange={(e) => updateField("name", e.target.value)}
-              required
+              id="plan-name"
+              {...register('name')}
+              disabled={isSubmitting}
+              aria-invalid={!!errors.name}
             />
+            {errors.name && <FieldError>{errors.name.message}</FieldError>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="price">Precio ($)</Label>
+              <Label htmlFor="plan-price">Precio ($)</Label>
               <Input
-                id="price"
+                id="plan-price"
                 type="number"
-                min="0"
-                value={form.price}
-                onChange={(e) => updateField("price", e.target.value)}
-                required
+                step="any"
+                {...register('price', { valueAsNumber: true })}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.price}
               />
+              {errors.price && <FieldError>{errors.price.message}</FieldError>}
             </div>
+
             <div className="space-y-1.5">
-              <Label htmlFor="durationDays">Duración (días)</Label>
+              <Label htmlFor="plan-durationDays">Duración (días)</Label>
               <Input
-                id="durationDays"
+                id="plan-durationDays"
                 type="number"
-                min="1"
-                value={form.durationDays}
-                onChange={(e) => updateField("durationDays", e.target.value)}
-                required
+                step="1"
+                {...register('durationDays', { valueAsNumber: true })}
+                disabled={isSubmitting}
+                aria-invalid={!!errors.durationDays}
               />
+              {errors.durationDays && (
+                <FieldError>{errors.durationDays.message}</FieldError>
+              )}
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="plan-description">Descripción</Label>
             <Textarea
-              id="description"
-              value={form.description}
-              onChange={(e) => updateField("description", e.target.value)}
+              id="plan-description"
               rows={3}
+              {...register('description')}
+              disabled={isSubmitting}
+              aria-invalid={!!errors.description}
             />
+            {errors.description && (
+              <FieldError>{errors.description.message}</FieldError>
+            )}
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               Cancelar
             </Button>
-            <Button type="submit">{planToEdit ? "Guardar cambios" : "Crear plan"}</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting
+                ? 'Guardando...'
+                : planToEdit
+                  ? 'Guardar cambios'
+                  : 'Crear plan'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

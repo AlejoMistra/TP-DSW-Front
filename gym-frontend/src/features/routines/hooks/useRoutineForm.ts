@@ -168,6 +168,28 @@ export function useRoutineForm({
       return;
     }
 
+    if (name.trim().length > 200) {
+      toast.error('El nombre de la rutina no puede superar los 200 caracteres');
+      return;
+    }
+
+    if (description && description.trim().length > 1000) {
+      toast.error(
+        'La descripción de la rutina no puede superar los 1000 caracteres',
+      );
+      return;
+    }
+
+    const hasNoteTooLong = exercises.some(
+      (ex) => ex.notes && ex.notes.trim().length > 500,
+    );
+    if (hasNoteTooLong) {
+      toast.error(
+        'Las notas de los ejercicios no pueden superar los 500 caracteres',
+      );
+      return;
+    }
+
     if (!instructorId) {
       toast.error('Por favor, seleccioná un instructor');
       return;
