@@ -5,11 +5,24 @@ import {
   type UpdateClassSessionInput,
 } from '../models/ClassSession';
 
+export interface GetAllClassSessionsParams {
+  date?: string;
+  page?: number;
+  limit?: number;
+}
+
 export const classSessionService = {
-  async getAll(): Promise<ClassSession[]> {
-    const response = await apiClient.get<ClassSession[] | { items: ClassSession[] }>('/api/classSessions');
+  async getAll(params?: GetAllClassSessionsParams): Promise<ClassSession[]> {
+    const response = await apiClient.get<ClassSession[] | { items: ClassSession[] }>(
+      '/api/classSessions',
+      { params }
+    );
     const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && 'items' in data && Array.isArray(data.items)) {
+      return data.items;
+    }
+    return [];
   },
 
   async getById(id: number): Promise<ClassSession> {

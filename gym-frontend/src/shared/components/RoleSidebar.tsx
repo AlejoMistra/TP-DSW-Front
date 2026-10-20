@@ -1,5 +1,5 @@
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 import { Dumbbell } from "lucide-react"
 import {
   Sidebar,
@@ -24,6 +24,7 @@ export default function RoleSidebar({
   title = "MyGymManager",
   footer,
 }: RoleSidebarProps) {
+  const location = useLocation()
   const homeLink = links[0]
 
   return (
@@ -32,7 +33,6 @@ export default function RoleSidebar({
         {homeLink ? (
           <NavLink
             to={homeLink.to}
-            end={homeLink.to.endsWith("/")}
             aria-label={`${title} home`}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1 transition-[width,padding,gap,margin] duration-200 ease-in-out group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:px-0"
           >
@@ -48,22 +48,28 @@ export default function RoleSidebar({
 
       <SidebarContent>
         <SidebarMenu>
-          {links.map((link) => (
-            <SidebarMenuItem key={link.to}>
-              <SidebarMenuButton asChild tooltip={link.label}>
-                <NavLink to={link.to} end={link.to.endsWith("/")}>
-                  {link.icon ? <link.icon aria-hidden="true" /> : null}
-                  <span className="text-lg max-w-40 overflow-hidden whitespace-nowrap opacity-100 transition-[max-width,opacity] duration-200 ease-in-out group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:opacity-0">
-                    {link.label}
-                  </span>
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {links.map((link) => {
+            const isActive =
+              location.pathname === link.to ||
+              location.pathname.startsWith(link.to + "/")
+
+            return (
+              <SidebarMenuItem key={link.to}>
+                <SidebarMenuButton asChild isActive={isActive} tooltip={link.label}>
+                  <NavLink to={link.to}>
+                    {link.icon ? <link.icon aria-hidden="true" /> : null}
+                    <span className="text-lg max-w-40 overflow-hidden whitespace-nowrap opacity-100 transition-[max-width,opacity] duration-200 ease-in-out group-data-[collapsible=icon]:max-w-0 group-data-[collapsible=icon]:opacity-0">
+                      {link.label}
+                    </span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })}
         </SidebarMenu>
       </SidebarContent>
 
       {footer ? <SidebarFooter>{footer}</SidebarFooter> : null}
-    </Sidebar >
+    </Sidebar>
   )
 }
