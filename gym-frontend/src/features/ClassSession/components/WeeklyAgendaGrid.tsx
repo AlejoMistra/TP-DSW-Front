@@ -1,6 +1,10 @@
 import { Plus, CalendarX } from 'lucide-react'
 import type { WeekDay } from '../lib/dateUtils'
-import type { ClassSession, UpdateClassSessionInput } from '../models/ClassSession'
+import type {
+  ClassSession,
+  UpdateClassSessionInput,
+  RecurrenceScope,
+} from '../models/ClassSession'
 import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule'
 import type { Instructor } from '@/features/instructors/models/Instructor'
 import { SessionEditPopover } from './SessionEditPopover'
@@ -18,9 +22,9 @@ interface WeeklyAgendaGridProps {
   onCloseEdit: () => void
   onAddSessionForDay: (dateString: string) => void
   onUpdateSession: (id: number, payload: UpdateClassSessionInput) => Promise<any>
-  onCancelSession: (id: number) => Promise<void>
-  onRestoreSession: (id: number) => Promise<void>
-  onDeleteSession: (id: number) => Promise<void>
+  onCancelSession: (id: number, scope?: RecurrenceScope) => Promise<void>
+  onRestoreSession: (id: number, scope?: RecurrenceScope) => Promise<void>
+  onDeleteSession: (id: number, scope?: RecurrenceScope) => Promise<void>
 }
 
 export function WeeklyAgendaGrid({
@@ -97,9 +101,9 @@ export function WeeklyAgendaGrid({
                       onSelect={() => onSelectSession(session)}
                       onClose={onCloseEdit}
                       onSave={(data) => onUpdateSession(session.id, data)}
-                      onCancelSession={() => onCancelSession(session.id)}
-                      onRestoreSession={() => onRestoreSession(session.id)}
-                      onDeleteSession={() => onDeleteSession(session.id)}
+                      onCancelSession={(scope) => onCancelSession(session.id, scope)}
+                      onRestoreSession={(scope) => onRestoreSession(session.id, scope)}
+                      onDeleteSession={(scope) => onDeleteSession(session.id, scope)}
                     />
                   ))
                 ) : (
