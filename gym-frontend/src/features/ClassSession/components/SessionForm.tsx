@@ -199,6 +199,19 @@ export function SessionForm({
   const isCancelled = session?.status === 'CANCELLED'
   const isPartOfRecurrence = Boolean(session?.recurrenceId)
 
+  const originalDate = useMemo(() => {
+    if (!session?.date) return ''
+    const d =
+      typeof session.date === 'string'
+        ? parseDateString(session.date)
+        : session.date
+    return toLocalDateString(d)
+  }, [session])
+
+  const isDateChanged = Boolean(
+    mode === 'edit' && session && originalDate && date !== originalDate
+  )
+
   const toggleDay = (dayValue: number) => {
     setSelectedDays((prev) => {
       if (prev.includes(dayValue)) {
@@ -227,11 +240,17 @@ export function SessionForm({
   const executeSave = async (scope: RecurrenceScope = 'this') => {
     setIsSubmitting(true)
     try {
+      if (isDateChanged && scope !== 'this') {
+        throw new Error(
+          'El cambio de fecha solo está permitido para una clase individual ("Solo esta clase")'
+        )
+      }
+
       const payload: SessionFormValues = {
         classScheduleId: Number(selectedScheduleId),
         instructorId:
           selectedInstructorId === 'none' ? null : Number(selectedInstructorId),
-        ...(mode === 'create' || scope === 'this' ? { date } : {}),
+        ...(mode === 'create' || isDateChanged || scope === 'this' ? { date } : {}),
         startTime,
         scope,
       }
@@ -415,6 +434,12 @@ export function SessionForm({
               }}
               required
             />
+            {isDateChanged && isPartOfRecurrence && (
+              <p className="text-xs text-amber-500 mt-1 flex items-center gap-1 font-medium">
+                <AlertCircle className="size-3.5 shrink-0" />
+                Al modificar la fecha, el cambio solo se aplicará a esta clase individual.
+              </p>
+            )}
           </div>
 
           {/* Horario (Inicio y Fin Calculado) */}
@@ -696,6 +721,7 @@ export function SessionForm({
           open={scopeDialogOpen}
           sessionId={session.id}
           actionType={scopeActionType}
+          isDateChanged={isDateChanged}
           onClose={() => setScopeDialogOpen(false)}
           onConfirm={handleScopeConfirm}
         />
