@@ -238,7 +238,6 @@ export function SessionForm({
 
       if (mode === 'create' && isRecurring) {
         payload.recurrence = {
-          frequency: 'WEEKLY',
           daysOfWeek: selectedDays,
           endDate,
         }
