@@ -39,7 +39,7 @@ export const ROLE_NAVIGATION: Record<
   instructor: {
     title: 'Instructor',
     links: [
-      { to: '/instructor/rutinas', label: 'Inicio', icon: House },
+      { to: '/instructor/inicio', label: 'Inicio', icon: House },
       { to: '/instructor/rutinas', label: 'Rutinas', icon: ClipboardList },
       { to: '/instructor/ejercicios', label: 'Ejercicios', icon: NotebookPen },
     ],

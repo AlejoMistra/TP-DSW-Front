@@ -6,6 +6,7 @@ import { Navigate } from 'react-router-dom';
 import RoleLayout from '@/layouts/RoleLayout';
 import ProtectedRoute from '../ProtectedRoute';
 
+const InstructorHomePage = lazy(() => import('@/pages/instructor/InstructorHomePage'));
 const RoutinesPage = lazy(() => import('@/pages/instructor/RoutinesPage'));
 const ExercisesPage = lazy(() => import('@/pages/instructor/ExercisesPage'));
 
@@ -17,7 +18,8 @@ export const instructorRoutes: RouteObject = {
     </ProtectedRoute>
   ),
   children: [
-    { index: true, element: <Navigate to="/instructor/rutinas" replace /> },
+    { index: true, element: <Navigate to="/instructor/inicio" replace /> },
+    { path: 'inicio', element: <InstructorHomePage /> },
     { path: 'rutinas', element: <RoutinesPage /> },
     { path: 'ejercicios', element: <ExercisesPage /> },
     { path: 'exercises', element: <ExercisesPage /> },

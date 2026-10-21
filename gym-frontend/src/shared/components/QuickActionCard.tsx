@@ -27,7 +27,7 @@ export function QuickActionCard({
   const content = (
     <div
       className={cn(
-        'group relative flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-5 text-card-foreground transition-all duration-200',
+        'group relative flex flex-col justify-between rounded-2xl border border-border/70 bg-card p-4 sm:p-5 text-card-foreground transition-all duration-200',
         disabled
           ? 'cursor-not-allowed opacity-60'
           : 'hover:border-primary/50 hover:bg-muted/40 hover:shadow-md cursor-pointer',
@@ -38,22 +38,22 @@ export function QuickActionCard({
       <div className="flex items-start justify-between gap-3">
         <div
           className={cn(
-            'flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105',
+            'flex size-10 sm:size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform group-hover:scale-105',
             iconClassName
           )}
         >
-          <Icon className="size-5" />
+          <Icon className="size-4 sm:size-5" />
         </div>
         <div className="rounded-full p-1 text-muted-foreground transition-all group-hover:text-primary group-hover:translate-x-0.5">
-          <ArrowRight className="size-4" />
+          <ArrowRight className="size-3.5 sm:size-4" />
         </div>
       </div>
 
-      <div className="mt-4 space-y-1">
-        <h3 className="font-semibold text-base leading-snug tracking-tight text-foreground transition-colors">
+      <div className="mt-3 sm:mt-4 space-y-1">
+        <h3 className="font-semibold text-sm sm:text-base leading-snug tracking-tight text-foreground transition-colors">
           {title}
         </h3>
-        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+        <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-2">
           {description}
         </p>
       </div>
