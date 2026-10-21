@@ -47,7 +47,7 @@ export function CreateSessionDialog({
           schedules={schedules}
           instructors={instructors}
           onClose={onClose}
-          onSubmit={onCreate}
+          onSubmit={(values) => onCreate(values as CreateClassSessionInput)}
         />
       </DialogContent>
     </Dialog>
