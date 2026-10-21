@@ -16,7 +16,6 @@ interface RecurrenceScopeDialogProps {
   open: boolean;
   sessionId: number;
   actionType: 'edit' | 'cancel' | 'delete';
-  isDateChanged?: boolean;
   onClose: () => void;
   onConfirm: (scope: RecurrenceScope) => Promise<void>;
 }
@@ -25,7 +24,6 @@ export function RecurrenceScopeDialog({
   open,
   sessionId,
   actionType,
-  isDateChanged = false,
   onClose,
   onConfirm,
 }: RecurrenceScopeDialogProps) {
@@ -33,13 +31,6 @@ export function RecurrenceScopeDialog({
   const [loadingImpact, setLoadingImpact] = useState<boolean>(false);
   const [impact, setImpact] = useState<{ sessionCount: number; confirmedBookingsCount: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  // Si cambia la fecha y es edición, asegurar scope 'this'
-  useEffect(() => {
-    if (isDateChanged && actionType === 'edit') {
-      setScope('this');
-    }
-  }, [isDateChanged, actionType, open]);
 
   // Consultar impacto cuando cambia el scope o se abre el diálogo
   useEffect(() => {
@@ -94,7 +85,7 @@ export function RecurrenceScopeDialog({
 
   const actionVerb = actionVerbs[actionType];
 
-  const options: { id: RecurrenceScope; title: string; description: string; disabled?: boolean }[] = [
+  const options: { id: RecurrenceScope; title: string; description: string }[] = [
     {
       id: 'this',
       title: 'Solo esta clase',
@@ -103,20 +94,12 @@ export function RecurrenceScopeDialog({
     {
       id: 'following',
       title: 'Esta y las siguientes',
-      description:
-        isDateChanged && actionType === 'edit'
-          ? 'No disponible al modificar la fecha (solo se puede cambiar la fecha de una clase individual).'
-          : `Se ${actionVerb} esta clase y las siguientes.`,
-      disabled: Boolean(isDateChanged && actionType === 'edit'),
+      description: `Se ${actionVerb} esta clase y las siguientes.`,
     },
     {
       id: 'all',
       title: 'Todas las clases',
-      description:
-        isDateChanged && actionType === 'edit'
-          ? 'No disponible al modificar la fecha (solo se puede cambiar la fecha de una clase individual).'
-          : `Se ${actionVerb}n todas las clases, excepto las dictadas.`,
-      disabled: Boolean(isDateChanged && actionType === 'edit'),
+      description: `Se ${actionVerb}n todas las clases, excepto las dictadas.`,
     },
   ];
 
@@ -136,40 +119,21 @@ export function RecurrenceScopeDialog({
         </DialogHeader>
 
         <div className="py-2 space-y-2.5">
-          {isDateChanged && actionType === 'edit' && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-2.5 text-amber-500 text-xs mb-1">
-              <AlertTriangle className="size-4 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-semibold">Cambio de fecha detectado</p>
-                <p className="text-amber-500/90 mt-0.5">
-                  El cambio de fecha solo puede aplicarse a <strong>Solo esta clase</strong>. Para modificar la serie completa, mantené la fecha original.
-                </p>
-              </div>
-            </div>
-          )}
-
           {options.map((opt) => {
             const isSelected = scope === opt.id;
-            const isDisabled = opt.disabled;
             return (
               <div
                 key={opt.id}
-                onClick={() => {
-                  if (!isDisabled) setScope(opt.id);
-                }}
-                className={`relative flex items-start gap-3 rounded-xl border p-3 transition-all ${
-                  isDisabled
-                    ? 'opacity-50 cursor-not-allowed border-border/40 bg-muted/20'
-                    : isSelected
-                    ? 'border-primary bg-primary/5 ring-1 ring-primary/40 cursor-pointer'
-                    : 'border-border/60 hover:border-border hover:bg-muted/40 cursor-pointer'
+                onClick={() => setScope(opt.id)}
+                className={`relative flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all ${
+                  isSelected
+                    ? 'border-primary bg-primary/5 ring-1 ring-primary/40'
+                    : 'border-border/60 hover:border-border hover:bg-muted/40'
                 }`}
               >
                 <div
                   className={`mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
-                    isDisabled
-                      ? 'border-muted-foreground/20 bg-muted/20'
-                      : isSelected
+                    isSelected
                       ? 'border-primary bg-primary text-primary-foreground'
                       : 'border-muted-foreground/40 bg-transparent'
                   }`}
@@ -177,7 +141,7 @@ export function RecurrenceScopeDialog({
                   {isSelected && <Check className="size-2.5 stroke-[3]" />}
                 </div>
                 <div className="flex flex-col">
-                  <span className={`text-sm font-semibold ${isDisabled ? 'text-muted-foreground' : 'text-foreground'}`}>
+                  <span className="text-sm font-semibold text-foreground">
                     {opt.title}
                   </span>
                   <span className="text-xs text-muted-foreground leading-relaxed mt-0.5">

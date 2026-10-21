@@ -199,19 +199,6 @@ export function SessionForm({
   const isCancelled = session?.status === 'CANCELLED'
   const isPartOfRecurrence = Boolean(session?.recurrenceId)
 
-  const originalDate = useMemo(() => {
-    if (!session?.date) return ''
-    const d =
-      typeof session.date === 'string'
-        ? parseDateString(session.date)
-        : session.date
-    return toLocalDateString(d)
-  }, [session])
-
-  const isDateChanged = Boolean(
-    mode === 'edit' && session && originalDate && date !== originalDate
-  )
-
   const toggleDay = (dayValue: number) => {
     setSelectedDays((prev) => {
       if (prev.includes(dayValue)) {
@@ -240,17 +227,13 @@ export function SessionForm({
   const executeSave = async (scope: RecurrenceScope = 'this') => {
     setIsSubmitting(true)
     try {
-      if (isDateChanged && scope !== 'this') {
-        throw new Error(
-          'El cambio de fecha solo está permitido para una clase individual ("Solo esta clase")'
-        )
-      }
-
       const payload: SessionFormValues = {
         classScheduleId: Number(selectedScheduleId),
         instructorId:
           selectedInstructorId === 'none' ? null : Number(selectedInstructorId),
-        ...(mode === 'create' || isDateChanged || scope === 'this' ? { date } : {}),
+        ...(mode === 'create' || (!isPartOfRecurrence && scope === 'this')
+          ? { date }
+          : {}),
         startTime,
         scope,
       }
@@ -402,12 +385,25 @@ export function SessionForm({
 
           {/* Fecha */}
           <div className="space-y-1.5">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Fecha *
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Fecha *
+              </Label>
+              {mode === 'edit' && isPartOfRecurrence && (
+                <span className="text-[11px] text-muted-foreground italic">
+                  (Inmutable en clases periódicas)
+                </span>
+              )}
+            </div>
             <Input
               type="date"
               value={date}
+              disabled={mode === 'edit' && isPartOfRecurrence}
+              className={`w-full h-9 font-medium ${
+                mode === 'edit' && isPartOfRecurrence
+                  ? 'opacity-85 cursor-not-allowed bg-muted/40 font-medium'
+                  : ''
+              }`}
               onChange={(e) => {
                 const newDate = e.target.value
                 setDate(newDate)
@@ -434,10 +430,9 @@ export function SessionForm({
               }}
               required
             />
-            {isDateChanged && isPartOfRecurrence && (
-              <p className="text-xs text-amber-500 mt-1 flex items-center gap-1 font-medium">
-                <AlertCircle className="size-3.5 shrink-0" />
-                Al modificar la fecha, el cambio solo se aplicará a esta clase individual.
+            {mode === 'edit' && isPartOfRecurrence && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Las clases periódicas no pueden cambiar de fecha. Si no se dicta este día, podés cancelarla abajo.
               </p>
             )}
           </div>
@@ -721,7 +716,6 @@ export function SessionForm({
           open={scopeDialogOpen}
           sessionId={session.id}
           actionType={scopeActionType}
-          isDateChanged={isDateChanged}
           onClose={() => setScopeDialogOpen(false)}
           onConfirm={handleScopeConfirm}
         />
