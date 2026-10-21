@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useRoutines } from '@/features/routines/hooks/useRoutines';
 import { RoutineDataTable } from '@/features/routines/components/RoutineDataTable';
 import { RoutineDetailsDialog } from '@/features/routines/components/RoutineDetailsDialog';
@@ -8,6 +9,7 @@ import type { Routine } from '@/features/routines/models/Routine';
 import { usePageTitle } from '@/shared/context/PageHeaderContext';
 
 export default function RoutinesPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const {
         routines,
         loading,
@@ -21,9 +23,18 @@ export default function RoutinesPage() {
     } = useRoutines();
 
     // Vista activa: 'list' (tabla) o 'form' (alta/edición)
-    const [view, setView] = useState<'list' | 'form'>('list');
+    const [view, setView] = useState<'list' | 'form'>(() =>
+        searchParams.get('new') === 'true' ? 'form' : 'list'
+    );
     const [selectedRoutine, setSelectedRoutine] = useState<Routine | null>(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.get('new') === 'true') {
+            setView('form');
+            setSelectedRoutine(null);
+        }
+    }, [searchParams]);
 
     usePageTitle(view === 'form' ? (selectedRoutine ? 'Editar Rutina' : 'Nueva Rutina') : 'Rutinas');
 
@@ -42,7 +53,20 @@ export default function RoutinesPage() {
         setDetailsOpen(true);
     };
 
+    const handleBack = () => {
+        if (searchParams.get('new')) {
+            searchParams.delete('new');
+            setSearchParams(searchParams, { replace: true });
+        }
+        setView('list');
+        setSelectedRoutine(null);
+    };
+
     const handleFormSuccess = () => {
+        if (searchParams.get('new')) {
+            searchParams.delete('new');
+            setSearchParams(searchParams, { replace: true });
+        }
         setView('list');
         setSelectedRoutine(null);
         refetch();
@@ -53,10 +77,7 @@ export default function RoutinesPage() {
         return (
             <RoutineForm
                 routine={selectedRoutine}
-                onBack={() => {
-                    setView('list');
-                    setSelectedRoutine(null);
-                }}
+                onBack={handleBack}
                 onSuccess={handleFormSuccess}
             />
         );

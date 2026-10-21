@@ -45,6 +45,18 @@ export const classSessionService = {
     return response.data;
   },
 
+  async getByInstructor(instructorId: number): Promise<ClassSession[]> {
+    const response = await apiClient.get<ClassSession[] | { items: ClassSession[] }>(
+      `/api/classSessions/instructor/${instructorId}`
+    );
+    const data = response.data;
+    if (Array.isArray(data)) return data;
+    if (data && typeof data === 'object' && 'items' in data && Array.isArray((data as any).items)) {
+      return (data as any).items;
+    }
+    return [];
+  },
+
   async create(data: CreateClassSessionInput): Promise<ClassSession> {
     const response = await apiClient.post<ClassSession>(
       '/api/classSessions',

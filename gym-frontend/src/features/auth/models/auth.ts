@@ -48,7 +48,7 @@ export function getDefaultPathForRole(role: AppRole): string {
     case 'admin':
       return '/administrativo/menu';
     case 'instructor':
-      return '/instructor/rutinas';
+      return '/instructor/inicio';
     case 'member':
       return '/socio/inicio';
     default:
