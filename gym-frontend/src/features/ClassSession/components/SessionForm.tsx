@@ -231,14 +231,15 @@ export function SessionForm({
         classScheduleId: Number(selectedScheduleId),
         instructorId:
           selectedInstructorId === 'none' ? null : Number(selectedInstructorId),
-        ...(mode === 'create' || scope === 'this' ? { date } : {}),
+        ...(mode === 'create' || (!isPartOfRecurrence && scope === 'this')
+          ? { date }
+          : {}),
         startTime,
         scope,
       }
 
       if (mode === 'create' && isRecurring) {
         payload.recurrence = {
-          frequency: 'WEEKLY',
           daysOfWeek: selectedDays,
           endDate,
         }
@@ -384,12 +385,25 @@ export function SessionForm({
 
           {/* Fecha */}
           <div className="space-y-1.5">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Fecha *
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Fecha *
+              </Label>
+              {mode === 'edit' && isPartOfRecurrence && (
+                <span className="text-[11px] text-muted-foreground italic">
+                  (Inmutable en clases periódicas)
+                </span>
+              )}
+            </div>
             <Input
               type="date"
               value={date}
+              disabled={mode === 'edit' && isPartOfRecurrence}
+              className={`w-full h-9 font-medium ${
+                mode === 'edit' && isPartOfRecurrence
+                  ? 'opacity-85 cursor-not-allowed bg-muted/40 font-medium'
+                  : ''
+              }`}
               onChange={(e) => {
                 const newDate = e.target.value
                 setDate(newDate)
@@ -416,6 +430,11 @@ export function SessionForm({
               }}
               required
             />
+            {mode === 'edit' && isPartOfRecurrence && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Las clases periódicas no pueden cambiar de fecha. Si no se dicta este día, podés cancelarla abajo.
+              </p>
+            )}
           </div>
 
           {/* Horario (Inicio y Fin Calculado) */}

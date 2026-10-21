@@ -59,11 +59,9 @@ export interface ClassDateOption {
 }
 
 export type ClassSessionStatus = 'SCHEDULED' | 'CANCELLED';
-export type RecurrenceFrequency = 'DAILY' | 'WEEKLY' | 'MONTHLY';
 export type RecurrenceScope = 'this' | 'following' | 'all';
 
 export interface RecurrenceInput {
-  frequency: RecurrenceFrequency;
   daysOfWeek?: number[]; // 1 = Lunes ... 7 = Domingo
   endDate: string;
 }
