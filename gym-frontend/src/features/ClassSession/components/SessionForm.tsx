@@ -40,7 +40,7 @@ import { ConfirmDeleteDialog } from '@/shared/components/ConfirmDeleteDialog'
 export interface SessionFormValues {
   classScheduleId: number
   instructorId: number | null
-  date: string
+  date?: string
   startTime: string
   recurrence?: RecurrenceInput
   scope?: RecurrenceScope
@@ -231,7 +231,7 @@ export function SessionForm({
         classScheduleId: Number(selectedScheduleId),
         instructorId:
           selectedInstructorId === 'none' ? null : Number(selectedInstructorId),
-        date,
+        ...(mode === 'create' || scope === 'this' ? { date } : {}),
         startTime,
         scope,
       }

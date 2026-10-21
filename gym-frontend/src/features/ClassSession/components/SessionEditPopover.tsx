@@ -45,7 +45,7 @@ export function SessionEditPopover({
   const handleFormSubmit = async (values: SessionFormValues) => {
     await onSave({
       instructorId: values.instructorId,
-      date: values.date,
+      ...(values.date ? { date: values.date } : {}),
       startTime: values.startTime,
       scope: values.scope,
     })
