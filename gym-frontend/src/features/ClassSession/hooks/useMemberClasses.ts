@@ -10,8 +10,7 @@ import { classBookingService } from '@/features/classBooking/api/classBookingSer
 import type { ClassBooking } from '@/features/classBooking/models/ClassBooking';
 import { classScheduleService } from '@/features/classSchedule/api/classScheduleService';
 import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule';
-import { instructorService } from '@/features/instructors/api/instructorService';
-import type { Instructor } from '@/features/instructors/models/Instructor';
+
 import { memberService } from '@/features/members/api/memberService';
 import type { Member } from '@/features/members/models/Member';
 import { parseDateString, toLocalDateString } from '../lib/dateUtils';
@@ -86,35 +85,26 @@ export function useMemberClasses() {
         sessionsData,
         bookingsData,
         schedulesData,
-        instructorsData,
       ] = await Promise.all([
         memberService.getMe(),
         classSessionService.getAll().catch(() => []),
         classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
-        instructorService.getAll().catch(() => [] as Instructor[]),
       ]);
 
       setCurrentMember(memberData);
       setBookings(bookingsData);
       setSchedules(schedulesData);
 
-      // Schedule and instructor maps
+      // Schedule map
       const scheduleMap = new Map(schedulesData.map((s) => [String(s.id), s]));
-      const instructorMap = new Map(
-        instructorsData.map((i) => [String(i.id), i]),
-      );
 
       // Map sessions with enriched relations and reservation status
       const mapped: MemberClassSession[] = sessionsData.map((session) => {
         const sched =
           session.classSchedule ??
           scheduleMap.get(String(session.classScheduleId));
-        const inst =
-          session.instructor ??
-          (session.instructorId
-            ? instructorMap.get(String(session.instructorId))
-            : null);
+        const inst = session.instructor ?? null;
 
         const userBooking = bookingsData.find(
           (b) =>

@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   role: AppRole;
   memberId: number | null;
+  instructorId: number | null;
 }
 
 export interface LoginCredentials {
@@ -21,6 +22,7 @@ export interface LoginResponse {
     email: string;
     role: BackendRole | AppRole;
     memberId: number | null;
+    instructorId: number | null;
   };
 }
 

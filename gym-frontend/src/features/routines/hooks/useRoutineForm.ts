@@ -50,19 +50,26 @@ export function useRoutineForm({
     async function loadData() {
       try {
         setLoading(true);
+        // Solo el admin consulta la lista completa de instructores; el instructor usa su propio ID de sesión
         const [instList, exList] = await Promise.all([
-          instructorService.getAll(),
+          user?.role === 'admin'
+            ? instructorService.getAll().catch(() => [] as Instructor[])
+            : Promise.resolve([] as Instructor[]),
           exerciseService.getAllExercises(),
         ]);
         setInstructors(instList);
         setAvailableExercises(exList);
 
-        if (instList.length > 0 && !instructorId) {
-          const instructor = instList.find(
-            (i) => i.email.toLowerCase() === user?.email?.toLowerCase(),
-          );
-          if (instructor) {
-            setInstructorId(instructor.id);
+        if (!instructorId) {
+          if (user?.instructorId) {
+            setInstructorId(user.instructorId);
+          } else if (instList.length > 0) {
+            const instructor = instList.find(
+              (i) => i.email.toLowerCase() === user?.email?.toLowerCase(),
+            );
+            if (instructor) {
+              setInstructorId(instructor.id);
+            }
           }
         }
 

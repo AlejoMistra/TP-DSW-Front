@@ -4,8 +4,7 @@ import type { ClassBooking } from '@/features/classBooking/models/ClassBooking';
 import { classSessionService } from '../api/classSessionService';
 import { classScheduleService } from '@/features/classSchedule/api/classScheduleService';
 import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule';
-import { instructorService } from '@/features/instructors/api/instructorService';
-import type { Instructor } from '@/features/instructors/models/Instructor';
+
 import type { MemberClassSession } from '../models/ClassSession';
 import { parseDateString, toLocalDateString } from '../lib/dateUtils';
 
@@ -35,20 +34,15 @@ export function useMemberUpcomingBookings() {
       try {
         setError(null);
 
-        const [bookings, sessions, schedules, instructors] = await Promise.all([
+        const [bookings, sessions, schedules] = await Promise.all([
           classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
           classSessionService.getAll().catch(() => []),
           classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
-          instructorService.getAll().catch(() => [] as Instructor[]),
         ]);
 
         if (cancelled) return;
 
         const scheduleMap = new Map(schedules.map((s) => [String(s.id), s]));
-        const instructorMap = new Map(
-          instructors.map((i) => [String(i.id), i]),
-        );
-
         const todayStr = toLocalDateString(new Date());
 
         // Filter confirmed bookings for this member
@@ -78,11 +72,7 @@ export function useMemberUpcomingBookings() {
             const sched =
               session.classSchedule ??
               scheduleMap.get(String(session.classScheduleId));
-            const inst =
-              session.instructor ??
-              (session.instructorId
-                ? instructorMap.get(String(session.instructorId))
-                : null);
+            const inst = session.instructor ?? null;
 
             const isToday = sessionDateStr === todayStr;
 
