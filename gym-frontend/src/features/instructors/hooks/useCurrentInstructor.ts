@@ -30,18 +30,15 @@ export function useCurrentInstructor() {
         }
 
         setError(null);
-        const instructors = await instructorService.getAll();
+        const current = await instructorService.getMe();
         if (cancelled) return;
-
-        const current = instructors.find(
-          (i) => i.email.toLowerCase() === userEmail.toLowerCase()
-        );
-
         setInstructor(current || null);
       } catch (err) {
         if (cancelled) return;
         const msg =
-          err instanceof Error ? err.message : 'Error al cargar datos del instructor';
+          err instanceof Error
+            ? err.message
+            : 'Error al cargar datos del instructor';
         setError(msg);
       } finally {
         if (!cancelled) {
@@ -66,4 +63,3 @@ export function useCurrentInstructor() {
 }
 
 export default useCurrentInstructor;
-
