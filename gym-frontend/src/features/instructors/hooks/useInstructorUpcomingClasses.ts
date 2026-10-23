@@ -5,8 +5,6 @@ import {
   parseDateString,
   toLocalDateString,
 } from '@/features/ClassSession/lib/dateUtils';
-import { useCurrentInstructor } from './useCurrentInstructor';
-
 export interface InstructorUpcomingClass {
   id: number;
   classScheduleId: number;
@@ -23,7 +21,6 @@ export interface InstructorUpcomingClass {
 }
 
 export function useInstructorUpcomingClasses() {
-  const { instructor, loading: instructorLoading } = useCurrentInstructor();
   const [classes, setClasses] = useState<InstructorUpcomingClass[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +35,6 @@ export function useInstructorUpcomingClasses() {
     let cancelled = false;
 
     const fetchSessions = async () => {
-      if (instructorLoading) return;
 
       try {
         setError(null);
@@ -147,11 +143,11 @@ export function useInstructorUpcomingClasses() {
     return () => {
       cancelled = true;
     };
-  }, [instructorLoading, instructor?.id, reloadKey]);
+  }, [reloadKey]);
 
   return {
     classes,
-    loading: instructorLoading || loading,
+    loading,
     error,
     refetch,
   };
