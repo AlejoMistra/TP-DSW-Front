@@ -7,8 +7,11 @@ export interface ApiErrorResponse {
   message: string;
   details: Array<{ field?: string; message: string }> | null;
 }
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL =
+  typeof rawBaseUrl === 'string' && rawBaseUrl.trim() !== ''
+    ? rawBaseUrl.trim().replace(/\/+$/, '')
+    : 'http://localhost:3000';
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
