@@ -7,8 +7,9 @@ import {
 
 export const membershipPlanService = {
   async getAll(): Promise<MembershipPlan[]> {
-    const response = await apiClient.get<MembershipPlan[]>('/api/membership-plans');
-    return response.data;
+    const response = await apiClient.get<MembershipPlan[] | { items: MembershipPlan[] }>('/api/membership-plans');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
   },
 
   async getById(id: number): Promise<MembershipPlan> {

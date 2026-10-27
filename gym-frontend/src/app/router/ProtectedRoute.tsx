@@ -1,37 +1,44 @@
-import { type ReactNode } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { toast } from 'sonner';
+import { Suspense } from 'react';
+import type { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import type { AppRole } from '@/config/navigation';
-import { getDefaultPathForRole } from '@/features/auth/models/auth';
-import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
-  allowedRoles?: AppRole[];
-  children?: ReactNode;
+  children: ReactNode;
+  allowedRoles: AppRole[];
 }
 
-export default function ProtectedRoute({ allowedRoles, children }: ProtectedRouteProps) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
+export default function ProtectedRoute({
+  children,
+  allowedRoles,
+}: ProtectedRouteProps) {
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  if (!isAuthenticated || !user) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+  if (!user || !allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
   }
 
-  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    toast.error('No tienes permisos suficientes para acceder a esa sección');
-    return <Navigate to={getDefaultPathForRole(user.role)} replace />;
-  }
-
-  return children ? <>{children}</> : <Outlet />;
+  // Agregar Suspense aquí
+  return <Suspense fallback={<LoadingFallback />}>{children}</Suspense>;
 }
 
+// Componente de fallback mientras carga
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+        <p className="text-muted-foreground text-sm">Cargando...</p>
+      </div>
+    </div>
+  );
+}

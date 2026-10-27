@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ConfirmDeleteDialog from '@/shared/components/ConfirmDeleteDialog'
 import { useExercises } from '@/features/exercises/hooks/useExercises'
 import { ExerciseDataTable } from '@/features/exercises/components/ExerciseDataTable'
@@ -8,6 +9,7 @@ import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
 export default function ExercisesPage() {
   usePageTitle("Ejercicios")
+  const [searchParams, setSearchParams] = useSearchParams()
   const {
     exercises,
     loading,
@@ -19,8 +21,23 @@ export default function ExercisesPage() {
     isDeleting,
     refetch,
   } = useExercises()
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(() => searchParams.get('new') === 'true')
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
+
+  useEffect(() => {
+    if (searchParams.get('new') === 'true') {
+      setSelectedExercise(null)
+      setDialogOpen(true)
+    }
+  }, [searchParams])
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setDialogOpen(open)
+    if (!open && searchParams.get('new')) {
+      searchParams.delete('new')
+      setSearchParams(searchParams, { replace: true })
+    }
+  }
 
   const handleEdit = (exercise: Exercise) => {
     setSelectedExercise(exercise)
@@ -45,7 +62,7 @@ export default function ExercisesPage() {
       />
       <ExerciseFormDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={handleDialogOpenChange}
         exercise={selectedExercise}
         onSuccess={refetch}
       />

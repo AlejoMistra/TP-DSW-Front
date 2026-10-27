@@ -7,7 +7,15 @@ import type {
 
 export const instructorService = {
   async getAll(): Promise<Instructor[]> {
-    const response = await apiClient.get<Instructor[]>('/api/instructors');
+    const response = await apiClient.get<
+      Instructor[] | { items: Instructor[] }
+    >('/api/instructors');
+    const data = response.data;
+    return Array.isArray(data) ? data : (data as any)?.items || [];
+  },
+
+  async getMe(): Promise<Instructor> {
+    const response = await apiClient.get<Instructor>('/api/instructors/me');
     return response.data;
   },
 
@@ -22,7 +30,10 @@ export const instructorService = {
   },
 
   async update(id: number, data: UpdateInstructorInput): Promise<Instructor> {
-    const response = await apiClient.put<Instructor>(`/api/instructors/${id}`, data);
+    const response = await apiClient.put<Instructor>(
+      `/api/instructors/${id}`,
+      data,
+    );
     return response.data;
   },
 

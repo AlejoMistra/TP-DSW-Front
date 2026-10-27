@@ -29,8 +29,8 @@ export function CreateSessionDialog({
 }: CreateSessionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
-      <DialogContent className="max-w-md p-6 bg-card border border-border/80 rounded-2xl shadow-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-4 sm:p-6 bg-card border border-border/80 rounded-2xl shadow-2xl overflow-hidden">
+        <DialogHeader className="shrink-0 pb-1">
           <div>
             <DialogTitle className="text-lg font-bold text-foreground">
               Agendar clase
@@ -47,7 +47,7 @@ export function CreateSessionDialog({
           schedules={schedules}
           instructors={instructors}
           onClose={onClose}
-          onSubmit={onCreate}
+          onSubmit={(values) => onCreate(values as CreateClassSessionInput)}
         />
       </DialogContent>
     </Dialog>

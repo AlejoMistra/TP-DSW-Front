@@ -1,7 +1,4 @@
-import { Menu } from "lucide-react"
 import { NavLink } from "react-router-dom"
-
-import { SidebarTrigger } from "@/shared/components/ui/sidebar"
 import type { SidebarLink } from "@/config/navigation"
 import { cn } from "@/shared/utils/utils"
 
@@ -13,7 +10,7 @@ type RoleBottomNavProps = {
 }
 
 export default function RoleBottomNav({ links }: RoleBottomNavProps) {
-  const totalItems = links.length + 1
+  const totalItems = links.length
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-50 border-t bg-background/70 backdrop-blur-lg md:hidden">
@@ -21,14 +18,6 @@ export default function RoleBottomNav({ links }: RoleBottomNavProps) {
         className="mx-auto grid h-16 max-w-7xl items-stretch pb-[env(safe-area-inset-bottom)]"
         style={{ gridTemplateColumns: `repeat(${totalItems}, minmax(0, 1fr))` }}
       >
-        <SidebarTrigger
-          size="default"
-          className={cn(navItemBaseClass, "h-full w-full rounded-none border-none")}
-        >
-          <Menu className="h-5 w-5" />
-          <span>Menu</span>
-        </SidebarTrigger>
-
         {links.map((link) => {
           const Icon = link.icon
 
@@ -36,13 +25,15 @@ export default function RoleBottomNav({ links }: RoleBottomNavProps) {
             <NavLink
               key={link.to}
               to={link.to}
-              end={link.to.endsWith("/")}
               className={({ isActive }) =>
                 cn(navItemBaseClass, isActive && "text-primary font-bold")
               }
             >
-              {Icon ? <Icon className="h-5 w-5" /> : null}
-              <span>{link.label}</span>
+              {Icon ? <Icon className="h-5 w-5 shrink-0" /> : null}
+              <span
+                className="truncate max-w-full px-0.5 text-center text-[9px] sm:text-[10px] leading-tight">
+                {link.label}
+              </span>
             </NavLink>
           )
         })}

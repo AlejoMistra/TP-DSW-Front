@@ -1,4 +1,8 @@
-import type { ClassSession, UpdateClassSessionInput } from '../models/ClassSession'
+import type {
+  ClassSession,
+  UpdateClassSessionInput,
+  RecurrenceScope,
+} from '../models/ClassSession'
 import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule'
 import type { Instructor } from '@/features/instructors/models/Instructor'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/components/ui/popover'
@@ -19,9 +23,9 @@ interface SessionEditPopoverProps {
   onSelect: () => void
   onClose: () => void
   onSave: (payload: UpdateClassSessionInput) => Promise<any>
-  onCancelSession: () => Promise<void>
-  onRestoreSession: () => Promise<void>
-  onDeleteSession: () => Promise<void>
+  onCancelSession: (scope?: RecurrenceScope) => Promise<void>
+  onRestoreSession: (scope?: RecurrenceScope) => Promise<void>
+  onDeleteSession: (scope?: RecurrenceScope) => Promise<void>
 }
 
 export function SessionEditPopover({
@@ -40,10 +44,10 @@ export function SessionEditPopover({
 
   const handleFormSubmit = async (values: SessionFormValues) => {
     await onSave({
-      classScheduleId: values.classScheduleId,
       instructorId: values.instructorId,
-      date: values.date,
+      ...(values.date ? { date: values.date } : {}),
       startTime: values.startTime,
+      scope: values.scope,
     })
   }
 
@@ -58,7 +62,7 @@ export function SessionEditPopover({
         />
 
         <Dialog open={isEditing} onOpenChange={(open) => !open && onClose()}>
-          <DialogContent className="max-w-md p-5 bg-card border border-border">
+          <DialogContent className="max-w-md max-h-[90vh] flex flex-col p-4 sm:p-5 bg-card border border-border overflow-hidden">
             <DialogTitle className="sr-only">
               Editar Sesión: {session.classSchedule?.name ?? 'Clase'}
             </DialogTitle>
@@ -96,7 +100,7 @@ export function SessionEditPopover({
         side="right"
         align="start"
         sideOffset={8}
-        className="w-96 rounded-2xl border border-border/80 bg-card/98 p-4 shadow-2xl backdrop-blur-md"
+        className="w-96 max-h-[85vh] overflow-y-auto rounded-2xl border border-border/80 bg-card/98 p-4 shadow-2xl backdrop-blur-md"
       >
         <SessionForm
           mode="edit"

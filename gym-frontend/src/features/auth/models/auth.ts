@@ -6,6 +6,8 @@ export interface AuthUser {
   id: number;
   email: string;
   role: AppRole;
+  memberId: number | null;
+  instructorId: number | null;
 }
 
 export interface LoginCredentials {
@@ -19,6 +21,8 @@ export interface LoginResponse {
     id: number;
     email: string;
     role: BackendRole | AppRole;
+    memberId: number | null;
+    instructorId: number | null;
   };
 }
 
@@ -44,13 +48,12 @@ export function mapBackendRoleToAppRole(role: string): AppRole {
 export function getDefaultPathForRole(role: AppRole): string {
   switch (role) {
     case 'admin':
-      return '/administrativo/socios';
+      return '/administrativo/menu';
     case 'instructor':
-      return '/instructor/rutinas';
+      return '/instructor/inicio';
     case 'member':
-      return '/socio/rutinas';
+      return '/socio/inicio';
     default:
       return '/';
   }
 }
-

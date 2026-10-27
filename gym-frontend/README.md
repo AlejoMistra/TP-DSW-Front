@@ -21,3 +21,12 @@ pnpm build  # build de producción
 pnpm preview
 pnpm lint
 ```
+
+## Despliegue en Vercel
+
+1. **Root Directory**: `gym-frontend`
+2. **Framework Preset**: `Vite`
+3. **Environment Variables**:
+   - `VITE_API_BASE_URL`: URL base del backend en producción.
+4. Las rutas y recargas de `react-router-dom` están gestionadas por `vercel.json` mediante reescritura a `/index.html`.
+

@@ -338,7 +338,7 @@ export default function MembersDataTable({
       if (Object.keys(prev).length > 0) {
         return prev
       }
-      return isMobile ? { nextExpiration: false } : {}
+      return isMobile ? { nextExpiration: false, docNumber:false} : {}
     })
   }, [isMobile])
 

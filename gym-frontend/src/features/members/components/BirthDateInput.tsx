@@ -42,6 +42,7 @@ export interface BirthDateInputProps {
   onChange: (date?: Date) => void
   onBlur?: () => void
   error?: boolean
+  disabled?: boolean
 }
 
 export function BirthDateInput({
@@ -50,6 +51,7 @@ export function BirthDateInput({
   onChange,
   onBlur,
   error,
+  disabled = false,
 }: BirthDateInputProps) {
   const [open, setOpen] = useState(false)
   const [inputValue, setInputValue] = useState<string>(() => formatDateString(value))
@@ -145,6 +147,7 @@ export function BirthDateInput({
             maxLength={10}
             className="pr-10"
             aria-invalid={error}
+            disabled={disabled}
           />
           <PopoverTrigger asChild>
             <Button
@@ -153,6 +156,7 @@ export function BirthDateInput({
               size="icon"
               className="absolute right-1 size-8 text-muted-foreground hover:text-foreground cursor-pointer"
               aria-label="Abrir calendario"
+              disabled={disabled}
             >
               <CalendarIcon className="size-4" />
             </Button>
