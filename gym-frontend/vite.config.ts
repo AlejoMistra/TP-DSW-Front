@@ -13,8 +13,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'https://back-tp-dsw-whzb.onrender.com',
         changeOrigin: true,
+        secure: false,
+        headers: {
+          Origin: 'https://tp-dsw-front.vercel.app',
+        },
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader('origin', 'https://tp-dsw-front.vercel.app');
+          });
+        },
       },
     },
   },
