@@ -29,6 +29,17 @@ export const instructorService = {
     return response.data;
   },
 
+  async reactivate(
+    id: number,
+    data: CreateInstructorInput,
+  ): Promise<Instructor> {
+    const response = await apiClient.patch<Instructor>(
+      `/api/instructors/${id}/reactivate`,
+      data,
+    );
+    return response.data;
+  },
+
   async update(id: number, data: UpdateInstructorInput): Promise<Instructor> {
     const response = await apiClient.put<Instructor>(
       `/api/instructors/${id}`,

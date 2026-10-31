@@ -7,6 +7,7 @@ import PlanSelector from '@/features/membershipPlans/components/PlanSelector'
 import PaymentMethodSelector from '@/features/payments/components/PaymentForm'
 import { useNewMember } from '@/features/members/hooks/useNewMember'
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
+import { ConfirmReactivateDialog } from '@/shared/components/ConfirmReactivateDialog'
 
 export default function NewMemberPage() {
   usePageTitle("Alta de Socio")
@@ -24,6 +25,10 @@ export default function NewMemberPage() {
     activationDate,
     expirationDate,
     handleSubmit,
+    reactivateDialog,
+    isReactivating,
+    confirmReactivate,
+    closeReactivateDialog,
   } = useNewMember()
 
   if (loading) {
@@ -41,6 +46,11 @@ export default function NewMemberPage() {
       </div>
     )
   }
+
+  const dialogDescription =
+    reactivateDialog.data?.reason === 'STATUS_INACTIVE'
+      ? `El documento pertenece al socio inactivo ${reactivateDialog.data.name} ${reactivateDialog.data.surname} (sin membresía vigente).\n\n¿Deseas activarlo con el nuevo plan y pago ingresados? Conservará su usuario y contraseña actuales.`
+      : `El documento pertenece a la cuenta de ${reactivateDialog.data?.name} ${reactivateDialog.data?.surname}, que fue dada de baja.\n\n¿Deseas reactivar la cuenta? El socio deberá volver a definir su contraseña al iniciar sesión.`
 
   return (
     <div className="space-y-4">
@@ -107,6 +117,24 @@ export default function NewMemberPage() {
           Confirmar Alta
         </Button>
       </section>
+
+      <ConfirmReactivateDialog
+        open={reactivateDialog.open}
+        title={
+          reactivateDialog.data?.reason === 'STATUS_INACTIVE'
+            ? 'Activar Socio Inactivo'
+            : 'Reactivar Socio Dado de Baja'
+        }
+        description={dialogDescription}
+        confirmText={
+          reactivateDialog.data?.reason === 'STATUS_INACTIVE'
+            ? 'Activar Socio'
+            : 'Reactivar Cuenta'
+        }
+        isLoading={isReactivating}
+        onClose={closeReactivateDialog}
+        onConfirm={confirmReactivate}
+      />
     </div>
   )
 }

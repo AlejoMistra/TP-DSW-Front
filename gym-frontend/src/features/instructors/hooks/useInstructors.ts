@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import axios from 'axios';
 import { instructorService } from '@/features/instructors/api/instructorService';
 import type {
   CreateInstructorInput,
   Instructor,
 } from '@/features/instructors/models/Instructor';
+
+interface InactiveInstructorConflict {
+  instructorId: number;
+  name: string;
+  surname: string;
+}
 
 export function useInstructors() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -14,7 +21,7 @@ export function useInstructors() {
     null,
   );
 
-  // Estado para el modal de confirmación individual
+  // Estado para el modal de confirmación individual de eliminación
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
     instructor: Instructor | null;
@@ -23,6 +30,18 @@ export function useInstructors() {
     instructor: null,
   });
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Estado para el modal de reactivación de instructor dado de baja
+  const [reactivateDialog, setReactivateDialog] = useState<{
+    open: boolean;
+    data: InactiveInstructorConflict | null;
+    pendingInput: CreateInstructorInput | null;
+  }>({
+    open: false,
+    data: null,
+    pendingInput: null,
+  });
+  const [isReactivating, setIsReactivating] = useState(false);
 
   useEffect(() => {
     async function loadInstructors() {
@@ -111,6 +130,21 @@ export function useInstructors() {
       setDialogOpen(false);
       setInstructorToEdit(null);
     } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.data?.code === 'INACTIVE_INSTRUCTOR_EXISTS'
+      ) {
+        const details = error.response.data
+          .details as InactiveInstructorConflict;
+        setDialogOpen(false);
+        setReactivateDialog({
+          open: true,
+          data: details,
+          pendingInput: data,
+        });
+        return;
+      }
+
       toast.error(
         error instanceof Error
           ? error.message
@@ -119,6 +153,34 @@ export function useInstructors() {
 
       throw error;
     }
+  }
+
+  async function confirmReactivate() {
+    if (!reactivateDialog.data || !reactivateDialog.pendingInput) return;
+
+    try {
+      setIsReactivating(true);
+      const reactivated = await instructorService.reactivate(
+        reactivateDialog.data.instructorId,
+        reactivateDialog.pendingInput,
+      );
+
+      setInstructors((previous) => [...previous, reactivated]);
+      toast.success('Instructor reactivado correctamente');
+      setReactivateDialog({ open: false, data: null, pendingInput: null });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Error al reactivar el instructor',
+      );
+    } finally {
+      setIsReactivating(false);
+    }
+  }
+
+  function closeReactivateDialog() {
+    setReactivateDialog({ open: false, data: null, pendingInput: null });
   }
 
   return {
@@ -135,5 +197,9 @@ export function useInstructors() {
     setDeleteConfirm,
     confirmDelete,
     isDeleting,
+    reactivateDialog,
+    isReactivating,
+    confirmReactivate,
+    closeReactivateDialog,
   };
 }

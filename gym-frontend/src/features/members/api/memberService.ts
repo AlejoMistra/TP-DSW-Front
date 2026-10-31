@@ -89,6 +89,14 @@ export const memberService = {
     return response.data;
   },
 
+  async reactivate(id: number, data: CreateMemberInput): Promise<Member> {
+    const response = await apiClient.patch<Member>(
+      `/api/members/${id}/reactivate`,
+      data,
+    );
+    return response.data;
+  },
+
   async update(id: number, data: UpdateMemberInput): Promise<Member> {
     const response = await apiClient.patch<Member>(`/api/members/${id}`, data);
     return response.data;
