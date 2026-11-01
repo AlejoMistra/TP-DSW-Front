@@ -180,7 +180,7 @@ export function useInstructors() {
   }
 
   function closeReactivateDialog() {
-    setReactivateDialog({ open: false, data: null, pendingInput: null });
+    setReactivateDialog((prev) => ({ ...prev, open: false }));
   }
 
   return {

@@ -66,7 +66,11 @@ export default function InstructorsPage() {
       <ConfirmReactivateDialog
         open={reactivateDialog.open}
         title="Reactivar Profesor Dado de Baja"
-        description={`El documento pertenece a la cuenta de ${reactivateDialog.data?.name} ${reactivateDialog.data?.surname}, quien fue dado de baja.\n\n¿Deseas reactivar la cuenta? El profesor deberá volver a definir su contraseña al iniciar sesión.`}
+        description={
+          reactivateDialog.data
+            ? `El documento pertenece a la cuenta de ${reactivateDialog.data.name} ${reactivateDialog.data.surname}, quien fue dado de baja.\n\n¿Deseas reactivar la cuenta? El profesor deberá volver a definir su contraseña al iniciar sesión.`
+            : ''
+        }
         confirmText="Reactivar Profesor"
         isLoading={isReactivating}
         onClose={closeReactivateDialog}

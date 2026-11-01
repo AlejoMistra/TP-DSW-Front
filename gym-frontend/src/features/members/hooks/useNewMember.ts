@@ -143,18 +143,24 @@ export function useNewMember() {
   };
 
   const confirmReactivate = async () => {
-    if (!reactivateDialog.data || !reactivateDialog.pendingInput) return;
+    if (!reactivateDialog.data) return;
+
+    // Si es inactivo sin baja, redirigir directo a su perfil
+    if (reactivateDialog.data.reason === 'STATUS_INACTIVE') {
+      navigate(`/administrativo/socios/${reactivateDialog.data.memberId}`);
+      setReactivateDialog((prev) => ({ ...prev, open: false }));
+      return;
+    }
+
+    // Si fue dado de baja, ejecutar reactivación con los datos cargados
+    if (!reactivateDialog.pendingInput) return;
     try {
       setIsReactivating(true);
       await memberService.reactivate(
         reactivateDialog.data.memberId,
         reactivateDialog.pendingInput,
       );
-      toast.success(
-        reactivateDialog.data.reason === 'STATUS_INACTIVE'
-          ? 'Socio activado correctamente'
-          : 'Socio reactivado correctamente',
-      );
+      toast.success('Socio reactivado correctamente');
       navigate('/administrativo/socios');
     } catch (err) {
       const errorMessage =
@@ -162,12 +168,12 @@ export function useNewMember() {
       toast.error(errorMessage);
     } finally {
       setIsReactivating(false);
-      setReactivateDialog({ open: false, data: null, pendingInput: null });
+      setReactivateDialog((prev) => ({ ...prev, open: false }));
     }
   };
 
   const closeReactivateDialog = () => {
-    setReactivateDialog({ open: false, data: null, pendingInput: null });
+    setReactivateDialog((prev) => ({ ...prev, open: false }));
   };
 
   return {

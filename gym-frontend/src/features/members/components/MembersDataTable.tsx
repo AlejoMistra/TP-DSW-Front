@@ -261,15 +261,20 @@ export default function MembersDataTable({
         return true
       },
       cell: ({ row }) => {
-        const status = row.original.membershipStatus ?? row.original.status
+        const memberStatus = row.original.status
+        const membershipStatus = row.original.membershipStatus ?? memberStatus
 
-        if (status === "ACTIVE") {
-          return <Badge variant="default" className="text-sm">Activo</Badge>
+        if (
+          memberStatus === "INACTIVE" ||
+          membershipStatus === "INACTIVE" ||
+          membershipStatus === "CANCELLED"
+        ) {
+          return <Badge variant="destructive" className="text-sm">Inactivo</Badge>
         }
-        if (status === "EXPIRED") {
+        if (membershipStatus === "EXPIRED") {
           return <Badge variant="outline" className="text-sm">Vencido</Badge>
         }
-        return <Badge variant="destructive" className="text-sm">Inactivo</Badge>
+        return <Badge variant="default" className="text-sm">Activo</Badge>
       },
 
     },

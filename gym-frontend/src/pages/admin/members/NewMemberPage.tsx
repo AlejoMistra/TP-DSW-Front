@@ -47,10 +47,11 @@ export default function NewMemberPage() {
     )
   }
 
-  const dialogDescription =
-    reactivateDialog.data?.reason === 'STATUS_INACTIVE'
-      ? `El documento pertenece al socio inactivo ${reactivateDialog.data.name} ${reactivateDialog.data.surname} (sin membresía vigente).\n\n¿Deseas activarlo con el nuevo plan y pago ingresados? Conservará su usuario y contraseña actuales.`
-      : `El documento pertenece a la cuenta de ${reactivateDialog.data?.name} ${reactivateDialog.data?.surname}, que fue dada de baja.\n\n¿Deseas reactivar la cuenta? El socio deberá volver a definir su contraseña al iniciar sesión.`
+  const dialogDescription = reactivateDialog.data
+    ? reactivateDialog.data.reason === 'STATUS_INACTIVE'
+      ? `El documento pertenece al socio inactivo ${reactivateDialog.data.name} ${reactivateDialog.data.surname}.\n\n¿Deseas ir a su perfil para ver sus datos y gestionar su membresía?`
+      : `El documento pertenece a la cuenta de ${reactivateDialog.data.name} ${reactivateDialog.data.surname}, que fue dada de baja.\n\n¿Deseas reactivar la cuenta? El socio deberá volver a definir su contraseña al iniciar sesión.`
+    : ''
 
   return (
     <div className="space-y-4">
@@ -122,13 +123,13 @@ export default function NewMemberPage() {
         open={reactivateDialog.open}
         title={
           reactivateDialog.data?.reason === 'STATUS_INACTIVE'
-            ? 'Activar Socio Inactivo'
+            ? 'Socio Inactivo Encontrado'
             : 'Reactivar Socio Dado de Baja'
         }
         description={dialogDescription}
         confirmText={
           reactivateDialog.data?.reason === 'STATUS_INACTIVE'
-            ? 'Activar Socio'
+            ? 'Ir al Perfil'
             : 'Reactivar Cuenta'
         }
         isLoading={isReactivating}
