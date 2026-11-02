@@ -249,7 +249,9 @@ export default function MembersDataTable({
           return currentMembershipStatus === "ACTIVE" && memberStatus === "ACTIVE"
         }
         if (value === "EXPIRED") {
-          return currentMembershipStatus === "EXPIRED"
+          return (
+            memberStatus === "ACTIVE" && currentMembershipStatus === "EXPIRED"
+          )
         }
         if (value === "INACTIVE") {
           return (

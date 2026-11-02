@@ -11,7 +11,7 @@ export const instructorService = {
       Instructor[] | { items: Instructor[] }
     >('/api/instructors');
     const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+    return Array.isArray(data) ? data : (data as { items?: Instructor[] })?.items || [];
   },
 
   async getMe(): Promise<Instructor> {

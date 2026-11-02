@@ -161,6 +161,7 @@ export function useNewMember() {
         reactivateDialog.pendingInput,
       );
       toast.success('Socio reactivado correctamente');
+      setReactivateDialog((prev) => ({ ...prev, open: false }));
       navigate('/administrativo/socios');
     } catch (err) {
       const errorMessage =
@@ -168,7 +169,6 @@ export function useNewMember() {
       toast.error(errorMessage);
     } finally {
       setIsReactivating(false);
-      setReactivateDialog((prev) => ({ ...prev, open: false }));
     }
   };
 

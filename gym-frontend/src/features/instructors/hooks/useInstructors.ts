@@ -20,6 +20,7 @@ export function useInstructors() {
   const [instructorToEdit, setInstructorToEdit] = useState<Instructor | null>(
     null,
   );
+  const [draft, setDraft] = useState<CreateInstructorInput | null>(null);
 
   // Estado para el modal de confirmación individual de eliminación
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -65,11 +66,13 @@ export function useInstructors() {
 
   function handleNew() {
     setInstructorToEdit(null);
+    setDraft(null);
     setDialogOpen(true);
   }
 
   function handleEdit(instructor: Instructor) {
     setInstructorToEdit(instructor);
+    setDraft(null);
     setDialogOpen(true);
   }
 
@@ -127,6 +130,7 @@ export function useInstructors() {
         toast.success('Instructor creado correctamente');
       }
 
+      setDraft(null);
       setDialogOpen(false);
       setInstructorToEdit(null);
     } catch (error) {
@@ -136,6 +140,7 @@ export function useInstructors() {
       ) {
         const details = error.response.data
           .details as InactiveInstructorConflict;
+        setDraft(data);
         setDialogOpen(false);
         setReactivateDialog({
           open: true,
@@ -167,6 +172,7 @@ export function useInstructors() {
 
       setInstructors((previous) => [...previous, reactivated]);
       toast.success('Instructor reactivado correctamente');
+      setDraft(null);
       setReactivateDialog({ open: false, data: null, pendingInput: null });
     } catch (error) {
       toast.error(
@@ -181,6 +187,9 @@ export function useInstructors() {
 
   function closeReactivateDialog() {
     setReactivateDialog((prev) => ({ ...prev, open: false }));
+    if (draft) {
+      setDialogOpen(true);
+    }
   }
 
   return {
@@ -189,6 +198,7 @@ export function useInstructors() {
     dialogOpen,
     setDialogOpen,
     instructorToEdit,
+    draft,
     handleNew,
     handleEdit,
     handleDelete,

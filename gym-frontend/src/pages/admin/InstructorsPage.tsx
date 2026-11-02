@@ -13,6 +13,7 @@ export default function InstructorsPage() {
     dialogOpen,
     setDialogOpen,
     instructorToEdit,
+    draft,
     handleNew,
     handleEdit,
     handleDelete,
@@ -49,6 +50,7 @@ export default function InstructorsPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         instructorToEdit={instructorToEdit}
+        draft={draft}
         onSave={handleSave}
       />
 
