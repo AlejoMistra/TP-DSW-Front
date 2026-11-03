@@ -127,7 +127,9 @@ export function useInstructors() {
 
         setInstructors((previous) => [...previous, newInstructor]);
 
-        toast.success('Instructor creado correctamente');
+        toast.success(
+          'Instructor creado correctamente. La contraseña temporal de acceso es instructor123',
+        );
       }
 
       setDraft(null);

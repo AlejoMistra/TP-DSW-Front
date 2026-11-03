@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: response.user.id,
         email: response.user.email,
         role: mapBackendRoleToAppRole(response.user.role),
+        accountStatus: response.user.accountStatus,
         memberId: response.user.memberId ?? null,
         instructorId: response.user.instructorId ?? null,
       };
@@ -56,6 +57,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(authUser);
 
       return authUser;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const activateAccount = useCallback(async (newPassword: string) => {
+    setIsLoading(true);
+    try {
+      await authService.activateAccount({ newPassword });
+
+      setUser((prev) => {
+        if (!prev) return null;
+        const updated: AuthUser = { ...prev, accountStatus: 'ACTIVE' };
+        localStorage.setItem(USER_KEY, JSON.stringify(updated));
+        return updated;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     logout,
+    activateAccount
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

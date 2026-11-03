@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { Button } from '@/shared/components/ui/button';
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
 import { useAuth } from '../hooks/useAuth';
 import { getDefaultPathForRole } from '../models/auth';
@@ -40,18 +40,14 @@ export default function LoginForm() {
 
     try {
       const authUser = await login({ email: data.email, password: data.password });
-      navigate(getDefaultPathForRole(authUser.role), { replace: true });
+      if (authUser.accountStatus === 'PENDING_ACTIVATION') {
+        navigate('/activar-cuenta', { replace: true });
+      } else {
+        navigate(getDefaultPathForRole(authUser.role), { replace: true });
+      }
     } catch (err) {
       if (axios.isAxiosError(err)) {
-        if (
-          err.response?.status === 403 &&
-          err.message.toLowerCase().includes('activar')
-        ) {
-          setIsPendingActivation(true);
-          setErrorMessage(err.message);
-        } else {
-          setErrorMessage(err.message || 'Error al iniciar sesión');
-        }
+        setErrorMessage(err.message || 'Error al iniciar sesión');
       } else if (err instanceof Error) {
         setErrorMessage(err.message);
       } else {
@@ -129,18 +125,6 @@ export default function LoginForm() {
               'Ingresar'
             )}
           </Button>
-        </Field>
-
-        <Field>
-          <FieldDescription className="text-center pt-2">
-            ¿Te dieron de alta y necesitas activar tu cuenta?{' '}
-            <Link
-              to="/activar-cuenta"
-              className="font-medium text-primary underline underline-offset-4 hover:opacity-80"
-            >
-              Activala acá
-            </Link>
-          </FieldDescription>
         </Field>
       </FieldGroup>
     </form>

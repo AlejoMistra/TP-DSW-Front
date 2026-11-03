@@ -120,7 +120,9 @@ export function useNewMember() {
 
     try {
       await memberService.create(dataWithPlan);
-      toast.success('Socio creado correctamente');
+      toast.success(
+        'Socio creado correctamente. La contraseña temporal de acceso es member123',
+      );
       navigate('/administrativo/socios');
     } catch (err) {
       if (
