@@ -11,7 +11,7 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<AuthUser>;
   logout: () => void;
-  activateAccount: (newPassword: string) => void;
+  activateAccount: (newPassword: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(

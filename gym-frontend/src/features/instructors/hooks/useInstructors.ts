@@ -152,13 +152,14 @@ export function useInstructors() {
         return;
       }
 
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : 'Error al guardar el instructor',
-      );
+      const errorMessage =
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || 'Error al guardar el instructor'
+          : error instanceof Error
+            ? error.message
+            : 'Error al guardar el instructor';
 
-      throw error;
+      toast.error(errorMessage);
     }
   }
 
@@ -173,7 +174,7 @@ export function useInstructors() {
       );
 
       setInstructors((previous) => [...previous, reactivated]);
-      toast.success('Instructor reactivado correctamente');
+      toast.success('Instructor reactivado correctamente. La contraseña temporal de acceso es instructor123');
       setDraft(null);
       setReactivateDialog({ open: false, data: null, pendingInput: null });
     } catch (error) {

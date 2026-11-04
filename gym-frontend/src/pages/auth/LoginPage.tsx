@@ -8,6 +8,9 @@ export default function LoginPage() {
   const { isAuthenticated, user, isLoading } = useAuth();
 
   if (!isLoading && isAuthenticated && user) {
+    if (user.accountStatus === 'PENDING_ACTIVATION') {
+      return <Navigate to="/activar-cuenta" replace />;
+    }
     return <Navigate to={getDefaultPathForRole(user.role)} replace />;
   }
 

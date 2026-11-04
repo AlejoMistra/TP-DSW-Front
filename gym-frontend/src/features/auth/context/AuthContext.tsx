@@ -65,14 +65,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const activateAccount = useCallback(async (newPassword: string) => {
     setIsLoading(true);
     try {
-      await authService.activateAccount({ newPassword });
+      const response = await authService.activateAccount({ newPassword });
 
-      setUser((prev) => {
-        if (!prev) return null;
-        const updated: AuthUser = { ...prev, accountStatus: 'ACTIVE' };
-        localStorage.setItem(USER_KEY, JSON.stringify(updated));
-        return updated;
-      });
+      const updatedUser: AuthUser = {
+        id: response.user.id,
+        email: response.user.email,
+        role: mapBackendRoleToAppRole(response.user.role),
+        accountStatus: 'ACTIVE',
+        memberId: response.user.memberId ?? null,
+        instructorId: response.user.instructorId ?? null,
+      };
+
+      localStorage.setItem(TOKEN_KEY, response.token);
+      localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+
+      setToken(response.token);
+      setUser(updatedUser);
     } finally {
       setIsLoading(false);
     }

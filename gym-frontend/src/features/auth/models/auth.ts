@@ -32,6 +32,8 @@ export interface ActivateAccountInput {
   newPassword: string;
 }
 export interface ActivateAccountResponse {
+  token: string;
+  user: LoginResponse['user'];
   message: string;
 }
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,7 +45,11 @@ export default function ActivateAccountForm() {
         navigate('/', { replace: true });
       }
     } catch (err) {
-      if (err instanceof Error) {
+      if (axios.isAxiosError(err)) {
+        setErrorMessage(
+          err.response?.data?.message || 'Error al activar la cuenta',
+        );
+      } else if (err instanceof Error) {
         setErrorMessage(err.message);
       } else {
         setErrorMessage('Ocurrió un error al activar la cuenta');
