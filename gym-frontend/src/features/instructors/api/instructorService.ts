@@ -11,7 +11,7 @@ export const instructorService = {
       Instructor[] | { items: Instructor[] }
     >('/api/instructors');
     const data = response.data;
-    return Array.isArray(data) ? data : (data as any)?.items || [];
+    return Array.isArray(data) ? data : (data as { items?: Instructor[] })?.items || [];
   },
 
   async getMe(): Promise<Instructor> {
@@ -26,6 +26,17 @@ export const instructorService = {
 
   async create(data: CreateInstructorInput): Promise<Instructor> {
     const response = await apiClient.post<Instructor>('/api/instructors', data);
+    return response.data;
+  },
+
+  async reactivate(
+    id: number,
+    data: CreateInstructorInput,
+  ): Promise<Instructor> {
+    const response = await apiClient.patch<Instructor>(
+      `/api/instructors/${id}/reactivate`,
+      data,
+    );
     return response.data;
   },
 

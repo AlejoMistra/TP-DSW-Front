@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import axios from 'axios';
 import { instructorService } from '@/features/instructors/api/instructorService';
 import type {
   CreateInstructorInput,
   Instructor,
 } from '@/features/instructors/models/Instructor';
+
+interface InactiveInstructorConflict {
+  instructorId: number;
+  name: string;
+  surname: string;
+}
 
 export function useInstructors() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
@@ -13,8 +20,9 @@ export function useInstructors() {
   const [instructorToEdit, setInstructorToEdit] = useState<Instructor | null>(
     null,
   );
+  const [draft, setDraft] = useState<CreateInstructorInput | null>(null);
 
-  // Estado para el modal de confirmación individual
+  // Estado para el modal de confirmación individual de eliminación
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
     instructor: Instructor | null;
@@ -23,6 +31,18 @@ export function useInstructors() {
     instructor: null,
   });
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Estado para el modal de reactivación de instructor dado de baja
+  const [reactivateDialog, setReactivateDialog] = useState<{
+    open: boolean;
+    data: InactiveInstructorConflict | null;
+    pendingInput: CreateInstructorInput | null;
+  }>({
+    open: false,
+    data: null,
+    pendingInput: null,
+  });
+  const [isReactivating, setIsReactivating] = useState(false);
 
   useEffect(() => {
     async function loadInstructors() {
@@ -46,11 +66,13 @@ export function useInstructors() {
 
   function handleNew() {
     setInstructorToEdit(null);
+    setDraft(null);
     setDialogOpen(true);
   }
 
   function handleEdit(instructor: Instructor) {
     setInstructorToEdit(instructor);
+    setDraft(null);
     setDialogOpen(true);
   }
 
@@ -108,9 +130,26 @@ export function useInstructors() {
         toast.success('Instructor creado correctamente');
       }
 
+      setDraft(null);
       setDialogOpen(false);
       setInstructorToEdit(null);
     } catch (error) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response?.data?.code === 'INACTIVE_INSTRUCTOR_EXISTS'
+      ) {
+        const details = error.response.data
+          .details as InactiveInstructorConflict;
+        setDraft(data);
+        setDialogOpen(false);
+        setReactivateDialog({
+          open: true,
+          data: details,
+          pendingInput: data,
+        });
+        return;
+      }
+
       toast.error(
         error instanceof Error
           ? error.message
@@ -121,12 +160,45 @@ export function useInstructors() {
     }
   }
 
+  async function confirmReactivate() {
+    if (!reactivateDialog.data || !reactivateDialog.pendingInput) return;
+
+    try {
+      setIsReactivating(true);
+      const reactivated = await instructorService.reactivate(
+        reactivateDialog.data.instructorId,
+        reactivateDialog.pendingInput,
+      );
+
+      setInstructors((previous) => [...previous, reactivated]);
+      toast.success('Instructor reactivado correctamente');
+      setDraft(null);
+      setReactivateDialog({ open: false, data: null, pendingInput: null });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Error al reactivar el instructor',
+      );
+    } finally {
+      setIsReactivating(false);
+    }
+  }
+
+  function closeReactivateDialog() {
+    setReactivateDialog((prev) => ({ ...prev, open: false }));
+    if (draft) {
+      setDialogOpen(true);
+    }
+  }
+
   return {
     instructors,
     loading,
     dialogOpen,
     setDialogOpen,
     instructorToEdit,
+    draft,
     handleNew,
     handleEdit,
     handleDelete,
@@ -135,5 +207,9 @@ export function useInstructors() {
     setDeleteConfirm,
     confirmDelete,
     isDeleting,
+    reactivateDialog,
+    isReactivating,
+    confirmReactivate,
+    closeReactivateDialog,
   };
 }

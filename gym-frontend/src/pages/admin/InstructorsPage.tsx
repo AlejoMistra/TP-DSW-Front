@@ -1,6 +1,7 @@
 import InstructorsDataTable from '@/features/instructors/components/InstructorsDataTable'
 import InstructorFormDialog from '@/features/instructors/components/InstructorFormDialog'
 import ConfirmDeleteDialog from '@/shared/components/ConfirmDeleteDialog'
+import { ConfirmReactivateDialog } from '@/shared/components/ConfirmReactivateDialog'
 import { useInstructors } from '@/features/instructors/hooks/useInstructors'
 import { usePageTitle } from '@/shared/context/PageHeaderContext'
 
@@ -12,6 +13,7 @@ export default function InstructorsPage() {
     dialogOpen,
     setDialogOpen,
     instructorToEdit,
+    draft,
     handleNew,
     handleEdit,
     handleDelete,
@@ -20,6 +22,10 @@ export default function InstructorsPage() {
     setDeleteConfirm,
     confirmDelete,
     isDeleting,
+    reactivateDialog,
+    isReactivating,
+    confirmReactivate,
+    closeReactivateDialog,
   } = useInstructors()
 
   const instructorName = deleteConfirm.instructor
@@ -44,6 +50,7 @@ export default function InstructorsPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         instructorToEdit={instructorToEdit}
+        draft={draft}
         onSave={handleSave}
       />
 
@@ -55,6 +62,21 @@ export default function InstructorsPage() {
         isLoading={isDeleting}
         onClose={() => setDeleteConfirm({ open: false, instructor: null })}
         onConfirm={confirmDelete}
+      />
+
+      {/* Modal de reactivación de instructor dado de baja */}
+      <ConfirmReactivateDialog
+        open={reactivateDialog.open}
+        title="Reactivar Profesor Dado de Baja"
+        description={
+          reactivateDialog.data
+            ? `El documento pertenece a la cuenta de ${reactivateDialog.data.name} ${reactivateDialog.data.surname}, quien fue dado de baja.\n\n¿Deseas reactivar la cuenta? El profesor deberá volver a definir su contraseña al iniciar sesión.`
+            : ''
+        }
+        confirmText="Reactivar Profesor"
+        isLoading={isReactivating}
+        onClose={closeReactivateDialog}
+        onConfirm={confirmReactivate}
       />
     </div>
   )

@@ -33,6 +33,7 @@ type InstructorFormDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   instructorToEdit: Instructor | null
+  draft?: CreateInstructorInput | null
   onSave: (data: CreateInstructorInput, id?: number) => Promise<void>
 }
 
@@ -40,6 +41,7 @@ export default function InstructorFormDialog({
   open,
   onOpenChange,
   instructorToEdit,
+  draft,
   onSave,
 }: InstructorFormDialogProps) {
   const isEditing = instructorToEdit !== null
@@ -74,6 +76,15 @@ export default function InstructorFormDialog({
           docType: instructorToEdit.docType ?? 'DNI',
           docNumber: instructorToEdit.docNumber ?? '',
         })
+      } else if (draft) {
+        reset({
+          name: draft.name,
+          surname: draft.surname,
+          email: draft.email,
+          phone: draft.phone ?? '',
+          docType: draft.docType ?? 'DNI',
+          docNumber: draft.docNumber ?? '',
+        })
       } else {
         reset({
           name: '',
@@ -85,7 +96,7 @@ export default function InstructorFormDialog({
         })
       }
     }
-  }, [open, instructorToEdit, reset])
+  }, [open, instructorToEdit, draft, reset])
 
   async function onSubmit(data: InstructorFormValues) {
     const payload: CreateInstructorInput = {
