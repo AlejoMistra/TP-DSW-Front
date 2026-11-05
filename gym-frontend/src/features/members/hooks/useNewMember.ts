@@ -120,7 +120,9 @@ export function useNewMember() {
 
     try {
       await memberService.create(dataWithPlan);
-      toast.success('Socio creado correctamente');
+      toast.success(
+        'Socio creado correctamente. La contraseña temporal de acceso es member123',
+      );
       navigate('/administrativo/socios');
     } catch (err) {
       if (
@@ -137,7 +139,11 @@ export function useNewMember() {
       }
 
       const errorMessage =
-        err instanceof Error ? err.message : 'Error desconocido';
+        axios.isAxiosError(err)
+          ? err.response?.data?.message || 'Error al crear socio'
+          : err instanceof Error
+            ? err.message
+            : 'Error desconocido';
       toast.error(errorMessage);
     }
   };
@@ -160,7 +166,7 @@ export function useNewMember() {
         reactivateDialog.data.memberId,
         reactivateDialog.pendingInput,
       );
-      toast.success('Socio reactivado correctamente');
+      toast.success('Socio reactivado correctamente. La contraseña temporal de acceso es member123');
       setReactivateDialog((prev) => ({ ...prev, open: false }));
       navigate('/administrativo/socios');
     } catch (err) {

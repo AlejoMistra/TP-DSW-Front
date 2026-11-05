@@ -6,6 +6,7 @@ export interface AuthUser {
   id: number;
   email: string;
   role: AppRole;
+  accountStatus?: 'PENDING_ACTIVATION' | 'ACTIVE' | 'SUSPENDED';
   memberId: number | null;
   instructorId: number | null;
 }
@@ -21,20 +22,18 @@ export interface LoginResponse {
     id: number;
     email: string;
     role: BackendRole | AppRole;
+    accountStatus: 'PENDING_ACTIVATION' | 'ACTIVE' | 'SUSPENDED';
     memberId: number | null;
     instructorId: number | null;
   };
 }
 
 export interface ActivateAccountInput {
-  email: string;
-  name: string;
-  surname: string;
-  docNumber: string;
   newPassword: string;
 }
-
 export interface ActivateAccountResponse {
+  token: string;
+  user: LoginResponse['user'];
   message: string;
 }
 

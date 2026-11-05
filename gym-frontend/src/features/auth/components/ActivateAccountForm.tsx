@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/shared/components/ui/field';
 import { Input } from '@/shared/components/ui/input';
-import { authService } from '../api/authService';
+import { useAuth } from '../hooks/useAuth';
+import { getDefaultPathForRole } from '../models/auth';
 import {
   activateAccountSchema,
   type ActivateAccountFormValues,
@@ -14,53 +16,41 @@ import {
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function ActivateAccountForm() {
+  const { user, activateAccount, logout } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const initialEmail = searchParams.get('email') ?? '';
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ActivateAccountFormValues>({
     resolver: zodResolver(activateAccountSchema),
     mode: 'onBlur',
     defaultValues: {
-      email: initialEmail,
-      name: '',
-      surname: '',
-      docNumber: '',
       newPassword: '',
       confirmPassword: '',
     },
   });
 
-  useEffect(() => {
-    if (initialEmail) {
-      setValue('email', initialEmail);
-    }
-  }, [initialEmail, setValue]);
-
   const onSubmit = async (data: ActivateAccountFormValues) => {
     setErrorMessage(null);
 
     try {
-      const response = await authService.activateAccount({
-        email: data.email.trim(),
-        name: data.name.trim(),
-        surname: data.surname.trim(),
-        docNumber: data.docNumber.trim(),
-        newPassword: data.newPassword,
-      });
-
-      toast.success(response.message || 'Cuenta activada exitosamente. Ya puedes iniciar sesión.');
-      navigate('/', { replace: true });
+      await activateAccount(data.newPassword);
+      toast.success('¡Cuenta activada con éxito! Bienvenido al gimnasio.');
+      if (user) {
+        navigate(getDefaultPathForRole(user.role), { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (err) {
-      if (err instanceof Error) {
-        setErrorMessage(err.message || 'No se pudieron verificar los datos');
+      if (axios.isAxiosError(err)) {
+        setErrorMessage(
+          err.response?.data?.message || 'Error al activar la cuenta',
+        );
+      } else if (err instanceof Error) {
+        setErrorMessage(err.message);
       } else {
         setErrorMessage('Ocurrió un error al activar la cuenta');
       }
@@ -77,59 +67,13 @@ export default function ActivateAccountForm() {
       )}
 
       <FieldGroup>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel htmlFor="name">Nombre</FieldLabel>
-            <Input
-              id="name"
-              disabled={isSubmitting}
-              aria-invalid={!!errors.name}
-              {...register('name')}
-            />
-            {errors.name && <FieldError>{errors.name.message}</FieldError>}
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="surname">Apellido</FieldLabel>
-            <Input
-              id="surname"
-              disabled={isSubmitting}
-              aria-invalid={!!errors.surname}
-              {...register('surname')}
-            />
-            {errors.surname && <FieldError>{errors.surname.message}</FieldError>}
-          </Field>
-        </div>
-
-        <Field>
-          <FieldLabel htmlFor="docNumber">Número de Documento (DNI)</FieldLabel>
-          <Input
-            id="docNumber"
-            disabled={isSubmitting}
-            aria-invalid={!!errors.docNumber}
-            {...register('docNumber')}
-          />
-          {errors.docNumber && <FieldError>{errors.docNumber.message}</FieldError>}
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="activation-email">Correo electrónico</FieldLabel>
-          <Input
-            id="activation-email"
-            type="email"
-            autoComplete="email"
-            disabled={isSubmitting}
-            aria-invalid={!!errors.email}
-            {...register('email')}
-          />
-          {errors.email && <FieldError>{errors.email.message}</FieldError>}
-        </Field>
-
         <Field>
           <FieldLabel htmlFor="newPassword">Nueva Contraseña</FieldLabel>
           <Input
             id="newPassword"
             type="password"
             autoComplete="new-password"
+            placeholder="Mínimo 8 caracteres"
             disabled={isSubmitting}
             aria-invalid={!!errors.newPassword}
             {...register('newPassword')}
@@ -143,6 +87,7 @@ export default function ActivateAccountForm() {
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
+            placeholder="Repetí la contraseña"
             disabled={isSubmitting}
             aria-invalid={!!errors.confirmPassword}
             {...register('confirmPassword')}
@@ -157,25 +102,23 @@ export default function ActivateAccountForm() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Validando y activando...
+                Activando cuenta...
               </>
             ) : (
-              'Activar Cuenta'
+              'Activar Cuenta y Continuar'
             )}
           </Button>
         </Field>
 
-        <Field>
-          <FieldDescription className="text-center pt-2">
-            ¿Ya activaste tu cuenta?{' '}
-            <Link
-              to="/"
-              className="font-medium text-primary underline underline-offset-4 hover:opacity-80"
-            >
-              Iniciar sesión
-            </Link>
-          </FieldDescription>
-        </Field>
+        <div className="text-center pt-2">
+          <button
+            type="button"
+            onClick={logout}
+            className="text-xs text-muted-foreground hover:underline"
+          >
+            Cerrar sesión e ingresar más tarde
+          </button>
+        </div>
       </FieldGroup>
     </form>
   );

@@ -22,9 +22,12 @@ export default function ProtectedRoute({
       </div>
     );
   }
-
   if (!user || !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
+  }
+
+  if (user.accountStatus === 'PENDING_ACTIVATION') {
+    return <Navigate to="/activar-cuenta" replace />;
   }
 
   // Agregar Suspense aquí
