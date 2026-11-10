@@ -142,6 +142,16 @@ export function ClassSessionCard({ cls, onToggleReservation, isSubmitting = fals
           <Button variant="secondary" size="sm" disabled className="text-sm font-semibold opacity-60">
             Agotado
           </Button>
+        ) : cls.canBook === false ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled
+            className="text-xs font-semibold opacity-60 max-w-[150px] truncate"
+            title={cls.bookingDisabledReason || 'No disponible para reserva'}
+          >
+            {cls.bookingDisabledReason || 'No disponible'}
+          </Button>
         ) : (
           <Button
             onClick={() => onToggleReservation(cls.id)}

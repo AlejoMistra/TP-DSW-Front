@@ -13,9 +13,11 @@ import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedul
 
 import { memberService } from '@/features/members/api/memberService';
 import type { Member } from '@/features/members/models/Member';
+import { membershipService } from '@/features/memberships/api/membershipService';
+import type { Membership } from '@/features/memberships/models/Membership';
 import { parseDateString, toLocalDateString } from '../lib/dateUtils';
 
-function generateNextDays(count: number = 14): ClassDateOption[] {
+function generateNextDays(count: number = 7): ClassDateOption[] {
   const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
   const months = [
     'Ene',
@@ -56,6 +58,38 @@ function generateNextDays(count: number = 14): ClassDateOption[] {
   return result;
 }
 
+export function getBookingEligibility(
+  member: Member | null,
+  membership: Membership | null,
+  sessionDateRaw: string | Date,
+): { canBook: boolean; reason?: string } {
+  if (!member || member.status !== 'ACTIVE') {
+    return { canBook: false, reason: 'Cuenta inactiva' };
+  }
+  if (!membership || membership.status !== 'ACTIVE') {
+    return { canBook: false, reason: 'Membresía inactiva' };
+  }
+
+  const now = new Date();
+  const membershipExpiry = new Date(membership.endDate);
+  membershipExpiry.setHours(23, 59, 59, 999);
+
+  if (membershipExpiry < now) {
+    return { canBook: false, reason: 'Membresía vencida' };
+  }
+
+  const sessionDate =
+    typeof sessionDateRaw === 'string'
+      ? parseDateString(sessionDateRaw)
+      : new Date(sessionDateRaw);
+
+  if (sessionDate > membershipExpiry) {
+    return { canBook: false, reason: 'Membresía no cubre la fecha' };
+  }
+
+  return { canBook: true };
+}
+
 function normalizeDateStr(rawDate: string | Date | undefined | null): string {
   if (!rawDate) return '';
   const d = typeof rawDate === 'string' ? parseDateString(rawDate) : rawDate;
@@ -63,7 +97,7 @@ function normalizeDateStr(rawDate: string | Date | undefined | null): string {
 }
 
 export function useMemberClasses() {
-  const dates = useMemo(() => generateNextDays(14), []);
+  const dates = useMemo(() => generateNextDays(7), []);
   const [selectedDate, setSelectedDate] = useState<string>(
     dates[0]?.fullDate || '',
   );
@@ -73,6 +107,7 @@ export function useMemberClasses() {
   const [schedules, setSchedules] = useState<ClassSchedule[]>([]);
   const [bookings, setBookings] = useState<ClassBooking[]>([]);
   const [currentMember, setCurrentMember] = useState<Member | null>(null);
+  const [membership, setMembership] = useState<Membership | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
@@ -82,17 +117,20 @@ export function useMemberClasses() {
 
       const [
         memberData,
+        membershipData,
         sessionsData,
         bookingsData,
         schedulesData,
       ] = await Promise.all([
         memberService.getMe(),
+        membershipService.getMyMembership().catch(() => null),
         classSessionService.getAll().catch(() => []),
         classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
       ]);
 
       setCurrentMember(memberData);
+      setMembership(membershipData);
       setBookings(bookingsData);
       setSchedules(schedulesData);
 
@@ -117,6 +155,12 @@ export function useMemberClasses() {
         const remainingCapacity =
           session.remainingCapacity ?? sched?.maxCapacity ?? 15;
 
+        const eligibility = getBookingEligibility(
+          memberData,
+          membershipData,
+          session.date,
+        );
+
         return {
           ...session,
           classSchedule: sched,
@@ -124,6 +168,8 @@ export function useMemberClasses() {
           remainingCapacity,
           isReserved: Boolean(userBooking),
           userBookingId: userBooking?.id ?? null,
+          canBook: eligibility.canBook,
+          bookingDisabledReason: eligibility.reason,
         };
       });
 
@@ -172,6 +218,20 @@ export function useMemberClasses() {
           ),
         );
       } else {
+        const eligibility = getBookingEligibility(
+          currentMember,
+          membership,
+          targetSession.date,
+        );
+        if (!eligibility.canBook) {
+          toast.error(
+            eligibility.reason
+              ? `No se puede reservar: ${eligibility.reason}`
+              : 'No podés reservar esta clase con tu estado actual',
+          );
+          return;
+        }
+
         if (targetSession.remainingCapacity <= 0) {
           toast.error('No hay cupos disponibles para esta clase');
           return;
@@ -245,6 +305,34 @@ export function useMemberClasses() {
       .length;
   }, [rawSessions, selectedDate]);
 
+  const isMemberActive = currentMember?.status === 'ACTIVE';
+  const isMembershipActive = Boolean(
+    membership &&
+      membership.status === 'ACTIVE' &&
+      new Date(membership.endDate).setHours(23, 59, 59, 999) >= Date.now(),
+  );
+
+  const membershipAlert = useMemo(() => {
+    if (loading || !currentMember) return null;
+    if (!isMemberActive) {
+      return {
+        type: 'error' as const,
+        title: 'Cuenta Inactiva',
+        message:
+          'Tu cuenta de socio se encuentra inactiva. Comunicate con administración para reactivarla.',
+      };
+    }
+    if (!membership || membership.status !== 'ACTIVE' || !isMembershipActive) {
+      return {
+        type: 'warning' as const,
+        title: 'Membresía Vencida o Inactiva',
+        message:
+          'Tu membresía no se encuentra vigente. Por favor renovala para poder reservar clases.',
+      };
+    }
+    return null;
+  }, [loading, currentMember, isMemberActive, membership, isMembershipActive]);
+
   return {
     dates,
     categories,
@@ -256,6 +344,10 @@ export function useMemberClasses() {
     bookings,
     loading,
     currentMember,
+    membership,
+    isMemberActive,
+    isMembershipActive,
+    membershipAlert,
     selectedDayTotalSessions,
     actionLoadingId,
     handleToggleReservation,
