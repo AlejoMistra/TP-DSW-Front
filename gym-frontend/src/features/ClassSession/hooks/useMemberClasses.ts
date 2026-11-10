@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
-import {
-  type ClassDateOption,
-  type ClassCategory,
-  type MemberClassSession,
-} from '../models/ClassSession';
 import { classSessionService } from '../api/classSessionService';
 import { classBookingService } from '@/features/classBooking/api/classBookingService';
-import type { ClassBooking } from '@/features/classBooking/models/ClassBooking';
 import { classScheduleService } from '@/features/classSchedule/api/classScheduleService';
+import type {
+  MemberClassSession,
+  ClassBooking,
+  ClassDateOption,
+  ClassCategory,
+} from '../models/ClassSession';
 import type { ClassSchedule } from '@/features/classSchedule/models/ClassSchedule';
 
 import { memberService } from '@/features/members/api/memberService';
@@ -71,7 +71,10 @@ export function getBookingEligibility(
   }
 
   const now = new Date();
-  const membershipExpiry = new Date(membership.endDate);
+  const membershipExpiry =
+    typeof membership.endDate === 'string'
+      ? parseDateString(membership.endDate)
+      : new Date(membership.endDate);
   membershipExpiry.setHours(23, 59, 59, 999);
 
   if (membershipExpiry < now) {
@@ -115,6 +118,9 @@ export function useMemberClasses() {
     try {
       setLoading(true);
 
+      const startDate = dates[0]?.fullDate;
+      const endDate = dates[dates.length - 1]?.fullDate;
+
       const [
         memberData,
         membershipData,
@@ -124,7 +130,7 @@ export function useMemberClasses() {
       ] = await Promise.all([
         memberService.getMe(),
         membershipService.getMyMembership().catch(() => null),
-        classSessionService.getAll().catch(() => []),
+        classSessionService.getAll({ startDate, endDate }).catch(() => []),
         classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
       ]);
@@ -179,7 +185,7 @@ export function useMemberClasses() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dates]);
 
   useEffect(() => {
     void loadData();
@@ -202,6 +208,12 @@ export function useMemberClasses() {
         await classBookingService.delete(targetSession.userBookingId);
         toast.success('Reserva cancelada con éxito');
 
+        const eligibility = getBookingEligibility(
+          currentMember,
+          membership,
+          targetSession.date,
+        );
+
         setBookings((prev) =>
           prev.filter((b) => b.id !== targetSession.userBookingId),
         );
@@ -213,6 +225,8 @@ export function useMemberClasses() {
                   isReserved: false,
                   userBookingId: null,
                   remainingCapacity: s.remainingCapacity + 1,
+                  canBook: eligibility.canBook,
+                  bookingDisabledReason: eligibility.reason,
                 }
               : s,
           ),
@@ -309,7 +323,10 @@ export function useMemberClasses() {
   const isMembershipActive = Boolean(
     membership &&
       membership.status === 'ACTIVE' &&
-      new Date(membership.endDate).setHours(23, 59, 59, 999) >= Date.now(),
+      (typeof membership.endDate === 'string'
+        ? parseDateString(membership.endDate)
+        : new Date(membership.endDate)
+      ).setHours(23, 59, 59, 999) >= Date.now(),
   );
 
   const membershipAlert = useMemo(() => {

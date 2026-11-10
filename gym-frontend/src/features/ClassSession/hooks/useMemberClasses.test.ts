@@ -43,6 +43,18 @@ describe('getBookingEligibility', () => {
     expect(result.reason).toBeUndefined();
   });
 
+  it('permite reservar el mismo día que vence la membresía aun con ISO UTC midnight', () => {
+    const today = new Date();
+    const todayStr = today.toISOString().slice(0, 10);
+    const todayMembership: Membership = {
+      ...activeMembership,
+      endDate: `${todayStr}T00:00:00.000Z`,
+    };
+    const result = getBookingEligibility(activeMember, todayMembership, todayStr);
+    expect(result.canBook).toBe(true);
+    expect(result.reason).toBeUndefined();
+  });
+
   it('bloquea reserva si el socio no existe o su estado es INACTIVE', () => {
     const inactiveMember: Member = { ...activeMember, status: 'INACTIVE' };
     const result = getBookingEligibility(inactiveMember, activeMembership, tomorrow.toISOString().slice(0, 10));

@@ -27,7 +27,13 @@ export default function ClassesPage() {
     <div>
       <div className="max-w-7xl mx-auto space-y-4">
         {membershipAlert && (
-          <div className="mx-4 md:mx-8 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-destructive flex items-start gap-3 shadow-xs">
+          <div
+            className={`mx-4 md:mx-8 rounded-2xl border p-4 flex items-start gap-3 shadow-xs ${
+              membershipAlert.type === 'warning'
+                ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                : 'border-destructive/30 bg-destructive/10 text-destructive'
+            }`}
+          >
             <AlertCircle className="size-5 shrink-0 mt-0.5" />
             <div>
               <h4 className="font-bold text-sm leading-tight">{membershipAlert.title}</h4>
