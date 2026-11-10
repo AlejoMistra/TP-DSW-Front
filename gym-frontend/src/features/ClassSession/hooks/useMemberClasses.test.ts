@@ -105,4 +105,22 @@ describe('getBookingEligibility', () => {
     expect(result.canBook).toBe(false);
     expect(result.reason).toBe('Error al verificar membresía');
   });
+
+  it('bloquea reserva si la fecha de la sesión es previa al inicio de la membresía (startDate futura)', () => {
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    const nextMonth = new Date();
+    nextMonth.setDate(nextMonth.getDate() + 30);
+
+    const futureMembership: Membership = {
+      ...activeMembership,
+      startDate: nextWeek.toISOString(),
+      endDate: nextMonth.toISOString(),
+    };
+
+    const result = getBookingEligibility(activeMember, futureMembership, tomorrow.toISOString().slice(0, 10));
+    expect(result.canBook).toBe(false);
+    expect(result.reason).toBe('Membresía aún no vigente');
+  });
 });

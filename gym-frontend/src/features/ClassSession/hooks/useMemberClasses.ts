@@ -101,6 +101,18 @@ export function getBookingEligibility(
       ? parseDateString(sessionDateRaw)
       : new Date(sessionDateRaw);
 
+  if (membership.startDate) {
+    const membershipStart =
+      typeof membership.startDate === 'string'
+        ? parseDateString(membership.startDate)
+        : new Date(membership.startDate);
+    membershipStart.setHours(0, 0, 0, 0);
+
+    if (sessionDate < membershipStart) {
+      return { canBook: false, reason: 'Membresía aún no vigente' };
+    }
+  }
+
   if (sessionDate > membershipExpiry) {
     return { canBook: false, reason: 'Membresía no cubre la fecha' };
   }
