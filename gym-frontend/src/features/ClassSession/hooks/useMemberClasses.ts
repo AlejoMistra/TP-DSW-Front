@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import axios from 'axios';
 import { toast } from 'sonner';
 import { classSessionService } from '../api/classSessionService';
 import { classBookingService } from '@/features/classBooking/api/classBookingService';
@@ -16,6 +17,16 @@ import type { Member } from '@/features/members/models/Member';
 import { membershipService } from '@/features/memberships/api/membershipService';
 import type { Membership } from '@/features/memberships/models/Membership';
 import { parseDateString, toLocalDateString } from '../lib/dateUtils';
+
+export interface MembershipAlertInfo {
+  type: 'error' | 'warning';
+  title: string;
+  message: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
 
 function generateNextDays(count: number = 7): ClassDateOption[] {
   const days = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
@@ -62,7 +73,11 @@ export function getBookingEligibility(
   member: Member | null,
   membership: Membership | null,
   sessionDateRaw: string | Date,
+  options?: { membershipFetchFailed?: boolean },
 ): { canBook: boolean; reason?: string } {
+  if (options?.membershipFetchFailed) {
+    return { canBook: false, reason: 'Error al verificar membresía' };
+  }
   if (!member || member.status !== 'ACTIVE') {
     return { canBook: false, reason: 'Cuenta inactiva' };
   }
@@ -111,25 +126,45 @@ export function useMemberClasses() {
   const [bookings, setBookings] = useState<ClassBooking[]>([]);
   const [currentMember, setCurrentMember] = useState<Member | null>(null);
   const [membership, setMembership] = useState<Membership | null>(null);
+  const [membershipError, setMembershipError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setMembershipError(false);
 
       const startDate = dates[0]?.fullDate;
       const endDate = dates[dates.length - 1]?.fullDate;
 
+      let membershipData: Membership | null = null;
+      let membershipFetchFailed = false;
+
+      const membershipPromise = membershipService
+        .getMyMembership()
+        .then((data) => {
+          membershipData = data;
+        })
+        .catch((err: unknown) => {
+          if (axios.isAxiosError(err) && err.response?.status === 404) {
+            // 404 confirmado: el socio existe pero no tiene membresía
+            membershipData = null;
+          } else {
+            // Error de red, 500, timeout, etc.
+            membershipFetchFailed = true;
+          }
+        });
+
       const [
         memberData,
-        membershipData,
+        _membershipResult,
         sessionsData,
         bookingsData,
         schedulesData,
       ] = await Promise.all([
         memberService.getMe(),
-        membershipService.getMyMembership().catch(() => null),
+        membershipPromise,
         classSessionService.getAll({ startDate, endDate }).catch(() => []),
         classBookingService.getMyBookings().catch(() => [] as ClassBooking[]),
         classScheduleService.getAll().catch(() => [] as ClassSchedule[]),
@@ -137,6 +172,7 @@ export function useMemberClasses() {
 
       setCurrentMember(memberData);
       setMembership(membershipData);
+      setMembershipError(membershipFetchFailed);
       setBookings(bookingsData);
       setSchedules(schedulesData);
 
@@ -165,6 +201,7 @@ export function useMemberClasses() {
           memberData,
           membershipData,
           session.date,
+          { membershipFetchFailed },
         );
 
         return {
@@ -197,6 +234,13 @@ export function useMemberClasses() {
       return;
     }
 
+    if (membershipError) {
+      toast.error(
+        'No se puede reservar: No se pudo verificar el estado de tu membresía. Por favor reintentá la carga.',
+      );
+      return;
+    }
+
     const targetSession = rawSessions.find((s) => s.id === sessionId);
     if (!targetSession) return;
 
@@ -212,6 +256,7 @@ export function useMemberClasses() {
           currentMember,
           membership,
           targetSession.date,
+          { membershipFetchFailed: membershipError },
         );
 
         setBookings((prev) =>
@@ -236,6 +281,7 @@ export function useMemberClasses() {
           currentMember,
           membership,
           targetSession.date,
+          { membershipFetchFailed: membershipError },
         );
         if (!eligibility.canBook) {
           toast.error(
@@ -329,26 +375,48 @@ export function useMemberClasses() {
       ).setHours(23, 59, 59, 999) >= Date.now(),
   );
 
-  const membershipAlert = useMemo(() => {
+  const membershipAlert = useMemo((): MembershipAlertInfo | null => {
     if (loading || !currentMember) return null;
     if (!isMemberActive) {
       return {
-        type: 'error' as const,
+        type: 'error',
         title: 'Cuenta Inactiva',
         message:
           'Tu cuenta de socio se encuentra inactiva. Comunicate con administración para reactivarla.',
       };
     }
+    if (membershipError) {
+      return {
+        type: 'error',
+        title: 'Error de verificación de membresía',
+        message:
+          'No se pudo verificar el estado de tu membresía debido a un problema de conexión.',
+        action: {
+          label: 'Reintentar',
+          onClick: () => {
+            void loadData();
+          },
+        },
+      };
+    }
     if (!membership || membership.status !== 'ACTIVE' || !isMembershipActive) {
       return {
-        type: 'warning' as const,
+        type: 'warning',
         title: 'Membresía Vencida o Inactiva',
         message:
           'Tu membresía no se encuentra vigente. Por favor renovala para poder reservar clases.',
       };
     }
     return null;
-  }, [loading, currentMember, isMemberActive, membership, isMembershipActive]);
+  }, [
+    loading,
+    currentMember,
+    isMemberActive,
+    membershipError,
+    membership,
+    isMembershipActive,
+    loadData,
+  ]);
 
   return {
     dates,
@@ -362,6 +430,7 @@ export function useMemberClasses() {
     loading,
     currentMember,
     membership,
+    membershipError,
     isMemberActive,
     isMembershipActive,
     membershipAlert,

@@ -97,4 +97,12 @@ describe('getBookingEligibility', () => {
     expect(result.canBook).toBe(false);
     expect(result.reason).toBe('Membresía no cubre la fecha');
   });
+
+  it('bloquea reserva si hubo un error de conexión al consultar la membresía (lookup failure)', () => {
+    const result = getBookingEligibility(activeMember, null, tomorrow.toISOString().slice(0, 10), {
+      membershipFetchFailed: true,
+    });
+    expect(result.canBook).toBe(false);
+    expect(result.reason).toBe('Error al verificar membresía');
+  });
 });
