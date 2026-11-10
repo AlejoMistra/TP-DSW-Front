@@ -88,6 +88,8 @@ export interface ClassSession {
 export interface MemberClassSession extends ClassSession {
   userBookingId?: number | null;
   isReserved: boolean;
+  canBook?: boolean;
+  bookingDisabledReason?: string;
 }
 
 export interface ClassBooking {

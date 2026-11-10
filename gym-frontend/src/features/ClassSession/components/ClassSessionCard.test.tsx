@@ -219,4 +219,55 @@ describe('ClassSessionCard', () => {
 
     expect(screen.getByText('Profe Carlos Gómez')).toBeInTheDocument()
   })
+
+  it('deshabilita el botón mostrando el motivo cuando canBook es false', async () => {
+    const user = userEvent.setup()
+    const onToggleReservation = vi.fn()
+    const classSession = createClassSession({
+      canBook: false,
+      bookingDisabledReason: 'Membresía vencida',
+    })
+
+    render(
+      <ClassSessionCard
+        cls={classSession}
+        onToggleReservation={onToggleReservation}
+      />,
+    )
+
+    const button = screen.getByRole('button', {
+      name: 'Membresía vencida',
+    })
+
+    expect(button).toBeDisabled()
+    await user.click(button)
+    expect(onToggleReservation).not.toHaveBeenCalled()
+  })
+
+  it('permite cancelar reserva aun si canBook es false pero el socio ya estaba anotado', async () => {
+    const user = userEvent.setup()
+    const onToggleReservation = vi.fn()
+    const classSession = createClassSession({
+      id: 42,
+      isReserved: true,
+      userBookingId: 99,
+      canBook: false,
+      bookingDisabledReason: 'Cuenta inactiva',
+    })
+
+    render(
+      <ClassSessionCard
+        cls={classSession}
+        onToggleReservation={onToggleReservation}
+      />,
+    )
+
+    const button = screen.getByRole('button', {
+      name: 'Cancelar Reserva',
+    })
+
+    expect(button).toBeEnabled()
+    await user.click(button)
+    expect(onToggleReservation).toHaveBeenCalledWith(42)
+  })
 })
